@@ -119,7 +119,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const getWhatsAppLink = () => {
     if (items.length === 0) return ""
 
-    const phoneNumber = "919876543210" // Replace with your actual WhatsApp business number
+    const phoneNumber = "919972122462" // Replace with your actual WhatsApp business number
 
     let message = "Hello, I would like to rent the following items:\n\n"
 

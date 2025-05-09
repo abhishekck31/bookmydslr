@@ -31,7 +31,7 @@ export function CheckoutSteps() {
     pincode: "",
     deliveryMethod: "standard",
   })
-  const { items, clearCart, totalAmount } = useCart()
+  const { items, clearCart, total } = useCart()
   const { toast } = useToast()
 
   const handleDeliveryInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -82,7 +82,7 @@ export function CheckoutSteps() {
 ----------------------------
 ${orderItems}
 ----------------------------
-*Total: ₹${totalAmount}*
+*Total: ₹${total}*
 
 *Customer Details:*
 Name: ${deliveryInfo.name}
@@ -92,7 +92,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
 `
 
     // Create WhatsApp link with pre-filled message
-    const whatsappNumber = "919876543210" // Replace with your actual WhatsApp business number
+    const whatsappNumber = "919972122462" // Replace with your actual WhatsApp business number
     const encodedMessage = encodeURIComponent(orderDetails)
     const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
 
@@ -197,7 +197,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                 <div className="border-t pt-4">
                   <div className="flex justify-between mb-2">
                     <span>Subtotal</span>
-                    <span>₹{totalAmount}</span>
+                    <span>₹{total}</span>
                   </div>
                   <div className="flex justify-between mb-2">
                     <span>Delivery Fee</span>
@@ -205,7 +205,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                   </div>
                   <div className="flex justify-between font-bold pt-2 border-t">
                     <span>Total</span>
-                    <span>₹{totalAmount + 200}</span>
+                    <span>₹{total + 200}</span>
                   </div>
                 </div>
 
@@ -366,7 +366,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
               <div className="border-t pt-2 mt-2">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
-                  <span>₹{totalAmount}</span>
+                  <span>₹{total}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Delivery Fee</span>
@@ -374,7 +374,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                 </div>
                 <div className="flex justify-between font-bold mt-2 pt-2 border-t">
                   <span>Total</span>
-                  <span>₹{totalAmount + (deliveryInfo.deliveryMethod === "express" ? 200 : 0)}</span>
+                  <span>₹{total + (deliveryInfo.deliveryMethod === "express" ? 200 : 0)}</span>
                 </div>
               </div>
             </div>
