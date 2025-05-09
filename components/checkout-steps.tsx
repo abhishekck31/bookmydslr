@@ -92,7 +92,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
 `
 
     // Create WhatsApp link with pre-filled message
-    const whatsappNumber = "919972122462" // Replace with your actual WhatsApp business number
+    const whatsappNumber = "919972122462" // This is already correct
     const encodedMessage = encodeURIComponent(orderDetails)
     const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
 

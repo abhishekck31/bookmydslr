@@ -24,6 +24,21 @@ const allProducts = [
   ...accessories.map((accessory) => ({ ...accessory, productType: "accessory" })),
 ]
 
+// Add this type at the top of your file
+type Product = {
+  productType: string
+  id: number | string
+  name: string
+  brand?: string
+  price: number
+  description: string
+  type: string
+  image: string
+  available: boolean
+  rating?: number
+  reviews?: number
+}
+
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { toast } = useToast()
@@ -34,7 +49,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   // Find the product by ID (try both string and number comparison)
   const productId = params.id
-  const product = allProducts.find((p) => p.id.toString() === productId || p.id === Number.parseInt(productId))
+  const product = allProducts.find((p) => p.id.toString() === productId || p.id === Number.parseInt(productId)) as Product
 
   // If product not found, redirect to products page instead of showing 404
   if (!product) {
@@ -63,7 +78,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     // Format WhatsApp message
     const message = `Hi, I'm interested in renting the ${product.name} for ${rentalDays} days starting from ${pickupDate}. Is it available?`
     const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`
+    const whatsappUrl = `https://wa.me/919972122462?text=${encodedMessage}`
     window.open(whatsappUrl, "_blank")
   }
 
