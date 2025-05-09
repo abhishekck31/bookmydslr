@@ -46,7 +46,7 @@ export default function LensDetailPage({ params }: { params: { id: string } }) {
     // Format WhatsApp message
     const message = `Hi, I'm interested in renting the ${lens.name} for ${rentalDays} days. Is it available?`
     const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`
+    const whatsappUrl = `https://wa.me/919972122462?text=${encodedMessage}`
     window.open(whatsappUrl, "_blank")
   }
 

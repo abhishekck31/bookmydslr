@@ -69,7 +69,7 @@ Total: ₹${total}
 
     // Encode for WhatsApp
     const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`
+    const whatsappUrl = `https://wa.me/919972122462?text=${encodedMessage}`
 
     // Open WhatsApp
     window.open(whatsappUrl, "_blank")
