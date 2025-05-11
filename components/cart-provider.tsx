@@ -34,9 +34,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const savedCart = localStorage.getItem("cart")
     if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart))
+        // Only load items that were explicitly added by the user
+        const parsedCart = JSON.parse(savedCart)
+        if (Array.isArray(parsedCart)) {
+          setItems(parsedCart)
+        }
       } catch (e) {
         console.error("Failed to parse cart from localStorage")
+        // Clear invalid cart data
+        localStorage.removeItem("cart")
       }
     }
   }, [])
@@ -45,6 +51,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (items.length > 0) {
       localStorage.setItem("cart", JSON.stringify(items))
+    } else {
+      localStorage.removeItem("cart")
     }
   }, [items])
 

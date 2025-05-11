@@ -23,7 +23,7 @@ export default function HowItWorksPage() {
 
       {/* Process Steps */}
       <section className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 gap-12">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">1. Browse & Select</h2>
             <p className="text-muted-foreground mb-6">
@@ -39,15 +39,7 @@ export default function HowItWorksPage() {
               ))}
             </ul>
           </div>
-          <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-            <Image src="/placeholder.svg?height=400&width=600" alt="Browse cameras" fill className="object-cover" />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mt-16 md:mt-24">
-          <div className="relative h-64 md:h-80 rounded-lg overflow-hidden order-1 md:order-none">
-            <Image src="/placeholder.svg?height=400&width=600" alt="Book and pay" fill className="object-cover" />
-          </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">2. Book & Pay</h2>
             <p className="text-muted-foreground mb-6">
@@ -63,9 +55,7 @@ export default function HowItWorksPage() {
               ))}
             </ul>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mt-16 md:mt-24">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">3. Receive Equipment</h2>
             <p className="text-muted-foreground mb-6">
@@ -81,15 +71,7 @@ export default function HowItWorksPage() {
               ))}
             </ul>
           </div>
-          <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-            <Image src="/placeholder.svg?height=400&width=600" alt="Receive equipment" fill className="object-cover" />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mt-16 md:mt-24">
-          <div className="relative h-64 md:h-80 rounded-lg overflow-hidden order-1 md:order-none">
-            <Image src="/placeholder.svg?height=400&width=600" alt="Return equipment" fill className="object-cover" />
-          </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">4. Return</h2>
             <p className="text-muted-foreground mb-6">
