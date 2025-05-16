@@ -541,7 +541,7 @@ export default function AccessoriesPage() {
                                 <Star
                                   key={i}
                                   className={`h-4 w-4 ${i < ((accessory as any).rating ?? 0) ? "fill-amber-500 text-amber-500" : "text-gray-300"
-                                    }`}
+                                  }`}
                                 />
                               ))}
                           </div>

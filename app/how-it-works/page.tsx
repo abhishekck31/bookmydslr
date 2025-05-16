@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
                 </li>
               ))}
             </ul>
-          </div>
+        </div>
 
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">2. Book & Pay</h2>
@@ -54,7 +54,7 @@ export default function HowItWorksPage() {
                 </li>
               ))}
             </ul>
-          </div>
+        </div>
 
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">3. Receive Equipment</h2>
@@ -70,7 +70,7 @@ export default function HowItWorksPage() {
                 </li>
               ))}
             </ul>
-          </div>
+        </div>
 
           <div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4">4. Return</h2>

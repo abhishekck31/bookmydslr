@@ -495,7 +495,7 @@ export default function ProductsPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-12">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 overflow-x-auto">
                 <Button
                   variant="outline"
                   size="icon"
@@ -505,21 +505,32 @@ export default function ProductsPage() {
                 >
                   &lt;
                 </Button>
-                {[...Array(totalPages)].map((_, idx) => (
-                  <Button
-                    key={idx}
-                    variant="outline"
-                    size="sm"
-                    className={
-                      currentPage === idx + 1
-                        ? "bg-gradient-to-r from-amber-500 to-yellow-300 text-black border-amber-500"
-                        : "border-amber-200 hover:border-amber-500 hover:text-amber-500"
-                    }
-                    onClick={() => setCurrentPage(idx + 1)}
-                  >
-                    {idx + 1}
-                  </Button>
-                ))}
+                {/* Responsive Pagination Logic */}
+                {(() => {
+                  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+                  const maxVisible = isMobile ? 5 : totalPages;
+                  let start = Math.max(1, currentPage - 2);
+                  let end = Math.min(totalPages, start + maxVisible - 1);
+                  if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
+                  return Array.from({ length: end - start + 1 }).map((_, idx) => {
+                    const pageNum = start + idx;
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant="outline"
+                        size="sm"
+                        className={
+                          currentPage === pageNum
+                            ? "bg-gradient-to-r from-amber-500 to-yellow-300 text-black border-amber-500"
+                            : "border-amber-200 hover:border-amber-500 hover:text-amber-500"
+                        }
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  });
+                })()}
                 <Button
                   variant="outline"
                   size="icon"

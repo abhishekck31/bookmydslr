@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/favicon_io/site.webmanifest',
-  generator: 'v0.dev'
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
