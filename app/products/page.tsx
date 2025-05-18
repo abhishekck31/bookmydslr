@@ -140,7 +140,7 @@ export default function ProductsPage() {
     <div className="container py-8">
       <div className="flex flex-col md:flex-row justify-between items-start gap-8">
         {/* Filters - Desktop */}
-        <div className="hidden md:block w-64 space-y-6">
+        <div className="hidden md:block w-64 space-y-6 bg-white rounded-xl shadow p-6">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Filters</h2>
@@ -149,7 +149,7 @@ export default function ProductsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={clearFilters}
-                  className="text-amber-500 hover:text-amber-600"
+                  className="text-amber-500 hover:text-amber-600 font-semibold px-0"
                 >
                   Clear All
                 </Button>
@@ -174,69 +174,67 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="category">
-                  <AccordionTrigger className="text-sm font-medium py-2">Category</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-1 max-h-60 overflow-y-auto">
-                      {categories.map((category) => (
-                        <div key={category} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`category-${category}`}
-                            checked={selectedCategories.includes(category)}
-                            onCheckedChange={() => toggleCategory(category)}
-                            className="text-amber-500 border-amber-200 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
-                          />
-                          <Label htmlFor={`category-${category}`} className="text-sm font-normal cursor-pointer">
-                            {category}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+              <hr className="my-4 border-gray-200" />
 
-                <AccordionItem value="brand">
-                  <AccordionTrigger className="text-sm font-medium py-2">Brand</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-1">
-                      {brands.map((brand) => (
-                        <div key={brand} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`brand-${brand}`}
-                            checked={selectedBrands.includes(brand)}
-                            onCheckedChange={() => toggleBrand(brand)}
-                            className="text-amber-500 border-amber-200 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
-                          />
-                          <Label htmlFor={`brand-${brand}`} className="text-sm font-normal cursor-pointer">
-                            {brand}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="price-range">
-                  <AccordionTrigger className="text-sm font-medium py-2">Price Range (per day)</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-4 pt-2">
-                      <Slider
-                        value={priceRange}
-                        min={0}
-                        max={3000}
-                        step={100}
-                        onValueChange={setPriceRange}
-                        className="[&>span]:bg-amber-500"
+              <div className="mt-6">
+                <h3 className="text-base font-semibold mb-2">Category</h3>
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                  {categories.map((category) => (
+                    <div key={category} className="flex items-center space-x-3 py-1">
+                      <Checkbox
+                        id={`category-${category}`}
+                        checked={selectedCategories.includes(category)}
+                        onCheckedChange={() => toggleCategory(category)}
+                        className="w-5 h-5 text-amber-500 border-amber-200 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
                       />
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">₹{priceRange[0]}</span>
-                        <span className="text-sm">₹{priceRange[1]}</span>
-                      </div>
+                      <Label htmlFor={`category-${category}`} className="text-base font-normal cursor-pointer">
+                        {category}
+                      </Label>
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                  ))}
+                </div>
+              </div>
+
+              <hr className="my-4 border-gray-200" />
+
+              <div className="mt-6">
+                <h3 className="text-base font-semibold mb-2">Brand</h3>
+                <div className="space-y-2">
+                  {brands.map((brand) => (
+                    <div key={brand} className="flex items-center space-x-3 py-1">
+                      <Checkbox
+                        id={`brand-${brand}`}
+                        checked={selectedBrands.includes(brand)}
+                        onCheckedChange={() => toggleBrand(brand)}
+                        className="w-5 h-5 text-amber-500 border-amber-200 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                      />
+                      <Label htmlFor={`brand-${brand}`} className="text-base font-normal cursor-pointer">
+                        {brand}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <hr className="my-4 border-gray-200" />
+
+              <div className="mt-6">
+                <h3 className="text-base font-semibold mb-2">Price Range (per day)</h3>
+                <div className="space-y-4 pt-2">
+                  <Slider
+                    value={priceRange}
+                    min={0}
+                    max={3000}
+                    step={100}
+                    onValueChange={setPriceRange}
+                    className="[&>span]:bg-amber-500"
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">₹{priceRange[0]}</span>
+                    <span className="text-sm">₹{priceRange[1]}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -434,12 +432,13 @@ export default function ProductsPage() {
                 >
                   <Link href={`/product/${product.id}`}>
                     <Card className="h-full overflow-hidden transition-all hover:shadow-lg group">
-                      <div className="relative h-48">
+                      <div className="flex justify-center items-center w-60 h-40 mx-auto bg-white rounded-lg overflow-hidden">
                         <Image
-                          src={product.image || "/placeholder.svg"}
+                          src={String((product as any).image ?? "/placeholder.svg")}
                           alt={product.name}
-                          fill
-                          className="object-cover transition-transform group-hover:scale-105 duration-300"
+                          width={220}
+                          height={150}
+                          className="object-contain rounded-lg"
                         />
                         {("isNew" in product && product.isNew) as React.ReactNode && (
                           <Badge className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-yellow-300 text-black hover:from-amber-600 hover:to-yellow-400">
@@ -470,7 +469,7 @@ export default function ProductsPage() {
                         <div className="flex justify-between items-center">
                           <p className="font-bold text-amber-600">₹{product.price}/day</p>
                           <Badge variant="outline" className="border-amber-500 text-amber-500">
-                            {product.category}
+                            {String((product as any).category ?? "")}
                           </Badge>
                         </div>
                       </CardContent>
@@ -505,15 +504,29 @@ export default function ProductsPage() {
                 >
                   &lt;
                 </Button>
-                {/* Responsive Pagination Logic */}
+                {/* Custom Pagination Logic: show max 10, with ellipsis */}
                 {(() => {
-                  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
-                  const maxVisible = isMobile ? 5 : totalPages;
-                  let start = Math.max(1, currentPage - 2);
-                  let end = Math.min(totalPages, start + maxVisible - 1);
-                  if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-                  return Array.from({ length: end - start + 1 }).map((_, idx) => {
-                    const pageNum = start + idx;
+                  const maxVisible = 10;
+                  let pages = [];
+                  if (totalPages <= maxVisible) {
+                    for (let i = 1; i <= totalPages; i++) {
+                      pages.push(i);
+                    }
+                  } else {
+                    if (currentPage <= 6) {
+                      pages = [1,2,3,4,5,6,7,'...',totalPages];
+                    } else if (currentPage >= totalPages - 5) {
+                      pages = [1,'...',totalPages-6,totalPages-5,totalPages-4,totalPages-3,totalPages-2,totalPages-1,totalPages];
+                    } else {
+                      pages = [1,'...',currentPage-2,currentPage-1,currentPage,currentPage+1,currentPage+2,'...',totalPages];
+                    }
+                  }
+                  return pages.map((pageNum, idx) => {
+                    if (pageNum === '...') {
+                      return (
+                        <span key={"ellipsis-"+idx} className="px-2 text-gray-400">...</span>
+                      );
+                    }
                     return (
                       <Button
                         key={pageNum}
@@ -524,7 +537,7 @@ export default function ProductsPage() {
                             ? "bg-gradient-to-r from-amber-500 to-yellow-300 text-black border-amber-500"
                             : "border-amber-200 hover:border-amber-500 hover:text-amber-500"
                         }
-                        onClick={() => setCurrentPage(pageNum)}
+                        onClick={() => setCurrentPage(pageNum as number)}
                       >
                         {pageNum}
                       </Button>
