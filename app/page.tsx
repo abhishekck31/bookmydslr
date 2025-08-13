@@ -13,7 +13,38 @@ import { motion } from "framer-motion"
 import { cameras } from "@/data/cameras"
 import { lenses } from "@/data/lenses"
 import { accessories } from "@/data/accessories"
-
+export const metadata = {
+  title: "Book My DSLR - Camera & Lens Rental in Bangalore | Koramangala, Indiranagar, Whitefield & More",
+  description: "Rent cameras, lenses, and accessories in Bangalore. Fast delivery to Koramangala, Indiranagar, Whitefield, Jayanagar, HSR Layout, and all major Bangalore locations.",
+  keywords: [
+    "camera rental Bangalore",
+    "lens rental Bangalore",
+    "DSLR rental",
+    "Koramangala",
+    "Indiranagar",
+    "Whitefield",
+    "Jayanagar",
+    "HSR Layout",
+    "Marathahalli",
+    "BTM",
+    "Malleshwaram",
+    "Rajajinagar"
+  ],
+  openGraph: {
+    title: "Book My DSLR - Camera & Lens Rental in Bangalore",
+    description: "Rent cameras, lenses, and accessories in all Bangalore locations. Fast delivery and best prices.",
+    url: "https://yourdomain.com/",
+    type: "website",
+    images: [
+      {
+        url: "https://yourdomain.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Book My DSLR Bangalore"
+      }
+    ]
+  }
+}
 export default function HomePage() {
   // Get featured items
   const featuredCameras = cameras.filter((camera) => "featured" in camera && camera.featured).slice(0, 4)
