@@ -209,7 +209,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               {rentalDays >= 3 && (
                 <div className="bg-green-100 border border-green-300 rounded-lg p-3 text-center">
                   <p className="text-green-800 font-medium text-sm">
-                    🎉 Rent for 3 or more days get 20% off!
+                    {rentalDays >= 10 ? (
+                      "🎉 For bookings of 10+ days, we have exclusive rates! Get in touch with us directly on WhatsApp to unlock your special discount"
+                    ) : rentalDays >= 7 ? (
+                      "🎉 Book for 7 to 9 days and save 25%!"
+                    ) : (
+                      "🎉 Book for 3 to 6 days and save 20%!"
+                    )}
                   </p>
                 </div>
               )}
@@ -219,12 +225,26 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <p className="font-medium mb-2">Total Rental Cost:</p>
               {rentalDays >= 3 ? (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-lg text-gray-500 line-through">₹{product.price * rentalDays}</p>
-                    <p className="text-xl font-bold text-amber-600">₹{Math.round(product.price * rentalDays * 0.8)}</p>
-                  </div>
-                  <p className="text-sm text-green-600 font-medium">20% discount applied!</p>
-                  <p className="text-sm text-gray-500">For {rentalDays} days</p>
+                  {rentalDays >= 10 ? (
+                    <div>
+                      <p className="text-lg text-gray-500 line-through">₹{product.price * rentalDays}</p>
+                      <p className="text-sm text-blue-600 font-medium">Contact us for exclusive rates!</p>
+                      <p className="text-sm text-gray-500">For {rentalDays} days</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <p className="text-lg text-gray-500 line-through">₹{product.price * rentalDays}</p>
+                        <p className="text-xl font-bold text-amber-600">
+                          ₹{Math.round(product.price * rentalDays * (rentalDays >= 7 ? 0.75 : 0.8))}
+                        </p>
+                      </div>
+                      <p className="text-sm text-green-600 font-medium">
+                        {rentalDays >= 7 ? "25% discount applied!" : "20% discount applied!"}
+                      </p>
+                      <p className="text-sm text-gray-500">For {rentalDays} days</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div>

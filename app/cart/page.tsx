@@ -92,19 +92,29 @@ export default function CartPage() {
 
     const [itemDates, setItemDates] = useState(initialDates);
 
-    // --- NEW: Price Calculation Logic with 20% Discount on Total ---
+    // --- NEW: Price Calculation Logic with Progressive Discount ---
     const calculateItemPrice = (item: typeof items[0], calculatedDays: number) => {
         if (calculatedDays <= 0) return 0;
         
         // 1. Calculate the base total price (original daily rate * total days)
         const baseTotal = item.price * calculatedDays;
         
-        // 2. Determine if discount applies
+        // 2. Determine if discount applies and which tier
         const isDiscounted = calculatedDays >= DISCOUNT_THRESHOLD_DAYS;
         
-        // 3. Apply 20% discount to the total order price if threshold is met
+        // 3. Apply progressive discount based on rental duration
         if (isDiscounted) {
-            const discountedTotal = baseTotal * (1 - DISCOUNT_PERCENTAGE); 
+            let discountRate = 0.2; // Default 20% for 3-6 days
+            
+            if (calculatedDays >= 10) {
+                // For 10+ days, show original price but indicate special rates
+                return baseTotal;
+            } else if (calculatedDays >= 7) {
+                // 25% discount for 7-9 days
+                discountRate = 0.25;
+            }
+            
+            const discountedTotal = baseTotal * (1 - discountRate); 
             // Round to the nearest whole number for currency
             return Math.round(discountedTotal);
         }
@@ -290,7 +300,13 @@ Total: ₹${finalTotal}
                           </p>
                           {isDiscounted && (
                             <p className="text-xs text-green-600 font-semibold mt-1">
-                              20% Discount Applied! (-₹{discountAmount})
+                              {calculatedDays >= 10 ? (
+                                "Contact us for exclusive rates! (-₹" + discountAmount + ")"
+                              ) : calculatedDays >= 7 ? (
+                                "25% Discount Applied! (-₹" + discountAmount + ")"
+                              ) : (
+                                "20% Discount Applied! (-₹" + discountAmount + ")"
+                              )}
                             </p>
                           )}
                           
