@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/components/cart-provider"
+import { useCartGlow } from "@/components/cart-glow-provider"
 
 // Import all product data
 import { cameras } from "@/data/cameras"
@@ -43,9 +44,22 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const router = useRouter()
   const { toast } = useToast()
   const { addItem } = useCart()
+  const { triggerCartGlow } = useCartGlow()
 
-  const [rentalDays, setRentalDays] = useState(3)
   const [pickupDate, setPickupDate] = useState<string>(new Date(Date.now() + 86400000).toISOString().split("T")[0])
+  const [returnDate, setReturnDate] = useState<string>(new Date(Date.now() + 4 * 86400000).toISOString().split("T")[0])
+  const [rentalDays, setRentalDays] = useState(3)
+
+  // Calculate rental days based on date difference
+  useEffect(() => {
+    if (pickupDate && returnDate) {
+      const pickup = new Date(pickupDate)
+      const returnD = new Date(returnDate)
+      const diffTime = returnD.getTime() - pickup.getTime()
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      setRentalDays(Math.max(1, diffDays))
+    }
+  }, [pickupDate, returnDate])
 
   // Find the product by ID (try both string and number comparison)
   const productId = params.id
@@ -59,8 +73,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   }
 
   const handleAddToCart = () => {
+    const productId = typeof product.id === "string" ? Number.parseInt(product.id.replace(/\D/g, "")) : product.id;
+    
     addItem({
-      id: typeof product.id === "string" ? Number.parseInt(product.id.replace(/\D/g, "")) : product.id,
+      id: productId,
       name: product.name,
       price: product.price,
       image: product.image || "/placeholder.svg?height=200&width=200",
@@ -68,15 +84,25 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       category: product.productType + "s",
     })
 
+    // Save selected dates to localStorage
+    const dates = {
+      pickup: pickupDate,
+      return: returnDate
+    };
+    localStorage.setItem(`rental-dates-${productId}`, JSON.stringify(dates));
+
     toast({
       title: "Added to cart",
       description: `${product.name} has been added to your cart for ${rentalDays} days.`,
     })
+
+    // Trigger cart glow effect
+    triggerCartGlow()
   }
 
   const handleWhatsAppInquiry = () => {
     // Format WhatsApp message
-    const message = `Hi, I'm interested in renting the ${product.name} for ${rentalDays} days starting from ${pickupDate}. Is it available?`
+    const message = `Hi, I'm interested in renting the ${product.name} for ${rentalDays} days from ${pickupDate} to ${returnDate}. Is it available?`
     const encodedMessage = encodeURIComponent(message)
     const whatsappUrl = `https://wa.me/919972122462?text=${encodedMessage}`
     window.open(whatsappUrl, "_blank")
@@ -144,25 +170,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <p className="text-gray-700">{product.fullDescription || product.description}</p>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="rental-days" className="block text-sm font-medium mb-1">
-                  Rental Duration
-                </label>
-                <select
-                  id="rental-days"
-                  className="w-full border rounded-md p-2"
-                  value={rentalDays}
-                  onChange={(e) => setRentalDays(Number.parseInt(e.target.value, 10))}
-                >
-                  <option value="1">1 Day</option>
-                  <option value="2">2 Days</option>
-                  <option value="3">3 Days</option>
-                  <option value="7">1 Week</option>
-                  <option value="14">2 Weeks</option>
-                  <option value="30">1 Month</option>
-                </select>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="pickup-date" className="block text-sm font-medium mb-1">
                   Pickup Date
@@ -179,12 +187,51 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   />
                 </div>
               </div>
+              <div>
+                <label htmlFor="return-date" className="block text-sm font-medium mb-1">
+                  Return Date
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="date"
+                    id="return-date"
+                    className="w-full border rounded-md p-2 pl-10"
+                    min={pickupDate}
+                    value={returnDate}
+                    onChange={(e) => setReturnDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center">
+              {rentalDays >= 3 && (
+                <div className="bg-green-100 border border-green-300 rounded-lg p-3 text-center">
+                  <p className="text-green-800 font-medium text-sm">
+                    🎉 Rent for 3 or more days get 20% off!
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="pt-4">
               <p className="font-medium mb-2">Total Rental Cost:</p>
-              <p className="text-xl font-bold text-amber-600">₹{product.price * rentalDays}</p>
-              <p className="text-sm text-gray-500">For {rentalDays} days</p>
+              {rentalDays >= 3 ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg text-gray-500 line-through">₹{product.price * rentalDays}</p>
+                    <p className="text-xl font-bold text-amber-600">₹{Math.round(product.price * rentalDays * 0.8)}</p>
+                  </div>
+                  <p className="text-sm text-green-600 font-medium">20% discount applied!</p>
+                  <p className="text-sm text-gray-500">For {rentalDays} days</p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-xl font-bold text-amber-600">₹{product.price * rentalDays}</p>
+                  <p className="text-sm text-gray-500">For {rentalDays} days</p>
+                </div>
+              )}
             </div>
 
             <Button

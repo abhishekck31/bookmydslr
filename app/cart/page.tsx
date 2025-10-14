@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ChevronLeft, Trash2, ShoppingBag } from "lucide-react"
@@ -14,6 +13,37 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useCart } from "@/components/cart-provider"
+
+// --- CONSTANTS ---
+const DISCOUNT_THRESHOLD_DAYS = 3;
+const DISCOUNT_PERCENTAGE = 0.20; // 20% total discount
+
+// --- Helper function for date formatting ---
+const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A"
+    return new Date(dateString).toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    })
+}
+
+// --- Helper function to calculate rental days ---
+const calculateRentalDays = (pickup: string, returns: string): number => {
+    if (!pickup || !returns) return 0;
+
+    const pDate = new Date(pickup);
+    const rDate = new Date(returns);
+
+    if (rDate > pDate) {
+        const timeDiff = rDate.getTime() - pDate.getTime();
+        // Calculate difference in full days, add 1 to count the return day
+        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; 
+        return diffDays;
+    }
+    return 0;
+}
+
 
 export default function CartPage() {
   const { items, removeItem, updateItemDays, clearCart } = useCart()
@@ -28,10 +58,101 @@ export default function CartPage() {
     notes: "",
   })
 
-  // Calculate subtotal
-  const subtotal = items.reduce((total, item) => total + item.price * item.days, 0)
+    // --- State Initialization ---
+    const today = new Date().toISOString().split('T')[0];
+    
+    const initialDates = useMemo(() => {
+        const dates: { [key: string]: { pickup: string, return: string } } = {};
+        items.forEach(item => {
+            // Try to get dates from localStorage if they exist
+            const storedDates = localStorage.getItem(`rental-dates-${item.id}`);
+            if (storedDates) {
+                try {
+                    const parsedDates = JSON.parse(storedDates);
+                    dates[item.id] = parsedDates;
+                } catch (e) {
+                    // Fallback to default dates
+                    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                    dates[item.id] = { 
+                        pickup: today, 
+                        return: tomorrow 
+                    };
+                }
+            } else {
+                // Default dates
+                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                dates[item.id] = { 
+                    pickup: today, 
+                    return: tomorrow 
+                };
+            }
+        });
+        return dates;
+    }, [items]);
+
+    const [itemDates, setItemDates] = useState(initialDates);
+
+    // --- NEW: Price Calculation Logic with 20% Discount on Total ---
+    const calculateItemPrice = (item: typeof items[0], calculatedDays: number) => {
+        if (calculatedDays <= 0) return 0;
+        
+        // 1. Calculate the base total price (original daily rate * total days)
+        const baseTotal = item.price * calculatedDays;
+        
+        // 2. Determine if discount applies
+        const isDiscounted = calculatedDays >= DISCOUNT_THRESHOLD_DAYS;
+        
+        // 3. Apply 20% discount to the total order price if threshold is met
+        if (isDiscounted) {
+            const discountedTotal = baseTotal * (1 - DISCOUNT_PERCENTAGE); 
+            // Round to the nearest whole number for currency
+            return Math.round(discountedTotal);
+        }
+        
+        return baseTotal;
+    };
+    
+    // --- Centralized Subtotal Calculation ---
+    const subtotal = useMemo(() => {
+        return items.reduce((totalSum, item) => {
+            const dates = itemDates[item.id] || { pickup: today, return: '' };
+            const days = calculateRentalDays(dates.pickup, dates.return);
+            
+            const itemTotal = calculateItemPrice(item, days);
+            
+            return totalSum + itemTotal;
+        }, 0);
+    }, [items, itemDates]); // Dependency on itemDates ensures price updates when dates change
+    
   const deliveryFee = deliveryMethod === "delivery" ? 200 : 0
-  const total = subtotal + deliveryFee
+    const finalTotal = subtotal + deliveryFee
+
+
+    // --- Handle Date Change ---
+    const handleDateChange = useCallback((itemId: string, dateType: 'pickup' | 'return', dateValue: string) => {
+        setItemDates(prevDates => {
+            const updatedDates = { 
+                ...prevDates, 
+                [itemId]: { 
+                    ...prevDates[itemId], 
+                    [dateType]: dateValue 
+                } 
+            };
+            
+            const { pickup, return: returns } = updatedDates[itemId];
+            const calculatedDays = calculateRentalDays(pickup, returns);
+            
+            // Save dates to localStorage
+            localStorage.setItem(`rental-dates-${itemId}`, JSON.stringify(updatedDates[itemId]));
+            
+            // Update the cart context with the new calculated days.
+            if (calculatedDays >= 0) { 
+                 updateItemDays(Number(itemId), calculatedDays);
+            }
+
+            return updatedDates;
+        });
+    }, [updateItemDays]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -39,10 +160,31 @@ export default function CartPage() {
   }
 
   const handleCheckout = () => {
+      // Basic Validation
+      const invalidDates = items.some(item => {
+          const { pickup, return: returns } = itemDates[item.id] || {};
+          const days = calculateRentalDays(pickup, returns);
+          return days <= 0;
+      });
+
+      if (invalidDates) {
+        alert("Please select valid Pickup and Return dates for all items where the return date is after the pickup date.");
+        return;
+      }
+      
     // Format cart items for WhatsApp message
     const itemsList = items
-      .map((item) => `• ${item.name} - ₹${item.price}/day x ${item.days} days = ₹${item.price * item.days}`)
-      .join("\n")
+        .map(item => {
+            const dates = itemDates[item.id] || {};
+            const days = calculateRentalDays(dates.pickup, dates.return);
+            const isDiscounted = days >= DISCOUNT_THRESHOLD_DAYS;
+            const baseTotal = item.price * days;
+            const finalTotal = calculateItemPrice(item, days);
+            const discountAmount = baseTotal - finalTotal;
+            
+            return `• ${item.name}\n  - Dates: ${formatDate(dates.pickup)} to ${formatDate(dates.return)} (${days} days)\n  - Base Total: ₹${baseTotal}\n  - Discount: ${isDiscounted ? `20% OFF (-₹${discountAmount})` : 'None'}\n  - Final Price: ₹${finalTotal}`;
+        })
+        .join("\n\n")
 
     // Format customer info
     const customerDetails = `
@@ -61,7 +203,7 @@ ${customerInfo.notes ? `Notes: ${customerInfo.notes}` : ""}
     const orderSummary = `
 Subtotal: ₹${subtotal}
 ${deliveryMethod === "delivery" ? `Delivery Fee: ₹${deliveryFee}` : ""}
-Total: ₹${total}
+Total: ₹${finalTotal}
 `
 
     // Combine all parts
@@ -107,8 +249,17 @@ Total: ₹${total}
           <Card>
             <CardContent className="p-6">
               <div className="space-y-6">
-                {items.map((item) => (
-                  <div key={`${item.category}-${item.id}`} className="flex gap-4 py-4 border-b last:border-0">
+                  {items.map((item) => {
+                    const dates = itemDates[item.id] || { pickup: today, return: "" };
+                    const calculatedDays = calculateRentalDays(dates.pickup, dates.return);
+                    const isDiscounted = calculatedDays >= DISCOUNT_THRESHOLD_DAYS;
+                    
+                    const baseTotal = item.price * calculatedDays;
+                    const itemTotal = calculateItemPrice(item, calculatedDays);
+                    const discountAmount = baseTotal - itemTotal;
+                    
+                    return (
+                      <div key={item.id} className="flex gap-4 py-4 border-b last:border-0 relative">
                     <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                       <Image
                         src={item.image || "/placeholder.svg?height=100&width=100"}
@@ -119,43 +270,73 @@ Total: ₹${total}
                       />
                     </div>
                     <div className="flex-grow">
-                      <div className="flex justify-between">
+                          <div className="flex justify-between items-start">
                         <h3 className="font-medium">{item.name}</h3>
-                        <p className="font-bold text-amber-600">₹{item.price * item.days}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">₹{item.price}/day</p>
-                      <div className="flex items-center mt-2">
-                        <label htmlFor={`days-${item.id}`} className="text-sm mr-2">
-                          Days:
-                        </label>
-                        <select
-                          id={`days-${item.id}`}
-                          value={item.days}
-                          onChange={(e) => updateItemDays(item.id, Number.parseInt(e.target.value))}
-                          className="border rounded-md px-2 py-1 text-sm"
-                        >
-                          {[1, 2, 3, 7, 14, 30].map((days) => (
-                            <option key={days} value={days}>
-                              {days} {days === 1 ? "day" : "days"}
-                            </option>
-                          ))}
-                        </select>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-amber-600">₹{itemTotal}</p>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="ml-auto text-red-500 hover:text-red-700"
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded"
                           aria-label="Remove item"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
+                          </div>
+                          
+                          {/* --- Pricing Breakdown --- */}
+                          <p className="text-sm text-muted-foreground">
+                            Rate: ₹{item.price}/day
+                          </p>
+                          {isDiscounted && (
+                            <p className="text-xs text-green-600 font-semibold mt-1">
+                              20% Discount Applied! (-₹{discountAmount})
+                            </p>
+                          )}
+                          
+                          {/* --- Date Selectors for Pickup and Return --- */}
+                          <div className="grid grid-cols-2 gap-4 mt-2 mb-2">
+                            <div>
+                                <Label htmlFor={`pickup-${item.id}`} className="text-xs">Pickup Date</Label>
+                                <Input
+                                    id={`pickup-${item.id}`}
+                                    type="date"
+                                    value={dates.pickup}
+                                    onChange={(e) => handleDateChange(String(item.id), 'pickup', e.target.value)}
+                                    min={today}
+                                    className="h-8 text-sm border-amber-200 focus-visible:ring-amber-500"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor={`return-${item.id}`} className="text-xs">Return Date</Label>
+                                <Input
+                                    id={`return-${item.id}`}
+                                    type="date"
+                                    value={dates.return}
+                                    onChange={(e) => handleDateChange(String(item.id), 'return', e.target.value)}
+                                    min={dates.pickup || today}
+                                    className="h-8 text-sm border-amber-200 focus-visible:ring-amber-500"
+                                />
+                            </div>
+                          </div>
+                          
+                          {/* Display calculated duration */}
+                          <p className="text-sm font-medium mt-1">
+                              {calculatedDays > 0 
+                                  ? `Rental Duration: ${calculatedDays} days` 
+                                  : "Select valid dates"
+                              }
+                          </p>
                     </div>
                   </div>
-                ))}
+                    )
+                  })}
               </div>
             </CardContent>
           </Card>
         </div>
 
+          {/* --- Order Summary and Customer Info --- */}
         <div>
           <Card className="sticky top-6">
             <CardContent className="p-6 space-y-6">
@@ -174,7 +355,7 @@ Total: ₹${total}
                 )}
                 <div className="flex justify-between font-bold pt-2 border-t">
                   <span>Total</span>
-                  <span>₹{total}</span>
+                    <span>₹{finalTotal}</span>
                 </div>
               </div>
 

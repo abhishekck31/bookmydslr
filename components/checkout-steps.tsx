@@ -1,17 +1,46 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Check, ShoppingCart, Truck, CreditCard, MessageSquare } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { Check, ShoppingCart, Truck, CreditCard, MessageSquare, Calendar as CalendarIcon } from "lucide-react"
 import { useCart } from "@/components/cart-provider"
 import { useToast } from "@/components/ui/use-toast"
+
+// --- CONSTANTS ---
+const DISCOUNT_THRESHOLD_DAYS = 3;
+const DISCOUNT_PERCENTAGE = 0.20;
+
+// --- Helper function for date formatting ---
+const formatDate = (date: Date | undefined) => {
+  if (!date) return "N/A"
+  return new Date(date).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
+}
+
+// --- Helper function to calculate rental days ---
+const calculateRentalDays = (pickup: Date | undefined, returns: Date | undefined) => {
+    if (!pickup || !returns) return 0;
+
+    if (returns > pickup) {
+        const timeDiff = returns.getTime() - pickup.getTime();
+        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; 
+        return diffDays;
+    }
+    return 0;
+}
 
 const steps = [
   { id: "cart", name: "Cart", icon: <ShoppingCart className="h-5 w-5" /> },
@@ -30,13 +59,39 @@ export function CheckoutSteps() {
     city: "",
     pincode: "",
     deliveryMethod: "standard",
+    pickupDate: undefined as Date | undefined,
+    returnDate: undefined as Date | undefined,
   })
+  
   const { items, clearCart, total } = useCart()
   const { toast } = useToast()
+
+  // Calculate rental days from selected dates
+  const rentalDays = calculateRentalDays(deliveryInfo.pickupDate, deliveryInfo.returnDate);
+  
+  // Calculate base subtotal (without discount)
+  const baseSubtotal = useMemo(() => {
+    if (rentalDays <= 0) return total;
+    return items.reduce((sum, item) => {
+      return sum + (item.price * rentalDays);
+    }, 0);
+  }, [items, rentalDays, total]);
+  
+  // Calculate discount and final subtotal
+  const discountApplied = rentalDays >= DISCOUNT_THRESHOLD_DAYS ? baseSubtotal * DISCOUNT_PERCENTAGE : 0;
+  const finalSubtotal = baseSubtotal - discountApplied;
+  
+  // Calculate delivery fee and grand total
+  const deliveryFee = deliveryInfo.deliveryMethod === "express" ? 200 : 0;
+  const grandTotal = finalSubtotal + deliveryFee;
 
   const handleDeliveryInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setDeliveryInfo((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleDateChange = (date: Date | undefined, field: "pickupDate" | "returnDate") => {
+    setDeliveryInfo((prev) => ({ ...prev, [field]: date }))
   }
 
   const handleDeliveryMethodChange = (value: string) => {
@@ -45,23 +100,39 @@ export function CheckoutSteps() {
 
   const handleNextStep = () => {
     if (currentStep === "cart") {
+      if (items.length === 0) {
+        toast({ title: "Cart Empty", description: "Please add items to your cart before continuing.", variant: "destructive" });
+        return;
+      }
       setCurrentStep("delivery")
     } else if (currentStep === "delivery") {
-      // Validate delivery info
-      if (!deliveryInfo.name || !deliveryInfo.email || !deliveryInfo.phone || !deliveryInfo.address) {
+      if (!deliveryInfo.name || !deliveryInfo.phone || !deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.pincode) {
         toast({
-          title: "Missing information",
-          description: "Please fill in all required fields",
+          title: "Missing Information",
+          description: "Please fill in all required contact and address fields.",
+          variant: "destructive",
+        })
+        return
+      }
+      if (!deliveryInfo.pickupDate || !deliveryInfo.returnDate) {
+        toast({
+          title: "Missing Rental Dates",
+          description: "Please select both pickup and return dates.",
+          variant: "destructive",
+        })
+        return
+      }
+      if (rentalDays <= 0) {
+        toast({
+          title: "Invalid Dates",
+          description: "Return date must be after pickup date.",
           variant: "destructive",
         })
         return
       }
       setCurrentStep("payment")
     } else if (currentStep === "payment") {
-      // Process payment (in a real app)
       setCurrentStep("confirmation")
-      // In a real app, you would process the payment here
-      // For demo purposes, we'll just clear the cart
       clearCart()
     }
   }
@@ -75,38 +146,47 @@ export function CheckoutSteps() {
   }
 
   const handleWhatsAppCheckout = () => {
-    // Format the order details for WhatsApp
-    const orderItems = items.map((item) => `${item.name} (${item.days} days) - ₹${item.price * item.days}`).join("\n")
+    const orderItems = items
+      .map((item) => `${item.name} (${rentalDays} days) - ₹${item.price * rentalDays}`) 
+      .join("\n") 
+
     const orderDetails = `
 *New Order from Book My DSLR*
 ----------------------------
+*Rental Dates:*
+Period: ${rentalDays} Days
+Pickup: ${formatDate(deliveryInfo.pickupDate)}
+Return: ${formatDate(deliveryInfo.returnDate)}
+----------------------------
 ${orderItems}
 ----------------------------
-*Total: ₹${total}*
+*Base Subtotal: ₹${baseSubtotal}*
+${discountApplied > 0 ? `*Discount (20%): -₹${discountApplied.toFixed(2)}*` : ''}
+*Final Subtotal: ₹${finalSubtotal.toFixed(2)}*
+*Delivery Fee: ₹${deliveryFee}*
+*Grand Total: ₹${grandTotal.toFixed(2)}*
 
 *Customer Details:*
 Name: ${deliveryInfo.name}
 Phone: ${deliveryInfo.phone}
+Email: ${deliveryInfo.email}
 Address: ${deliveryInfo.address}, ${deliveryInfo.city}, ${deliveryInfo.pincode}
-Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delivery" : "Express Delivery"}
+Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delivery (Free)" : "Express Delivery (₹200)"}
 `
 
-    // Create WhatsApp link with pre-filled message
-    const whatsappNumber = "919972122462" // This is already correct
-    const encodedMessage = encodeURIComponent(orderDetails)
+    const whatsappNumber = "919972122462"
+    const encodedMessage = encodeURIComponent(orderDetails.trim())
     const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
 
-    // Open WhatsApp in a new tab
     window.open(whatsappLink, "_blank")
-
-    // Move to confirmation step
     setCurrentStep("confirmation")
     clearCart()
   }
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Checkout Steps */}
+      
+      {/* Checkout Steps Header */}
       <div className="mb-8">
         <div className="flex items-center justify-center">
           <ol className="flex items-center w-full">
@@ -145,6 +225,8 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
 
       {/* Step Content */}
       <AnimatePresence mode="wait">
+        
+        {/* Step 1: Cart - Display items and show dates if already selected */}
         {currentStep === "cart" && (
           <motion.div
             key="cart"
@@ -183,29 +265,81 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                         <div>
                           <h3 className="font-medium">{item.name}</h3>
                           <p className="text-sm text-gray-600">
-                            ₹{item.price} x {item.days} days
+                            ₹{item.price}/day
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold">₹{item.price * item.days}</p>
+                        <p className="font-bold">₹{item.price}</p>
+                        <p className="text-xs text-gray-500">per day</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between mb-2">
-                    <span>Subtotal</span>
-                    <span>₹{total}</span>
+                {/* Display Rental Dates if already selected in checkout */}
+                {deliveryInfo.pickupDate && deliveryInfo.returnDate && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="flex items-center text-lg font-semibold text-amber-600 mb-3">
+                      <CalendarIcon className="w-5 h-5 mr-2" />
+                      Selected Rental Period
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <Label className="font-medium text-gray-600">Pickup Date</Label>
+                        <p className="font-bold text-gray-900">{formatDate(deliveryInfo.pickupDate)}</p>
+                      </div>
+                      <div>
+                        <Label className="font-medium text-gray-600">Return Date</Label>
+                        <p className="font-bold text-gray-900">{formatDate(deliveryInfo.returnDate)}</p>
+                      </div>
+                    </div>
+                    {rentalDays > 0 && (
+                      <div className="text-sm font-medium pt-3 border-t mt-3">
+                        Total Duration: <span className="text-amber-600 font-bold">{rentalDays} Days</span>
+                      </div>
+                    )}
+                    {rentalDays >= DISCOUNT_THRESHOLD_DAYS && (
+                      <div className="text-sm text-green-600 font-medium pt-2">
+                        🎉 You're getting a flat 20% discount for renting 3 or more days!
+                      </div>
+                    )}
                   </div>
+                )}
+
+                <div className="border-t pt-4">
+                  {rentalDays > 0 ? (
+                    <>
+                      {discountApplied > 0 && (
+                        <>
+                          <div className="flex justify-between mb-2 text-gray-600">
+                            <span>Base Subtotal ({rentalDays} days)</span>
+                            <span>₹{baseSubtotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between mb-2 text-green-600">
+                            <span>Discount (20%)</span>
+                            <span>-₹{discountApplied.toFixed(2)}</span>
+                          </div>
+                        </>
+                      )}
+                      <div className="flex justify-between mb-2 font-semibold">
+                        <span>Subtotal</span>
+                        <span>₹{finalSubtotal.toFixed(2)}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between mb-2">
+                      <span>Subtotal</span>
+                      <span className="text-gray-400">Select dates in next step</span>
+                    </div>
+                  )}
                   <div className="flex justify-between mb-2">
                     <span>Delivery Fee</span>
-                    <span>₹200</span>
+                    <span>To be selected</span>
                   </div>
                   <div className="flex justify-between font-bold pt-2 border-t">
-                    <span>Total</span>
-                    <span>₹{total + 200}</span>
+                    <span>Estimated Total</span>
+                    <span>{rentalDays > 0 ? `₹${finalSubtotal.toFixed(2)}` : 'TBD'}</span>
                   </div>
                 </div>
 
@@ -219,6 +353,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
           </motion.div>
         )}
 
+        {/* Step 2: Delivery Information - DATE PICKERS HERE */}
         {currentStep === "delivery" && (
           <motion.div
             key="delivery"
@@ -228,68 +363,109 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <h2 className="text-2xl font-bold">Delivery Information</h2>
+            <h2 className="text-2xl font-bold">Delivery & Rental Details</h2>
+
+            {/* Date Selection Section - DATE PICKERS */}
+            <div className="border p-4 rounded-lg bg-amber-50 border-amber-200">
+              <div className="flex items-center text-lg font-semibold text-amber-600 mb-4">
+                <CalendarIcon className="w-5 h-5 mr-2" />
+                Select Rental Dates
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label htmlFor="pickup-date" className="mb-2 block">Pickup Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal border-amber-300 focus-visible:ring-amber-500",
+                          !deliveryInfo.pickupDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {deliveryInfo.pickupDate ? format(deliveryInfo.pickupDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={deliveryInfo.pickupDate}
+                        onSelect={(date) => handleDateChange(date, "pickupDate")}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <Label htmlFor="return-date" className="mb-2 block">Return Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal border-amber-300 focus-visible:ring-amber-500",
+                          !deliveryInfo.returnDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {deliveryInfo.returnDate ? format(deliveryInfo.returnDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={deliveryInfo.returnDate}
+                        onSelect={(date) => handleDateChange(date, "returnDate")}
+                        disabled={(date) => !deliveryInfo.pickupDate || date <= deliveryInfo.pickupDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              {rentalDays > 0 && (
+                <div className="text-sm font-medium pt-3 border-t border-amber-300">
+                  Total Rental Duration: <span className="text-amber-600 font-bold">{rentalDays} Days</span>
+                </div>
+              )}
+              
+              {rentalDays >= DISCOUNT_THRESHOLD_DAYS && (
+                <div className="text-sm text-green-600 font-medium pt-2">
+                  🎉 Rent for 3 or more days and get a flat 20% discount. The longer you rent, the more you save!
+                </div>
+              )}
+            </div>
+
+            <h3 className="text-xl font-semibold mt-6">Contact & Shipping Info</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={deliveryInfo.name}
-                  onChange={handleDeliveryInfoChange}
-                  className="border-amber-200 focus-visible:ring-amber-500"
-                />
+                <Label htmlFor="name">Full Name *</Label>
+                <Input id="name" name="name" value={deliveryInfo.name} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={deliveryInfo.email}
-                  onChange={handleDeliveryInfoChange}
-                  className="border-amber-200 focus-visible:ring-amber-500"
-                />
+                <Input id="email" name="email" type="email" value={deliveryInfo.email} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
               </div>
               <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={deliveryInfo.phone}
-                  onChange={handleDeliveryInfoChange}
-                  className="border-amber-200 focus-visible:ring-amber-500"
-                />
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input id="phone" name="phone" value={deliveryInfo.phone} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  name="address"
-                  value={deliveryInfo.address}
-                  onChange={handleDeliveryInfoChange}
-                  className="border-amber-200 focus-visible:ring-amber-500"
-                />
+                <Label htmlFor="address">Address *</Label>
+                <Textarea id="address" name="address" value={deliveryInfo.address} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
               </div>
               <div>
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={deliveryInfo.city}
-                  onChange={handleDeliveryInfoChange}
-                  className="border-amber-200 focus-visible:ring-amber-500"
-                />
+                <Label htmlFor="city">City *</Label>
+                <Input id="city" name="city" value={deliveryInfo.city} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
               </div>
               <div>
-                <Label htmlFor="pincode">PIN Code</Label>
-                <Input
-                  id="pincode"
-                  name="pincode"
-                  value={deliveryInfo.pincode}
-                  onChange={handleDeliveryInfoChange}
-                  className="border-amber-200 focus-visible:ring-amber-500"
-                />
+                <Label htmlFor="pincode">PIN Code *</Label>
+                <Input id="pincode" name="pincode" value={deliveryInfo.pincode} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
               </div>
             </div>
 
@@ -330,6 +506,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
           </motion.div>
         )}
 
+        {/* Step 3: Payment - SHOW FULL SUMMARY */}
         {currentStep === "payment" && (
           <motion.div
             key="payment"
@@ -339,42 +516,86 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <h2 className="text-2xl font-bold">Payment Method</h2>
+            <h2 className="text-2xl font-bold">Payment & Final Summary</h2>
+
+            {/* Rental Dates Summary */}
+            <div className="border p-4 rounded-lg bg-gray-50">
+              <div className="flex items-center text-lg font-semibold text-amber-600 mb-3">
+                <CalendarIcon className="w-5 h-5 mr-2" />
+                Rental Period
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <Label className="font-medium">Pickup Date</Label>
+                  <p className="font-bold">{formatDate(deliveryInfo.pickupDate)}</p>
+                </div>
+                <div>
+                  <Label className="font-medium">Return Date</Label>
+                  <p className="font-bold">{formatDate(deliveryInfo.returnDate)}</p>
+                </div>
+              </div>
+              <div className="text-sm font-medium pt-2 border-t mt-2">
+                Total Duration: <span className="text-amber-600 font-bold">{rentalDays} Days</span>
+              </div>
+            </div>
+
+            {/* Customer Information Summary */}
+            <div className="border p-4 rounded-lg bg-gray-50">
+              <h3 className="font-semibold mb-3">Customer Details</h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div><span className="font-medium">Name:</span> {deliveryInfo.name}</div>
+                <div><span className="font-medium">Phone:</span> {deliveryInfo.phone}</div>
+                <div className="col-span-2"><span className="font-medium">Email:</span> {deliveryInfo.email}</div>
+                <div className="col-span-2"><span className="font-medium">Address:</span> {deliveryInfo.address}, {deliveryInfo.city}, {deliveryInfo.pincode}</div>
+                <div className="col-span-2"><span className="font-medium">Delivery:</span> {deliveryInfo.deliveryMethod === "standard" ? "Standard (Free)" : "Express (₹200)"}</div>
+              </div>
+            </div>
 
             <div className="bg-amber-50 p-4 rounded-md border border-amber-200 flex items-center">
               <MessageSquare className="h-6 w-6 text-amber-500 mr-3" />
               <div>
-                <p className="font-medium">WhatsApp Payment</p>
+                <p className="font-medium">WhatsApp Checkout</p>
                 <p className="text-sm text-gray-600">
                   Complete your order via WhatsApp. Our team will contact you for payment details.
                 </p>
               </div>
             </div>
 
+            {/* Order Summary */}
             <div className="border rounded-md p-4 space-y-4">
-              <h3 className="font-medium">Order Summary</h3>
+              <h3 className="font-medium text-lg">Order Summary</h3>
               <div className="space-y-2">
                 {items.map((item) => (
                   <div key={`${item.category}-${item.id}`} className="flex justify-between text-sm">
-                    <span>
-                      {item.name} ({item.days} days)
-                    </span>
-                    <span>₹{item.price * item.days}</span>
+                    <span>{item.name} ({rentalDays} days)</span>
+                    <span>₹{(item.price * rentalDays).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="border-t pt-2 mt-2">
-                <div className="flex justify-between text-sm">
+                {discountApplied > 0 && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span>Base Subtotal</span>
+                      <span>₹{baseSubtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-green-600 font-medium">
+                      <span>Discount (20% - {rentalDays} days)</span>
+                      <span>-₹{discountApplied.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+                <div className="flex justify-between text-sm font-medium">
                   <span>Subtotal</span>
-                  <span>₹{total}</span>
+                  <span>₹{finalSubtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Delivery Fee</span>
-                  <span>₹{deliveryInfo.deliveryMethod === "express" ? 200 : 0}</span>
+                  <span>₹{deliveryFee}</span>
                 </div>
-                <div className="flex justify-between font-bold mt-2 pt-2 border-t">
-                  <span>Total</span>
-                  <span>₹{total + (deliveryInfo.deliveryMethod === "express" ? 200 : 0)}</span>
+                <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
+                  <span>Grand Total</span>
+                  <span className="text-amber-600">₹{grandTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -393,6 +614,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
           </motion.div>
         )}
 
+        {/* Step 4: Confirmation */}
         {currentStep === "confirmation" && (
           <motion.div
             key="confirmation"

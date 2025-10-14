@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/components/cart-provider"
+import { useCartGlow } from "@/components/cart-glow-provider"
 import { motion, AnimatePresence } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 
@@ -16,6 +17,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
   const { itemCount } = useCart()
+  const { showCartGlow } = useCartGlow()
 
   const mainRoutes = [
     { name: "Home", path: "/" },
@@ -78,8 +80,18 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-4">
           <Link href="/cart" className="relative">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className={cn(
+                "transition-all duration-500",
+                showCartGlow && "animate-pulse shadow-lg shadow-amber-500/50 bg-amber-50"
+              )}
+            >
+              <ShoppingCart className={cn(
+                "h-5 w-5 transition-all duration-500",
+                showCartGlow && "text-amber-600"
+              )} />
               <span className="sr-only">Cart</span>
               {itemCount > 0 && (
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-gradient-to-r from-amber-500 to-yellow-300 text-black">
@@ -93,8 +105,18 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
           <Link href="/cart" className="relative mr-2">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className={cn(
+                "transition-all duration-500",
+                showCartGlow && "animate-pulse shadow-lg shadow-amber-500/50 bg-amber-50"
+              )}
+            >
+              <ShoppingCart className={cn(
+                "h-5 w-5 transition-all duration-500",
+                showCartGlow && "text-amber-600"
+              )} />
               {itemCount > 0 && (
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-gradient-to-r from-amber-500 to-yellow-300 text-black">
                   {itemCount}
