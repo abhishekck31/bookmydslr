@@ -1,22 +1,23 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 export type CartItem = {
-  id: number
+  id: string
   name: string
   price: number
   image: string
   days: number
   category: string
+  brand?: string
 }
 
 type CartContextType = {
   items: CartItem[]
   addItem: (item: CartItem) => void
-  removeItem: (id: number) => void
-  updateItemDays: (id: number, days: number) => void
+  removeItem: (id: string) => void
+  updateItemDays: (id: string, days: number) => void
   clearCart: () => void
   itemCount: number
   total: number
@@ -87,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: string) => {
     setItems((prevItems) => {
       const itemToRemove = prevItems.find((item) => item.id === id)
       const newItems = prevItems.filter((item) => item.id !== id)
@@ -107,7 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const updateItemDays = (id: number, days: number) => {
+  const updateItemDays = (id: string, days: number) => {
     setItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, days } : item)))
   }
 

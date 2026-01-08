@@ -9,7 +9,24 @@
 // 4. Make sure to include all required fields (name, description, price, etc.)
 // 5. Add the new object to the cameras array below
 
-export const cameras = [
+export interface Camera {
+  id: number
+  name: string
+  brand: string
+  price: number
+  category: string
+  description: string
+  type: string
+  image: string
+  available: boolean
+  gallery?: string[]
+  rating?: number
+  reviews?: number
+  specs?: Record<string, string>
+  features?: string[]
+}
+
+export const cameras: Camera[] = [
   // --- Nikon ---
   { id: 1, name: "Nikon D5200", brand: "Nikon", price: 600, category: "DSLR Camera", description: "DSLR camera", type: "DSLR", image: "/Nikon/nikonD5200.png", available: true },
   { id: 2, name: "Nikon D7200", brand: "Nikon", price: 1000, category: "DSLR Camera", description: "DSLR camera", type: "DSLR", image: "/Nikon/nikonD7200.png", available: true },
@@ -50,5 +67,5 @@ export const cameras = [
   { id: 33, name: "Sony Alpha ILCE-7RM4 Full Frame Mirrorless Camera Body Featuring Eye AF and 4K Movie Recording (Black)", brand: "Sony", price: 2500, category: "Mirrorless Camera", description: "Full-frame mirrorless", type: "Mirrorless", image: "/Sony/sonyalpha2.png", available: true },
 
   // --- Panasonic ---
-  { id: 34, name: "Panasonic MDH3 Camcorder", brand: "Panasonic", price: 1500, description: "Camcorder", type: "Camcorder", image: "/Panasonic/MDH3.jpg", available: true },
+  { id: 34, name: "Panasonic MDH3 Camcorder", brand: "Panasonic", price: 1500, category: "Camcorder", description: "Camcorder", type: "Camcorder", image: "/Panasonic/MDH3.jpg", available: true },
 ]

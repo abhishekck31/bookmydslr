@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { Check, ShoppingCart, Truck, CreditCard, MessageSquare, Calendar as CalendarIcon } from "lucide-react"
 import { useCart } from "@/components/cart-provider"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 // --- CONSTANTS ---
 const DISCOUNT_THRESHOLD_DAYS = 3;
@@ -32,14 +32,14 @@ const formatDate = (date: Date | undefined) => {
 
 // --- Helper function to calculate rental days ---
 const calculateRentalDays = (pickup: Date | undefined, returns: Date | undefined) => {
-    if (!pickup || !returns) return 0;
+  if (!pickup || !returns) return 0;
 
-    if (returns > pickup) {
-        const timeDiff = returns.getTime() - pickup.getTime();
-        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; 
-        return diffDays;
-    }
-    return 0;
+  if (returns > pickup) {
+    const timeDiff = returns.getTime() - pickup.getTime();
+    const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+    return diffDays;
+  }
+  return 0;
 }
 
 const steps = [
@@ -62,13 +62,13 @@ export function CheckoutSteps() {
     pickupDate: undefined as Date | undefined,
     returnDate: undefined as Date | undefined,
   })
-  
+
   const { items, clearCart, total } = useCart()
   const { toast } = useToast()
 
   // Calculate rental days from selected dates
   const rentalDays = calculateRentalDays(deliveryInfo.pickupDate, deliveryInfo.returnDate);
-  
+
   // Calculate base subtotal (without discount)
   const baseSubtotal = useMemo(() => {
     if (rentalDays <= 0) return total;
@@ -76,11 +76,11 @@ export function CheckoutSteps() {
       return sum + (item.price * rentalDays);
     }, 0);
   }, [items, rentalDays, total]);
-  
+
   // Calculate discount and final subtotal
   const discountApplied = rentalDays >= DISCOUNT_THRESHOLD_DAYS ? baseSubtotal * DISCOUNT_PERCENTAGE : 0;
   const finalSubtotal = baseSubtotal - discountApplied;
-  
+
   // Calculate delivery fee and grand total
   const deliveryFee = deliveryInfo.deliveryMethod === "express" ? 200 : 0;
   const grandTotal = finalSubtotal + deliveryFee;
@@ -147,8 +147,8 @@ export function CheckoutSteps() {
 
   const handleWhatsAppCheckout = () => {
     const orderItems = items
-      .map((item) => `${item.name} (${rentalDays} days) - ₹${item.price * rentalDays}`) 
-      .join("\n") 
+      .map((item) => `${item.name} (${rentalDays} days) - ₹${item.price * rentalDays}`)
+      .join("\n")
 
     const orderDetails = `
 *New Order from Book My DSLR*
@@ -185,7 +185,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      
+
       {/* Checkout Steps Header */}
       <div className="mb-8">
         <div className="flex items-center justify-center">
@@ -193,27 +193,24 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
             {steps.map((step, index) => (
               <li
                 key={step.id}
-                className={`flex items-center ${
-                  index < steps.length - 1
+                className={`flex items-center ${index < steps.length - 1
                     ? "w-full after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:mx-6 after:inline-block"
                     : ""
-                }`}
+                  }`}
               >
                 <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                    currentStep === step.id || steps.findIndex((s) => s.id === currentStep) > index
+                  className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === step.id || steps.findIndex((s) => s.id === currentStep) > index
                       ? "bg-gradient-to-r from-amber-500 to-yellow-300 text-black"
                       : "bg-gray-200 text-gray-600"
-                  }`}
+                    }`}
                 >
                   {steps.findIndex((s) => s.id === currentStep) > index ? <Check className="w-5 h-5" /> : step.icon}
                 </div>
                 <span
-                  className={`ml-2 text-sm font-medium ${
-                    currentStep === step.id
+                  className={`ml-2 text-sm font-medium ${currentStep === step.id
                       ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300"
                       : "text-gray-500"
-                  } hidden sm:inline-block`}
+                    } hidden sm:inline-block`}
                 >
                   {step.name}
                 </span>
@@ -225,7 +222,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
 
       {/* Step Content */}
       <AnimatePresence mode="wait">
-        
+
         {/* Step 1: Cart - Display items and show dates if already selected */}
         {currentStep === "cart" && (
           <motion.div
@@ -371,7 +368,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                 <CalendarIcon className="w-5 h-5 mr-2" />
                 Select Rental Dates
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <Label htmlFor="pickup-date" className="mb-2 block">Pickup Date</Label>
@@ -399,7 +396,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                     </PopoverContent>
                   </Popover>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="return-date" className="mb-2 block">Return Date</Label>
                   <Popover>
@@ -433,7 +430,7 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
                   Total Rental Duration: <span className="text-amber-600 font-bold">{rentalDays} Days</span>
                 </div>
               )}
-              
+
               {rentalDays >= DISCOUNT_THRESHOLD_DAYS && (
                 <div className="text-sm text-green-600 font-medium pt-2">
                   🎉 Rent for 3 or more days and get a flat 20% discount. The longer you rent, the more you save!
@@ -445,27 +442,27 @@ Delivery Method: ${deliveryInfo.deliveryMethod === "standard" ? "Standard Delive
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name">Full Name *</Label>
-                <Input id="name" name="name" value={deliveryInfo.name} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
+                <Input id="name" name="name" value={deliveryInfo.name} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500" />
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={deliveryInfo.email} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
+                <Input id="email" name="email" type="email" value={deliveryInfo.email} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500" />
               </div>
               <div>
                 <Label htmlFor="phone">Phone Number *</Label>
-                <Input id="phone" name="phone" value={deliveryInfo.phone} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
+                <Input id="phone" name="phone" value={deliveryInfo.phone} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500" />
               </div>
               <div className="md:col-span-2">
                 <Label htmlFor="address">Address *</Label>
-                <Textarea id="address" name="address" value={deliveryInfo.address} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
+                <Textarea id="address" name="address" value={deliveryInfo.address} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500" />
               </div>
               <div>
                 <Label htmlFor="city">City *</Label>
-                <Input id="city" name="city" value={deliveryInfo.city} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
+                <Input id="city" name="city" value={deliveryInfo.city} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500" />
               </div>
               <div>
                 <Label htmlFor="pincode">PIN Code *</Label>
-                <Input id="pincode" name="pincode" value={deliveryInfo.pincode} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500"/>
+                <Input id="pincode" name="pincode" value={deliveryInfo.pincode} onChange={handleDeliveryInfoChange} className="border-amber-200 focus-visible:ring-amber-500" />
               </div>
             </div>
 

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { notFound } from "next/navigation"
 import Image from "next/image"
@@ -11,15 +9,16 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { accessories } from "@/data/accessories"
 import { useCart, type CartItem } from "@/components/cart-provider"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
-export default function AccessoryDetailPage({ params }: { params: { id: string } }) {
+export default async function AccessoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const [rentalDays, setRentalDays] = useState(3)
   const { addItem } = useCart()
   const { toast } = useToast()
 
   // Find the accessory by ID (string comparison since accessory IDs might be strings)
-  const accessory = accessories.find((a) => a.id.toString() === params.id)
+  const accessory = accessories.find((a) => a.id.toString() === resolvedParams.id)
 
   // If accessory not found, show 404
   if (!accessory) {
@@ -28,12 +27,13 @@ export default function AccessoryDetailPage({ params }: { params: { id: string }
 
   const handleAddToCart = () => {
     const cartItem: CartItem = {
-      id: typeof accessory.id === "number" ? accessory.id : Number.parseInt(accessory.id, 10),
+      id: accessory.id.toString(),
       name: accessory.name,
       price: accessory.price,
       image: accessory.image || "/placeholder.svg?height=200&width=200",
       days: rentalDays,
       category: "accessories",
+      brand: accessory.brand,
     }
 
     addItem(cartItem)

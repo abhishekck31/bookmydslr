@@ -1,136 +1,102 @@
 import Link from "next/link"
-import Image from "next/image"
-import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from "lucide-react"
+import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function Footer() {
   return (
-    <footer className="border-t bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 dark:border-gray-800">
-      <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="relative h-10 w-10 overflow-hidden">
-                <Image src="/images/logo.png" alt="Book My DSLR" fill className="object-contain" />
-              </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-yellow-300">
-                Book My DSLR
+    <footer className="bg-gray-900 text-white pt-24 pb-12 border-t border-gray-800 relative overflow-hidden">
+      {/* Decorative Background Element */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="container-premium relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
+          {/* Brand Column */}
+          <div className="lg:col-span-4 space-y-6">
+            <Link href="/" className="inline-block">
+              <span className="text-2xl font-bold tracking-tight text-white">
+                BookMy<span className="text-amber-500">DSLR</span>
               </span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Your one-stop destination for premium camera rentals. Capture your moments with the best equipment at
-              affordable prices.
+            </Link>
+            <p className="text-gray-400 leading-relaxed text-sm max-w-xs">
+              Bangalore's premium camera rental service. We empower creators with professional gear at accessible prices.
             </p>
-            <div className="flex gap-4">
-              <Link href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
-                <Instagram className="h-5 w-5" />
-                <span className="sr-only">Instagram</span>
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
-                <Youtube className="h-5 w-5" />
-                <span className="sr-only">YouTube</span>
-              </Link>
+            <div className="flex gap-4 pt-4">
+              {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                <Link
+                  key={i}
+                  href="#"
+                  className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-amber-500 hover:text-white transition-all duration-300 hover:scale-110"
+                >
+                  <Icon className="h-4 w-4" />
+                </Link>
+              ))}
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4 dark:text-gray-200">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/" className="text-gray-600 hover:text-amber-500 transition-colors dark:text-gray-400">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products"
-                  className="text-gray-600 hover:text-amber-500 transition-colors dark:text-gray-400"
-                >
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/services"
-                  className="text-gray-600 hover:text-amber-500 transition-colors dark:text-gray-400"
-                >
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/how-it-works"
-                  className="text-gray-600 hover:text-amber-500 transition-colors dark:text-gray-400"
-                >
-                  How It Works
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-gray-600 hover:text-amber-500 transition-colors dark:text-gray-400"
-                >
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-gray-600 hover:text-amber-500 transition-colors dark:text-gray-400">
-                  Terms & Conditions
-                </Link>
-              </li>
+          {/* Links Columns */}
+          <div className="lg:col-span-2">
+            <h3 className="text-sm font-semibold mb-6 text-white uppercase tracking-wider">Navigation</h3>
+            <ul className="space-y-4 text-gray-400 text-sm font-medium">
+              {['Home', 'Cameras', 'Lenses', 'Services', 'About'].map((item) => (
+                <li key={item}>
+                  <Link
+                    href={item === 'Home' ? '/' : `/${item.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="hover:text-amber-400 transition-colors flex items-center gap-2 group"
+                  >
+                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-amber-500" />
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4 dark:text-gray-200">Contact Us</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <MapPin className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-600 dark:text-gray-400">
-                  2nd Floor, No- 212/1, 33/3/3, Hennur Main Road, opposite to SBI, above Muthooth finance gold Loan,
-                  Post, Kalyan Nagar, Bengaluru, Karnataka 560043
-                </span>
-              </li>
-              <li className="flex items-center">
-                <Phone className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0" />
-                <span className="text-gray-600 dark:text-gray-400">+91 99721 22462</span>
-              </li>
-              <li className="flex items-center">
-                <Mail className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0" />
-                <span className="text-gray-600 dark:text-gray-400">bookmydslr@gmail.com</span>
-              </li>
+          <div className="lg:col-span-2">
+            <h3 className="text-sm font-semibold mb-6 text-white uppercase tracking-wider">Support</h3>
+            <ul className="space-y-4 text-gray-400 text-sm font-medium">
+              {['Contact Us', 'Rental Agreement', 'Terms', 'Privacy', 'FAQ'].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="hover:text-amber-400 transition-colors">
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4 dark:text-gray-200">Newsletter</h3>
-            <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
-              Subscribe to our newsletter for the latest updates, photography tips, and exclusive offers.
-            </p>
-            <div className="flex flex-col space-y-2">
-              <Input
-                type="email"
-                placeholder="Your email address"
-                className="border-amber-200 focus-visible:ring-amber-500 dark:border-gray-700"
-              />
-              <Button className="bg-gradient-to-r from-amber-500 to-yellow-300 text-black hover:from-amber-600 hover:to-yellow-400">
-                Subscribe
-              </Button>
+          {/* Contact Column */}
+          <div className="lg:col-span-4">
+            <h3 className="text-sm font-semibold mb-6 text-white uppercase tracking-wider">Get in Touch</h3>
+            <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700/50 backdrop-blur-sm">
+              <ul className="space-y-5 text-gray-300 text-sm">
+                <li className="flex items-start gap-4">
+                  <MapPin className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed text-gray-400">
+                    2nd Floor, No- 212/1, Hennur Main Road,<br />Kalyan Nagar, Bangalore 560043
+                  </span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <Phone className="h-5 w-5 text-amber-500 shrink-0" />
+                  <span className="font-mono text-white tracking-wide">+91 99721 22462</span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <Mail className="h-5 w-5 text-amber-500 shrink-0" />
+                  <span className="text-gray-400 group-hover:text-white transition-colors">bookmydslr@gmail.com</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
           <p>&copy; {new Date().getFullYear()} Book My DSLR. All rights reserved.</p>
+          <div className="flex gap-8">
+            <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="#" className="hover:text-white transition-colors">Sitemap</Link>
+          </div>
         </div>
       </div>
     </footer>

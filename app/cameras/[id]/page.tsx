@@ -11,18 +11,16 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cameras } from "@/data/cameras"
 import { useCart, type CartItem } from "@/components/cart-provider"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
-export default function CameraDetailPage({ params }: { params: { id: string } }) {
+export default async function CameraDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const [rentalDays, setRentalDays] = useState(3)
   const { addItem } = useCart()
   const { toast } = useToast()
 
-  // Convert id to number for comparison
-  const cameraId = Number.parseInt(params.id, 10)
-
   // Find the camera by ID
-  const camera = cameras.find((c) => c.id === cameraId)
+  const camera = cameras.find((c) => c.id.toString() === resolvedParams.id)
 
   // If camera not found, show 404
   if (!camera) {
@@ -31,12 +29,13 @@ export default function CameraDetailPage({ params }: { params: { id: string } })
 
   const handleAddToCart = () => {
     const cartItem: CartItem = {
-      id: camera.id,
+      id: camera.id.toString(),
       name: camera.name,
       price: camera.price,
       image: camera.image || "/placeholder.svg?height=200&width=200",
       days: rentalDays,
       category: "cameras",
+      brand: camera.brand,
     }
 
     addItem(cartItem)
@@ -246,7 +245,7 @@ export default function CameraDetailPage({ params }: { params: { id: string } })
         <h2 className="text-2xl font-bold mb-6">You might also like</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {cameras
-            .filter((item) => item.id !== camera.id)
+            .filter((item) => item.id.toString() !== camera.id.toString())
             .slice(0, 4)
             .map((item) => (
               <Link href={`/cameras/${item.id}`} key={item.id} className="group">

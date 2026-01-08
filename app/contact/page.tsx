@@ -1,212 +1,218 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
-import { motion } from "framer-motion"
-import { useInView } from "react-intersection-observer"
-import Link from "next/link"
+import { Send, MapPin, Phone, Mail, Clock, CheckCircle2, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Phone, Mail, Clock, MessageSquare, Send } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { motion } from "framer-motion"
 
 export default function ContactPage() {
   const { toast } = useToast()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const { ref: formRef, inView: formInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   })
 
-  const { ref: infoRef, inView: infoInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-
     // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
-      toast({
-        title: "Message sent!",
-        description: "We'll get back to you as soon as possible.",
-      })
-
-      // Reset form
-      const form = e.target as HTMLFormElement
-      form.reset()
-    }, 1500)
+    toast({
+      title: "Message sent",
+      description: "We've received your message and will get back to you shortly.",
+    })
+    setFormData({ name: "", email: "", subject: "", message: "" })
   }
 
   return (
-    <div className="container py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Contact Form */}
-        <motion.div
-          ref={formRef}
-          initial={{ opacity: 0, x: -50 }}
-          animate={formInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Contact Us</h1>
-            <p className="text-muted-foreground">
-              Have questions about our camera rental services? We're here to help! Fill out the form below and we'll get
-              back to you as soon as possible.
+    <main className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="bg-slate-950 border-b border-gray-800 py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+
+        <div className="container-premium text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-6">
+              Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Touch</span>
+            </h1>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
+              Have questions about gear availability or need a custom quote?
+              We are here to help you get the perfect setup.
             </p>
-          </div>
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first-name">First Name</Label>
-                <Input id="first-name" placeholder="Enter your first name" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name">Last Name</Label>
-                <Input id="last-name" placeholder="Enter your last name" required />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone (optional)</Label>
-              <Input id="phone" type="tel" placeholder="Enter your phone number" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
-              <Input id="subject" placeholder="What is this regarding?" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea id="message" placeholder="How can we help you?" rows={5} required />
-            </div>
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-amber-500 to-yellow-300 text-black hover:from-amber-600 hover:to-yellow-400"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>Processing...</>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" /> Send Message
-                </>
-              )}
-            </Button>
-          </form>
-        </motion.div>
-
-        {/* Contact Information */}
-        <motion.div
-          className="space-y-8"
-          ref={infoRef}
-          initial={{ opacity: 0, x: 50 }}
-          animate={infoInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="relative h-64 sm:h-80 rounded-lg overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.0051058428!2d77.63373307575761!3d13.031051513282!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae17b5c3b7e5a7%3A0x1e0f6b7c5e4b8e9a!2s212%2F1%2C%2033%2F3%2F3%2C%202nd%20Floor%2C%20Hennur%20Main%20Rd%2C%20Kalyan%20Nagar%2C%20Bengaluru%2C%20Karnataka%20560043!5e0!3m2!1sen!2sin!4v1714847654321!5m2!1sen!2sin"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Book My DSLR Location"
-              className="absolute inset-0"
-            ></iframe>
-          </div>
-
-          <div className="grid gap-6">
-            <Card>
-              <CardContent className="flex items-start p-6">
-                <MapPin className="h-5 w-5 text-yellow-500 mr-4 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold mb-1">Our Location</h3>
-                  <p className="text-muted-foreground">
-                    No- 212/1, 33/3/3, 2nd Floor, Hennur Main Road,
-                    <br />
-                    Post, opposite to SBI, above Muthooth finance gold Loan,
-                    <br />
-                    Kalyan Nagar, Bengaluru, Karnataka 560043
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card>
-                <CardContent className="flex items-start p-6">
-                  <Phone className="h-5 w-5 text-yellow-500 mr-4 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">+91 99721 22462</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="flex items-start p-6">
-                  <Mail className="h-5 w-5 text-yellow-500 mr-4 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">bookmydslr@gmail.com</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardContent className="flex items-start p-6">
-                <Clock className="h-5 w-5 text-yellow-500 mr-4 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold mb-1">Business Hours</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-muted-foreground">
-                    <span>Monday - Friday:</span>
-                    <span>9:00 AM - 6:00 PM</span>
-                    <span>Saturday:</span>
-                    <span>10:00 AM - 4:00 PM</span>
-                    <span>Sunday:</span>
-                    <span>Closed</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="flex items-start p-6">
-                <MessageSquare className="h-5 w-5 text-yellow-500 mr-4 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold mb-1">Live Chat</h3>
-                  <p className="text-muted-foreground mb-3">
-                    Need immediate assistance? Chat with our customer support team.
-                  </p>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black"
-                  >
-                    <Link href="https://wa.me/919972122642" target="_blank">
-                      Start Chat
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+
+      <div className="container-premium py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-24 items-start">
+
+          {/* Contact Information */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="lg:col-span-1 space-y-12"
+          >
+            <div>
+              <h3 className="text-xs font-bold text-gray-400 mb-8 uppercase tracking-widest">Contact Info</h3>
+              <div className="space-y-8">
+                <div className="flex gap-5 group">
+                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-amber-50 group-hover:text-amber-600 group-hover:border-amber-100 transition-all shrink-0 shadow-sm">
+                    <Phone className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg text-gray-900 mb-1">Phone</p>
+                    <p className="text-gray-600 font-medium">+91 99721 22462</p>
+                    <p className="text-xs text-gray-400 mt-1">Mon-Sat 10am to 8pm</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 group">
+                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-amber-50 group-hover:text-amber-600 group-hover:border-amber-100 transition-all shrink-0 shadow-sm">
+                    <Mail className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg text-gray-900 mb-1">Email</p>
+                    <p className="text-gray-600 font-medium">bookmydslr@gmail.com</p>
+                    <p className="text-xs text-gray-400 mt-1">Online support 24/7</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 group">
+                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-amber-50 group-hover:text-amber-600 group-hover:border-amber-100 transition-all shrink-0 shadow-sm">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg text-gray-900 mb-1">Studio Location</p>
+                    <p className="text-gray-600 leading-relaxed text-sm font-medium">
+                      2nd Floor, No- 212/1, Hennur Main Road,<br />
+                      Kalyan Nagar, Bengaluru, Karnataka 560043
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px bg-gray-100 w-full" />
+
+            <div>
+              <h3 className="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">Business Hours</h3>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600 font-medium">Monday - Saturday</span>
+                  <span className="font-bold text-gray-900 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">10:00 AM - 8:00 PM</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600 font-medium">Sunday</span>
+                  <span className="font-bold text-gray-900 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">10:00 AM - 2:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex gap-4 items-start">
+              <div className="bg-amber-100 p-2 rounded-full shrink-0">
+                <CheckCircle2 className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="font-bold text-amber-900 text-sm mb-1">Quick Response Promise</h4>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  We typically reply to inquiries within 2 hours during business hours. For urgent rentals, please call us directly.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Contact Form */}
+          <div className="lg:col-span-2">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card className="border-gray-100 shadow-2xl shadow-gray-200/50 rounded-[2rem] overflow-hidden bg-white">
+                <div className="bg-gray-50/50 px-10 py-8 border-b border-gray-100">
+                  <h2 className="text-2xl font-bold text-gray-900">Send us a message</h2>
+                  <p className="text-gray-500 mt-1">Fill out the form below and we will get back to you.</p>
+                </div>
+                <CardContent className="p-10">
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Name</Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          placeholder="John Doe"
+                          required
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="h-14 bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl text-base px-5"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Email</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="john@example.com"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="h-14 bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl text-base px-5"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="subject" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Subject</Label>
+                      <Input
+                        id="subject"
+                        name="subject"
+                        placeholder="Inquiry about Sony A7III..."
+                        required
+                        value={formData.subject}
+                        onChange={handleChange}
+                        className="h-14 bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl text-base px-5"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Message</Label>
+                      <Textarea
+                        id="message"
+                        name="message"
+                        placeholder="Tell us what you need..."
+                        required
+                        value={formData.message}
+                        onChange={handleChange}
+                        className="min-h-[200px] bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl resize-none p-5 text-base"
+                      />
+                    </div>
+
+                    <Button type="submit" size="lg" className="w-full h-16 text-lg bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-xl shadow-slate-900/20 hover:shadow-2xl hover:shadow-slate-900/30 transition-all transform hover:-translate-y-1">
+                      Send Message <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </main>
   )
 }

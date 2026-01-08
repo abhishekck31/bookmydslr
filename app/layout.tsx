@@ -2,17 +2,26 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
-import { CartProvider } from "@/components/cart-provider"
-import { CartGlowProvider } from "@/components/cart-glow-provider"
-import { Toaster } from "@/components/ui/toaster"
+import { Providers } from "@/components/providers"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Book My DSLR - Premium Camera Rentals",
-  description: "Rent premium cameras, lenses, and accessories at affordable prices.",
+  title: "Book My DSLR - Premium Camera Rentals in Bangalore",
+  description: "Rent premium cameras, lenses, and accessories at affordable prices. Top-rated DSLR and Mirrorless camera rental service in Bangalore.",
+  keywords: ["camera rental", "dslr rental", "lens rental", "bangalore", "canon", "nikon", "sony", "photography equipment"],
+  openGraph: {
+    title: "Book My DSLR - Premium Camera Rentals",
+    description: "Rent premium cameras, lenses, and accessories at affordable prices in Bangalore.",
+    type: "website",
+    locale: "en_IN",
+    siteName: "Book My DSLR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Book My DSLR - Premium Camera Rentals",
+    description: "Rent premium cameras, lenses, and accessories at affordable prices.",
+  },
   icons: {
     icon: [
       { url: '/favicon_io/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -20,19 +29,8 @@ export const metadata: Metadata = {
     ],
     shortcut: '/favicon_io/favicon.ico',
     apple: '/favicon_io/apple-touch-icon.png',
-    other: [
-      {
-        rel: 'android-chrome-192x192',
-        url: '/favicon_io/android-chrome-192x192.png',
-      },
-      {
-        rel: 'android-chrome-512x512',
-        url: '/favicon_io/android-chrome-512x512.png',
-      },
-    ],
   },
   manifest: '/favicon_io/site.webmanifest',
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -43,16 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CartProvider>
-          <CartGlowProvider>
-            <div className="flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-              <Toaster />
-            </div>
-          </CartGlowProvider>
-        </CartProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

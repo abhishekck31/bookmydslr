@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -7,130 +9,71 @@ import { Camera, CreditCard, Truck, Clock, CheckCircle } from "lucide-react"
 
 export default function HowItWorksPage() {
   return (
-    <div>
+    <main className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-black text-white py-16 md:py-24">
-        <div className="container text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-6">How Book My DSLR Works</h1>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8">
-            Renting a camera with us is quick, easy, and hassle-free. Follow these simple steps to get started.
+      <section className="bg-slate-950 text-white py-24 md:py-32 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
+
+        <div className="container-premium text-center relative z-10">
+          <div className="inline-flex items-center gap-2 mb-6 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 backdrop-blur-md">
+            <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">Simple & Fast</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">How It Works</h1>
+          <p className="text-xl md:text-2xl max-w-2xl mx-auto mb-10 text-slate-400 font-light leading-relaxed">
+            Renting a camera shouldn't be complicated. We've optimized our process to get gear in your hands in minutes.
           </p>
-          <Button asChild className="bg-yellow-500 text-black hover:bg-yellow-600">
-            <Link href="/cameras">Browse Cameras</Link>
+          <Button asChild size="lg" className="rounded-full bg-white text-black hover:bg-amber-50 min-w-[200px] h-14 text-lg font-bold">
+            <Link href="/products">Browse Gear</Link>
           </Button>
         </div>
       </section>
 
       {/* Process Steps */}
-      <section className="container py-16">
-        <div className="grid grid-cols-1 gap-12">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">1. Browse & Select</h2>
-            <p className="text-muted-foreground mb-6">
-              Browse our extensive collection of cameras, lenses, and accessories. Use filters to narrow down your
-              search based on brand, type, price, and availability.
-            </p>
-            <ul className="space-y-3">
-              {browseFeatures.map((feature, index) => (
-                <li key={index} className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-        </div>
-
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">2. Book & Pay</h2>
-            <p className="text-muted-foreground mb-6">
-              Once you've found the perfect camera, select your rental dates and add it to your cart. Complete the
-              checkout process with our secure payment system.
-            </p>
-            <ul className="space-y-3">
-              {bookFeatures.map((feature, index) => (
-                <li key={index} className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-        </div>
-
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">3. Receive Equipment</h2>
-            <p className="text-muted-foreground mb-6">
-              Choose between convenient delivery to your doorstep or pickup from our store. All equipment is thoroughly
-              checked and cleaned before handover.
-            </p>
-            <ul className="space-y-3">
-              {receiveFeatures.map((feature, index) => (
-                <li key={index} className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-        </div>
-
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">4. Return</h2>
-            <p className="text-muted-foreground mb-6">
-              When your rental period is over, return the equipment using our hassle-free return process. Drop it off at
-              our store or schedule a pickup.
-            </p>
-            <ul className="space-y-3">
-              {returnFeatures.map((feature, index) => (
-                <li key={index} className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Process Icons */}
-      <section className="bg-gray-100 py-16">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">The Rental Process</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Our streamlined process makes renting camera equipment simple and convenient
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {steps.map((step) => (
-              <Card key={step.id} className="border-none shadow-none bg-transparent">
-                <CardContent className="flex flex-col items-center text-center pt-6">
-                  <div className="bg-yellow-500 text-black rounded-full w-16 h-16 flex items-center justify-center mb-4">
+      <section className="py-24 bg-white">
+        <div className="container-premium">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step, index) => (
+              <div key={step.id} className="relative group">
+                <div className="absolute top-8 left-8 -right-8 h-0.5 bg-gray-100 hidden lg:block -z-10" />
+                <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-50 text-slate-900 flex items-center justify-center mb-6 text-xl font-bold border border-slate-100 group-hover:bg-slate-900 group-hover:text-amber-400 transition-colors">
                     {step.icon}
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
-                </CardContent>
-              </Card>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
+                  <p className="text-slate-500 font-light leading-relaxed mb-6 flex-1">{step.description}</p>
+
+                  <ul className="text-left w-full space-y-2">
+                    {step.features.map((feat, i) => (
+                      <li key={i} className="flex items-start text-xs text-slate-600 font-medium">
+                        <CheckCircle className="w-3.5 h-3.5 text-amber-500 mr-2 mt-0.5 shrink-0" />
+                        {feat}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="container py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Find answers to common questions about our rental process
-          </p>
-        </div>
+      <section className="py-24 bg-gray-50 border-t border-gray-200">
+        <div className="container-premium max-w-3xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+            <p className="text-slate-500">
+              Everything you need to know about the rental process.
+            </p>
+          </div>
 
-        <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full space-y-4">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
+              <AccordionItem key={index} value={`item-${index}`} className="border border-gray-200 bg-white rounded-2xl px-6 data-[state=open]:border-amber-400 transition-all duration-300">
+                <AccordionTrigger className="text-left font-bold text-lg text-slate-900 py-6 hover:text-amber-600 hover:no-underline">{faq.question}</AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed text-base pb-6 font-light">
+                  {faq.answer}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -138,116 +81,103 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-black text-white py-16">
-        <div className="container text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Rent Your Camera?</h2>
-          <p className="text-lg max-w-2xl mx-auto mb-8">
-            Browse our collection and find the perfect camera for your next photography adventure
+      <section className="bg-slate-900 text-white py-24 relative overflow-hidden">
+        <div className="container-premium text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Ready to Start Creating?</h2>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 text-slate-400">
+            Join thousands of satisfied creators in Bangalore.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button asChild size="lg" className="bg-yellow-500 text-black hover:bg-yellow-600">
-              <Link href="/cameras">Browse Cameras</Link>
+          <div className="flex flex-col sm:flex-row justify-center gap-5">
+            <Button asChild size="lg" className="bg-amber-500 text-black hover:bg-amber-600 rounded-full h-14 px-10 text-lg font-bold shadow-lg shadow-amber-500/20">
+              <Link href="/products">Browse Cameras</Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black"
+              className="border-slate-700 text-white hover:bg-slate-800 rounded-full h-14 px-10 text-lg"
             >
-              <Link href="/contact">Contact Us</Link>
+              <Link href="/contact">Contact Support</Link>
             </Button>
           </div>
         </div>
       </section>
-    </div>
+    </main>
   )
 }
 
 // Sample data
-const browseFeatures = [
-  "Detailed specifications and high-quality images",
-  "Real customer reviews and ratings",
-  "Availability calendar showing rental status",
-  "Compare different models side by side",
-]
-
-const bookFeatures = [
-  "Flexible rental periods from 1 day to several weeks",
-  "Secure payment processing with multiple options",
-  "Optional insurance coverage for peace of mind",
-  "Easy rescheduling if your plans change",
-]
-
-const receiveFeatures = [
-  "Same-day delivery available for urgent needs",
-  "Scheduled delivery at your preferred time",
-  "In-store pickup with equipment testing and tutorial",
-  "All accessories and manuals included",
-]
-
-const returnFeatures = [
-  "Convenient drop-off at our store location",
-  "Scheduled pickup from your location",
-  "Flexible return hours to fit your schedule",
-  "Quick inspection process with immediate confirmation",
-]
-
 const steps = [
   {
     id: 1,
     title: "Browse & Select",
-    description: "Browse our collection and select the camera that fits your needs",
-    icon: <Camera className="h-6 w-6" />,
+    description: "Find the perfect gear for your shoot from our extensive inventory.",
+    icon: <Camera className="h-8 w-8" />,
+    features: [
+      "Compare models side-by-side",
+      "View detailed specs & gallery",
+      "Check real-time availability"
+    ]
   },
   {
     id: 2,
-    title: "Book & Pay",
-    description: "Choose your rental dates and complete the payment securely",
-    icon: <CreditCard className="h-6 w-6" />,
+    title: "Book & Verify",
+    description: "Secure your dates and complete a quick one-time verification.",
+    icon: <CreditCard className="h-8 w-8" />,
+    features: [
+      "Simple WhatsApp checkout",
+      "Instant booking confirmation",
+      "Secure & transparent pricing"
+    ]
   },
   {
     id: 3,
-    title: "Receive Equipment",
-    description: "Get your camera delivered to your doorstep or pick it up",
-    icon: <Truck className="h-6 w-6" />,
+    title: "Pickup or Delivery",
+    description: "Get your gear delivered to your set or pick it up from our studio.",
+    icon: <Truck className="h-8 w-8" />,
+    features: [
+      "Same-day delivery available",
+      "Thorough gear walkthrough",
+      "Zero-hassle handover"
+    ]
   },
   {
     id: 4,
-    title: "Return",
-    description: "Return the equipment when your rental period is over",
-    icon: <Clock className="h-6 w-6" />,
+    title: "Shoot & Return",
+    description: "Create your masterpiece and return the gear when you're done.",
+    icon: <Clock className="h-8 w-8" />,
+    features: [
+      "Flexible return hours",
+      "Easy extension options",
+      "Quick return inspection"
+    ]
   },
 ]
 
 const faqs = [
   {
-    question: "What identification do I need to rent a camera?",
+    question: "What documents do I need to rent?",
     answer:
-      "You'll need a valid government-issued photo ID (such as a driver's license or passport) and a credit card in your name. For first-time renters, we may also require proof of address.",
+      "For efficient verification, we require a valid government-issued photo ID (Aadhar/Driving License) and a quick address proof. First-time renters may need a standard security deposit or a reference.",
   },
   {
-    question: "What happens if I damage the equipment?",
+    question: "Do you offer damage protection?",
     answer:
-      "We offer optional damage protection plans that cover accidental damage. If you decline this coverage, you'll be responsible for repair or replacement costs. Normal wear and tear is always covered.",
+      "Yes! We highly recommend our optional Damage Protection Plan. It covers accidental damage during your shoot, giving you complete peace of mind. Without it, you are liable for repair costs.",
   },
   {
-    question: "Can I extend my rental period?",
+    question: "Can I pick up the gear a day early?",
     answer:
-      "Yes, you can extend your rental period if the equipment isn't already reserved. Contact us at least 24 hours before your return date to check availability and arrange an extension.",
+      "Absolutely. We usually allow pickup after 7 PM on the day before your rental starts, free of charge, so you can prep your kit. Just let us know in advance.",
   },
   {
-    question: "Do you provide delivery services?",
+    question: "What if I need to cancel?",
     answer:
-      "Yes, we offer both delivery and pickup services. Delivery fees vary based on your location. Same-day delivery is available for orders placed before noon, subject to availability.",
+      "Plans change. You can cancel up to 48 hours before your booking for a full refund. Cancellations within 48 hours may incur a small fee to cover the reservation hold.",
   },
   {
-    question: "What if the equipment is faulty?",
+    question: "Is there a student discount?",
     answer:
-      "All our equipment is thoroughly tested before rental. If you experience any issues, contact us immediately and we'll arrange a replacement or refund. We have a 24/7 technical support line for urgent matters.",
-  },
-  {
-    question: "Can I cancel my reservation?",
-    answer:
-      "Reservations can be canceled up to 48 hours before the rental start date for a full refund. Cancellations within 48 hours may be subject to a cancellation fee of 50% of the rental cost.",
+      "We love supporting upcoming talent! Students with a valid college ID get a special discount on select gear. Contact our support team to apply.",
   },
 ]

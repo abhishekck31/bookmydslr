@@ -10,7 +10,24 @@
 // 4. Make sure to include all required fields (name, description, price, etc.)
 // 5. Add the new object to the accessories array below
 
-export const accessories = [
+export interface Accessory {
+  id: string
+  name: string
+  category: string
+  type: string
+  price: number
+  description: string
+  image: string
+  available: boolean
+  brand?: string
+  gallery?: string[]
+  specs?: Record<string, string>
+  features?: string[]
+  rating?: number
+  reviews?: number
+}
+
+export const accessories: Accessory[] = [
   // --- Action Cameras & Accessories ---
   { id: "ac-1", name: "GoPro Mic Adapter 3.5mm", category: "Action Camera Accessory", type: "Mic Adapter", price: 150, description: "Mic adapter for GoPro", image: "/mic&rec/gopromicadapter.png", available: true },
   { id: "ac-2", name: "GoPro 9 Black", category: "Action Camera", type: "Action Camera", price: 600, description: "Action camera", image: "/ActionCamera/gopro9black.png", available: true },
@@ -20,7 +37,7 @@ export const accessories = [
   { id: "ac-6", name: "INSTA 360 ONE R 4K", category: "Action Camera", type: "Action Camera", price: 500, description: "360 action camera", image: "/ActionCamera/insta360oneR4K.png", available: true },
   { id: "ac-7", name: "GoPro Hero 11 Black", category: "Action Camera", type: "Action Camera", price: 800, description: "Action camera with 5.3K video and 27MP photos", image: "/ActionCamera/gopro11.png", available: true },
   { id: "ac-8", name: "GoPro Hero 12 Black", category: "Action Camera", type: "Action Camera", price: 900, description: "Action camera with 5.3K video and 27MP photos", image: "/ActionCamera/gopro12.png", available: true },
- 
+
 
   // --- Gimbals ---
   { id: "g-1", name: "DJI Ronin S (Gimbal)", category: "Gimbal", type: "Gimbal", price: 1500, description: "3-axis gimbal", image: "/Gimbal/DJIRoninS.png", available: true },

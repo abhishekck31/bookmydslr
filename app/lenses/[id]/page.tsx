@@ -11,18 +11,16 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { lenses } from "@/data/lenses"
 import { useCart, type CartItem } from "@/components/cart-provider"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
-export default function LensDetailPage({ params }: { params: { id: string } }) {
+export default async function LensDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
   const [rentalDays, setRentalDays] = useState(3)
   const { addItem } = useCart()
   const { toast } = useToast()
 
-  // Convert id to number for comparison
-  const lensId = Number.parseInt(params.id, 10)
-
   // Find the lens by ID
-  const lens = lenses.find((l) => l.id === lensId)
+  const lens = lenses.find((l) => l.id.toString() === resolvedParams.id)
 
   // If lens not found, show 404
   if (!lens) {
@@ -31,12 +29,13 @@ export default function LensDetailPage({ params }: { params: { id: string } }) {
 
   const handleAddToCart = () => {
     const cartItem: CartItem = {
-      id: lens.id,
+      id: lens.id.toString(),
       name: lens.name,
       price: lens.price,
       image: lens.image || "/placeholder.svg?height=200&width=200",
       days: rentalDays,
       category: "lenses",
+      brand: lens.brand,
     }
 
     addItem(cartItem)
@@ -244,7 +243,7 @@ export default function LensDetailPage({ params }: { params: { id: string } }) {
         <h2 className="text-2xl font-bold mb-6">You might also like</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {lenses
-            .filter((item) => item.id !== lens.id)
+            .filter((item) => item.id.toString() !== lens.id.toString())
             .slice(0, 4)
             .map((item) => (
               <Link href={`/lenses/${item.id}`} key={item.id} className="group">

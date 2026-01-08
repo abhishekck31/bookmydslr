@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  slug      String    @unique
+  image     String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  image       String?
+  brand       String?
+  type        String?
+  
+  // Relations
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  
+  images      ProductImage[]
+  
+  // Status
+  isAvailable Boolean  @default(true)
+  availability Availability[]
+
+  // SEO / Extra (Stored as Json for flexibility in Postgres)
+  specs       Json?
+  features    Json?
+  
+  // Legacy fields
+  rating      Float?
+  reviews     Int?     @default(0)
+
+  // Use Strings for rich text or simple text? 
+  // Let's keep simple types.
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Index for search optimization
+  @@index([name])
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  url       String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Availability {
+   id        String   @id @default(uuid())
+   productId String
+   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+   startDate DateTime
+   endDate   DateTime
+   reason    String? // e.g., "Maintenance", "Rented"
+   
+   @@index([productId])
+   @@index([startDate, endDate])
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  city      String
+  details   Json?   // JSON with requested items/dates
+  source    String? // e.g., "WhatsApp Flow"
+  status    String   @default("NEW") // NEW, CONTACTED, CLOSED
+  createdAt DateTime @default(now())
+}
+
+model GlobalSettings {
+  id                String   @id @default("singleton")
+  discountPercent   Float    @default(0)
+  isDiscountActive  Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
+}

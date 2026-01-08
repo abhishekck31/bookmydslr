@@ -4,15 +4,18 @@ import { ChevronLeft } from "lucide-react"
 
 import { rentalEquipment } from "@/data/rental-equipment"
 
-export default function CategoryPage({
+export default async function CategoryPage({
   params,
   searchParams,
 }: {
-  params: { category: string }
-  searchParams: { subcategory?: string }
+  params: Promise<{ category: string }>
+  searchParams: Promise<{ subcategory?: string }>
 }) {
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+
   // Convert URL-friendly category back to original format
-  const categoryParam = params.category.replace(/-/g, " ")
+  const categoryParam = resolvedParams.category.replace(/-/g, " ")
 
   // Find all equipment in this category
   const categoryEquipment = rentalEquipment.filter(
@@ -39,8 +42,8 @@ export default function CategoryPage({
   let filteredEquipment = categoryEquipment
   let selectedSubcategory = ""
 
-  if (searchParams.subcategory) {
-    selectedSubcategory = searchParams.subcategory.replace(/-/g, " ")
+  if (resolvedSearchParams.subcategory) {
+    selectedSubcategory = resolvedSearchParams.subcategory.replace(/-/g, " ")
     filteredEquipment = categoryEquipment.filter(
       (item) => item.subcategory.toLowerCase() === selectedSubcategory.toLowerCase(),
     )
@@ -64,7 +67,7 @@ export default function CategoryPage({
           {subcategories.map((subcategory) => (
             <Link
               key={subcategory}
-              href={`/rental-equipment/${params.category}?subcategory=${subcategory.toLowerCase().replace(/\s+/g, "-")}`}
+              href={`/rental-equipment/${resolvedParams.category}?subcategory=${subcategory.toLowerCase().replace(/\s+/g, "-")}`}
               className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
             >
               {subcategory}

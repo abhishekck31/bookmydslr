@@ -1,58 +1,47 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useInView } from "react-intersection-observer"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export default function TermsPage() {
-  const { ref: headerRef, inView: headerInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
-
-  const { ref: contentRef, inView: contentInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
-
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
       {/* Header */}
-      <section ref={headerRef} className="bg-white py-16 border-b border-gray-100">
-        <div className="container text-center">
+      <section className="bg-slate-50 py-20 border-b border-gray-100">
+        <div className="container-premium text-center">
           <motion.div
-            className="mb-6 mx-auto w-24 h-1 bg-gradient-to-r from-amber-500 to-yellow-300 rounded-full"
+            className="mb-6 mx-auto w-16 h-1 bg-amber-500 rounded-full"
             initial={{ width: 0 }}
-            animate={headerInView ? { width: 96 } : {}}
+            animate={{ width: 64 }}
             transition={{ duration: 0.5 }}
           />
           <motion.h1
-            className="text-3xl md:text-4xl font-bold mb-4 text-gray-900"
+            className="text-4xl md:text-5xl font-bold mb-4 text-slate-900 tracking-tight"
             initial={{ opacity: 0, y: 20 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Terms and Conditions
+            Terms & Conditions
           </motion.h1>
           <motion.p
-            className="text-lg max-w-2xl mx-auto text-gray-600"
+            className="text-lg max-w-2xl mx-auto text-slate-500 font-light"
             initial={{ opacity: 0, y: 20 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Please read these terms carefully before using our services
+            Please read these terms carefully before using our services.
           </motion.p>
         </div>
       </section>
 
       {/* Content */}
-      <section ref={contentRef} className="py-12 bg-white">
-        <div className="container">
+      <section className="py-20 bg-white">
+        <div className="container-premium max-w-4xl">
           <motion.div
-            className="max-w-4xl mx-auto p-8 rounded-lg shadow-sm bg-white border border-gray-50 prose prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600"
+            className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-amber-600 hover:prose-a:text-amber-500 prose-li:text-slate-600"
             initial={{ opacity: 0, y: 20 }}
-            animate={contentInView ? { opacity: 1, y: 0 } : {}}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <h2>1. Acceptance of Terms</h2>
@@ -84,12 +73,12 @@ export default function TermsPage() {
             <h2>3. Payment Terms</h2>
             <p>
               Payment for rentals must be made in full at the time of booking. We accept various payment methods
-              including credit/debit cards and online payment services.
+              including credit/debit cards and online payment services via UPI.
             </p>
 
             <h3>3.1 Security Deposit</h3>
             <p>
-              A security deposit may be required for certain equipment. This deposit will be refunded upon the safe
+              A security deposit may be required for certain equipment or for first-time customers. This deposit will be refunded upon the safe
               return of the equipment, subject to any deductions for damage or late returns.
             </p>
 
@@ -146,26 +135,29 @@ export default function TermsPage() {
               periodically.
             </p>
 
-            <h2>9. Contact Information</h2>
-            <p>If you have any questions or concerns about these Terms and Conditions, please contact us at:</p>
-            <ul className="text-gray-600">
-              <li>Email: info@bookmydslr.com</li>
-              <li>Phone: +91 98765 43210</li>
-              <li>Address: 123 Photography Lane, Bangalore, Karnataka 560001, India</li>
-            </ul>
+            <div className="bg-gray-50 p-8 rounded-2xl border border-gray-100 mt-12 not-prose">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">Contact Information</h3>
+              <p className="text-slate-600 mb-6">If you have any questions or concerns about these Terms and Conditions, please contact us at:</p>
+              <ul className="space-y-2 text-slate-700 font-medium">
+                <li>Email: bookmydslr@gmail.com</li>
+                <li>Phone: +91 99721 22462</li>
+                <li>Address: 2nd Floor, No- 212/1, Hennur Main Road, Kalyan Nagar, Bengaluru, Karnataka 560043</li>
+              </ul>
+            </div>
 
-            <div className="mt-12 text-center border-t border-gray-100 pt-8">
-              <p className="font-semibold text-gray-700">Last updated: May 3, 2023</p>
+            <div className="mt-12 text-center border-t border-gray-100 pt-8 not-prose">
+              <p className="font-semibold text-gray-500 mb-6 text-sm uppercase tracking-widest">Last updated: January 2024</p>
               <Button
                 asChild
-                className="mt-6 bg-gradient-to-r from-amber-500 to-yellow-300 text-black hover:from-amber-600 hover:to-yellow-400 shadow-sm transition-all duration-300 hover:shadow"
+                size="lg"
+                className="bg-slate-900 text-white hover:bg-black rounded-full px-8 h-12"
               >
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/contact">Contact Support</Link>
               </Button>
             </div>
           </motion.div>
         </div>
       </section>
-    </div>
+    </main>
   )
 }
