@@ -6,7 +6,10 @@ export default async function CamerasPage() {
   const cameras = await prisma.product.findMany({
     where: {
       category: {
-        name: 'Cameras'
+        name: {
+          contains: 'Camera',
+          mode: 'insensitive'
+        }
       }
     },
     include: {

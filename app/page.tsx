@@ -44,7 +44,10 @@ export default async function HomePage() {
       // We can use a specific category or just a "featured" flag if we had one
       // For now, let's just get the latest 4 cameras
       category: {
-        name: 'Cameras'
+        name: {
+          contains: 'Camera',
+          mode: 'insensitive'
+        }
       }
     },
     take: 4,
