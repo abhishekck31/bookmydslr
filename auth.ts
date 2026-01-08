@@ -1,13 +1,10 @@
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-import { prisma } from "@/lib/prisma"
-import bcrypt from "bcryptjs"
+import type { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthOptions = {
     secret: process.env.AUTH_SECRET || "bookmydslr_secret_2025_fixed",
-    trustHost: true,
     providers: [
-        Credentials({
+        CredentialsProvider({
             name: "Credentials",
             credentials: {
                 email: { label: "Email", type: "email" },
@@ -29,8 +26,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         name: "Admin",
                     }
                 }
-
-                // Fallback to database check if needed, but the request was "if the email is ... it must login"
                 return null
             },
         }),
@@ -52,4 +47,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     pages: {
         signIn: "/admin/login",
     },
-})
+}
