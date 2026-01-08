@@ -20,14 +20,25 @@ export default function AdminDashboard() {
 
             if (prodRes.ok) {
                 const data = await prodRes.json()
-                // The API usually returns { products: [...] } or just the array
-                setProducts(Array.isArray(data) ? data : data.products || [])
+                // Defensive check to ensure array
+                const validProducts = Array.isArray(data) ? data : (data.products && Array.isArray(data.products) ? data.products : [])
+                console.log("Dashboard Products:", validProducts)
+                setProducts(validProducts)
             }
 
             if (catRes.ok) {
                 const data = await catRes.json()
-                setCategories(data)
+                // Defensive check - if API returns object or null, fallback
+                if (Array.isArray(data)) {
+                    console.log("Dashboard Categories:", data)
+                    setCategories(data)
+                } else {
+                    console.error("Categories API did not return an array:", data)
+                    // Fallback to empty to prevent crash
+                    setCategories([])
+                }
             } else {
+                console.error("Categories API failed:", catRes.status)
                 // Fallback categories if API fails or doesn't exist yet
                 setCategories([
                     { id: 'cam-cat-id', name: 'Cameras' },

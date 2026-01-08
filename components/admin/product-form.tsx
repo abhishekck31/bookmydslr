@@ -117,7 +117,7 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
                                     <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {categories.map((c) => (
+                                    {Array.isArray(categories) && categories.map((c) => (
                                         <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                     ))}
                                 </SelectContent>

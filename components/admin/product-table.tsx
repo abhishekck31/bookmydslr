@@ -23,7 +23,7 @@ interface Product {
     isAvailable: boolean
     category: {
         name: string
-    }
+    } | null | null // Allow null just in case
 }
 
 export function ProductTable({ products, onUpdate }: { products: Product[], onUpdate: () => void }) {
@@ -71,7 +71,7 @@ export function ProductTable({ products, onUpdate }: { products: Product[], onUp
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded bg-slate-100 flex items-center justify-center shrink-0">
-                                        {product.category.name === 'Cameras' ? <Camera className="h-5 w-5 text-slate-400" /> : <Package className="h-5 w-5 text-slate-400" />}
+                                        {product.category?.name === 'Cameras' ? <Camera className="h-5 w-5 text-slate-400" /> : <Package className="h-5 w-5 text-slate-400" />}
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="font-semibold text-slate-900">{product.name}</span>
@@ -80,7 +80,7 @@ export function ProductTable({ products, onUpdate }: { products: Product[], onUp
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <span className="text-sm font-medium text-slate-600">{product.category.name}</span>
+                                <span className="text-sm font-medium text-slate-600">{product.category?.name || 'Uncategorized'}</span>
                             </TableCell>
                             <TableCell>
                                 <span className="text-sm text-slate-500">{product.type || '--'}</span>

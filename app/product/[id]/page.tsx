@@ -2,7 +2,11 @@ import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import { ProductClient } from "@/components/product-client"
 
-export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProductDetailPage({
+  params
+}: {
+  params: Promise<{ id: string }>
+}) {
   const { id } = await params
 
   // Fetch product from DB
