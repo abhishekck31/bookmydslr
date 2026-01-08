@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react'
+import { Plus, Loader2, Image as ImageIcon, Sparkles, Save } from 'lucide-react'
 import { FeatureInput } from './feature-input'
 
 interface Category {
@@ -18,24 +19,60 @@ interface Category {
 
 interface ProductFormProps {
     categories: Category[]
-    onSuccess: () => void
+    onSuccess?: () => void
+    initialData?: any
+    action?: 'create' | 'update'
 }
 
-export function ProductForm({ categories, onSuccess }: ProductFormProps) {
+export function ProductForm({ categories, onSuccess, initialData, action = 'create' }: ProductFormProps) {
+    const router = useRouter()
     const { toast } = useToast()
     const [loading, setLoading] = useState(false)
+    
+    // Parse features from initialData if it's a JSON string or array
+    const parseFeatures = (features: any): string[] => {
+        if (!features) return []
+        if (Array.isArray(features)) return features
+        if (typeof features === 'string') {
+            try {
+                const parsed = JSON.parse(features)
+                return Array.isArray(parsed) ? parsed : []
+            } catch {
+                return []
+            }
+        }
+        return []
+    }
+
     const [formData, setFormData] = useState({
-        name: '',
-        categoryId: '',
-        brand: '',
-        type: '', // serves as 'Model'
-        price: '',
+        name: initialData?.name || '',
+        categoryId: initialData?.categoryId || '',
+        brand: initialData?.brand || '',
+        type: initialData?.type || '',
+        price: initialData?.price?.toString() || '',
         basePrice: '',
-        description: '',
-        image: '',
-        isAvailable: true,
-        features: [] as string[]
+        description: initialData?.description || '',
+        image: initialData?.image || '',
+        isAvailable: initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
+        features: parseFeatures(initialData?.features)
     })
+
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name || '',
+                categoryId: initialData.categoryId || '',
+                brand: initialData.brand || '',
+                type: initialData.type || '',
+                price: initialData.price?.toString() || '',
+                basePrice: '',
+                description: initialData.description || '',
+                image: initialData.image || '',
+                isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
+                features: parseFeatures(initialData.features)
+            })
+        }
+    }, [initialData])
 
     // Auto-fill brand/type logic can be added here if needed, but keeping it explicit is better for Admin CRUD.
 
@@ -58,30 +95,52 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
                 features: formData.features
             }
 
-            const res = await fetch('/api/admin/products', {
-                method: 'POST',
+            const url = action === 'update' && initialData?.id 
+                ? `/api/admin/products/${initialData.id}`
+                : '/api/admin/products'
+            const method = action === 'update' ? 'PUT' : 'POST'
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
 
             if (res.ok) {
-                toast({ title: "Product added successfully! 🚀" })
-                // Reset form
-                setFormData({
-                    name: '',
-                    categoryId: '',
-                    brand: '',
-                    type: '',
-                    price: '',
-                    basePrice: '',
-                    description: '',
-                    image: '',
-                    isAvailable: true,
-                    features: []
+                toast({ 
+                    title: action === 'update' ? "Product updated successfully! ✅" : "Product added successfully! 🚀" 
                 })
-                onSuccess()
+                
+                if (action === 'update') {
+                    // Navigate back or refresh
+                    if (onSuccess) {
+                        onSuccess()
+                    } else {
+                        router.push('/admin/dashboard')
+                    }
+                } else {
+                    // Reset form for create
+                    setFormData({
+                        name: '',
+                        categoryId: '',
+                        brand: '',
+                        type: '',
+                        price: '',
+                        basePrice: '',
+                        description: '',
+                        image: '',
+                        isAvailable: true,
+                        features: []
+                    })
+                    if (onSuccess) onSuccess()
+                }
             } else {
-                toast({ title: "Failed to add product", variant: "destructive" })
+                const errorData = await res.json().catch(() => ({}))
+                toast({ 
+                    title: action === 'update' ? "Failed to update product" : "Failed to add product", 
+                    description: errorData.error || 'Please try again',
+                    variant: "destructive" 
+                })
             }
         } catch (error) {
             console.error(error)
@@ -212,7 +271,17 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full h-12 text-base bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-md hover:shadow-lg transition-all">
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Plus className="h-5 w-5 mr-2" /> Add to Inventory</>}
+                {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                ) : action === 'update' ? (
+                    <>
+                        <Save className="h-5 w-5 mr-2" /> Update Product
+                    </>
+                ) : (
+                    <>
+                        <Plus className="h-5 w-5 mr-2" /> Add to Inventory
+                    </>
+                )}
             </Button>
         </form>
     )

@@ -20,8 +20,8 @@ export async function PUT(
                 type: body.type,
                 image: body.image,
                 isAvailable: body.isAvailable,
-                specs: body.specs,
-                features: body.features
+                specs: body.specs ? (typeof body.specs === 'string' ? JSON.parse(body.specs) : body.specs) : undefined,
+                features: body.features ? (Array.isArray(body.features) ? body.features : (typeof body.features === 'string' ? JSON.parse(body.features) : [body.features])) : undefined
             }
         })
 

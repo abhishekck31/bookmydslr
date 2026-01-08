@@ -85,7 +85,7 @@ export default function AdminDashboard() {
             {/* Inventory Table */}
             <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-slate-900">Live Inventory</h2>
-                <ProductTable products={products} onUpdate={fetchData} />
+                <ProductTable products={products} onUpdate={fetchData} categories={categories} />
             </div>
         </div>
     )
