@@ -117,9 +117,6 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
                                     <Image src={activeImage || "/placeholder.svg"} alt={product.name} fill className="object-contain" priority />
                                 </motion.div>
                             </AnimatePresence>
-                            {globalSettings?.isDiscountActive && (
-                                <Badge className="absolute top-4 right-4 bg-red-500">-{globalSettings.discountPercent}% OFF</Badge>
-                            )}
                         </div>
                         {/* More imagery USP etc (simplified for now to match structure) */}
                         <div className="grid grid-cols-3 gap-4">
