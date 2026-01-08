@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { AccessoriesClient } from "@/components/accessories-client"
 
+export const dynamic = 'force-dynamic'
+
 export default async function AccessoriesPage() {
   // Fetch accessories from DB
   // We fetch everything that's NOT in the 'Cameras' category

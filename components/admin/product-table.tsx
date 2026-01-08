@@ -124,4 +124,4 @@ export function ProductTable({ products, onUpdate }: { products: Product[], onUp
     )
 }
 
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+

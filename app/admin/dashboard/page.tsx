@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { CameraSection } from '@/components/admin/camera-section'
-import { AccessorySection } from '@/components/admin/accessory-section'
+import { ProductManagement } from '@/components/admin/product-management'
 import { PricingSection } from '@/components/admin/pricing-section'
 import { ProductTable } from '@/components/admin/product-table'
 import { Loader2, LayoutDashboard } from 'lucide-react'
@@ -63,14 +62,11 @@ export default function AdminDashboard() {
                     <LayoutDashboard className="h-8 w-8 text-amber-500" />
                     Admin Dashboard
                 </h1>
-                <p className="text-slate-500 mt-2 text-lg">Manage cameras, accessories, pricing & discounts from one place.</p>
+                <p className="text-slate-500 mt-2 text-lg">Manage detailed inventory, pricing & discounts from one unified system.</p>
             </div>
 
-            {/* Management Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CameraSection categories={categories} onUpdate={fetchData} />
-                <AccessorySection categories={categories} onUpdate={fetchData} />
-            </div>
+            {/* Unified Inventory Management */}
+            <ProductManagement categories={categories} onUpdate={fetchData} />
 
             {/* Pricing Section */}
             <PricingSection />

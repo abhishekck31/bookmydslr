@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { CamerasClient } from "@/components/cameras-client"
 
+export const dynamic = 'force-dynamic'
+
 export default async function CamerasPage() {
   // Fetch cameras from DB
   const cameras = await prisma.product.findMany({
