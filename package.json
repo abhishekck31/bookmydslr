@@ -6,7 +6,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@emotion/is-prop-valid": "latest",
@@ -48,6 +49,7 @@
         "input-otp": "1.4.1",
         "lucide-react": "^0.454.0",
         "next": "15.4.10",
+        "next-auth": "^4.24.7",
         "next-themes": "latest",
         "react": "^18.2.0",
         "react-day-picker": "8.10.1",
