@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { toast } from 'sonner'
 import { useState, useMemo } from 'react'
+import { Switch } from '@/components/ui/switch'
 
 interface Product {
     id: string
@@ -27,6 +28,8 @@ interface Product {
     price: number
     image: string | null
     isAvailable: boolean
+    discountPercentage: number | null
+    offerName: string | null
     category: {
         name: string
     } | null
@@ -40,6 +43,7 @@ interface ProductTableProps {
 
 export function ProductTable({ products, onUpdate, categories = [] }: ProductTableProps) {
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [togglingId, setTogglingId] = useState<string | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [selectedStatus, setSelectedStatus] = useState<string>('all')
@@ -111,6 +115,27 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
 
     const hasActiveFilters = searchTerm !== '' || selectedCategory !== 'all' || selectedStatus !== 'all' || sortBy !== 'newest'
 
+    const handleToggleAvailability = async (id: string, currentStatus: boolean) => {
+        setTogglingId(id)
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isAvailable: !currentStatus })
+            })
+            if (res.ok) {
+                toast.success(`Product ${!currentStatus ? 'activated' : 'deactivated'}`)
+                onUpdate()
+            } else {
+                toast.error('Failed to update availability')
+            }
+        } catch (error) {
+            toast.error('Error updating availability')
+        } finally {
+            setTogglingId(null)
+        }
+    }
+
     const handleDelete = async (id: string, name: string) => {
         if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
 
@@ -146,70 +171,73 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
 
             {/* Search and Filter Bar */}
             <div className="p-4 border-b border-slate-100 bg-white">
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col gap-4">
                     {/* Search */}
-                    <div className="flex-1 relative">
+                    <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder="Search by name, brand, or type..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9"
+                            className="pl-9 w-full"
                         />
                     </div>
 
-                    {/* Category Filter */}
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                        <SelectTrigger className="w-full md:w-[180px]">
-                            <SelectValue placeholder="All Categories" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Categories</SelectItem>
-                            {uniqueCategories.map((cat) => (
-                                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    {/* Filters Row */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        {/* Category Filter */}
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="All Categories" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                {uniqueCategories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                    {/* Status Filter */}
-                    <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                        <SelectTrigger className="w-full md:w-[150px]">
-                            <SelectValue placeholder="All Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        {/* Status Filter */}
+                        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                            <SelectTrigger className="w-full sm:w-[150px]">
+                                <SelectValue placeholder="All Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Sort */}
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="w-full md:w-[180px]">
-                            <SelectValue placeholder="Sort by" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="newest">Newest First</SelectItem>
-                            <SelectItem value="oldest">Oldest First</SelectItem>
-                            <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                            <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                            <SelectItem value="price-low">Price (Low to High)</SelectItem>
-                            <SelectItem value="price-high">Price (High to Low)</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        {/* Sort */}
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="Sort by" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="newest">Newest First</SelectItem>
+                                <SelectItem value="oldest">Oldest First</SelectItem>
+                                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                                <SelectItem value="price-low">Price (Low to High)</SelectItem>
+                                <SelectItem value="price-high">Price (High to Low)</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Clear Filters */}
-                    {hasActiveFilters && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={clearFilters}
-                            className="w-full md:w-auto"
-                        >
-                            <X className="h-4 w-4 mr-2" />
-                            Clear
-                        </Button>
-                    )}
+                        {/* Clear Filters */}
+                        {hasActiveFilters && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={clearFilters}
+                                className="w-full sm:w-auto"
+                            >
+                                <X className="h-4 w-4 mr-2" />
+                                Clear
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Active Filters Badges */}
@@ -249,17 +277,18 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
             <Table>
                 <TableHeader>
                     <TableRow className="bg-slate-50/50">
-                        <TableHead className="w-[300px]">Item Details</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Specs</TableHead>
-                        <TableHead>Price / Day</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="w-[300px] min-w-[200px]">Item Details</TableHead>
+                        <TableHead className="hidden md:table-cell">Category</TableHead>
+                        <TableHead className="hidden lg:table-cell">Specs</TableHead>
+                        <TableHead className="min-w-[120px]">Price / Day</TableHead>
+                        <TableHead className="min-w-[100px]">Available</TableHead>
+                        <TableHead className="hidden sm:table-cell">Status</TableHead>
+                        <TableHead className="text-right min-w-[100px]">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {filteredAndSortedProducts.map((product) => (
-                        <TableRow key={product.id}>
+                        <TableRow key={product.id} className="hover:bg-slate-50/50 transition-colors">
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden relative">
@@ -276,22 +305,58 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
                                                 <Package className="h-5 w-5 text-slate-400" />
                                         )}
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold text-slate-900">{product.name}</span>
-                                        <span className="text-xs text-slate-500">{product.brand || 'No Brand'}</span>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <span className="font-semibold text-slate-900 text-sm truncate">{product.name}</span>
+                                        <span className="text-xs text-slate-500 truncate">{product.brand || 'No Brand'}</span>
+                                        {/* Mobile-only category and specs */}
+                                        <div className="md:hidden flex flex-col gap-1 mt-1">
+                                            <span className="text-xs text-slate-600">{product.category?.name || 'Uncategorized'}</span>
+                                            {product.type && <span className="text-xs text-slate-500">{product.type}</span>}
+                                        </div>
                                     </div>
                                 </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden md:table-cell">
                                 <span className="text-sm font-medium text-slate-600">{product.category?.name || 'Uncategorized'}</span>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden lg:table-cell">
                                 <span className="text-sm text-slate-500">{product.type || '--'}</span>
                             </TableCell>
                             <TableCell>
-                                <span className="font-bold text-slate-900">₹{product.price}</span>
+                                <div className="space-y-1 min-w-[120px]">
+                                    {product.discountPercentage && product.discountPercentage > 0 ? (
+                                        <>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-slate-400 line-through">₹{product.price}</span>
+                                                    <span className="font-bold text-green-600 text-sm">₹{(product.price * (1 - product.discountPercentage / 100)).toFixed(2)}</span>
+                                                </div>
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 w-fit">
+                                                    -{product.discountPercentage}%
+                                                </span>
+                                                {product.offerName && (
+                                                    <div className="text-xs text-amber-600 font-medium truncate max-w-[120px]" title={product.offerName}>
+                                                        {product.offerName}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <span className="font-bold text-slate-900 text-sm">₹{product.price}</span>
+                                    )}
+                                </div>
                             </TableCell>
                             <TableCell>
+                                <div className="flex items-center justify-center">
+                                    <Switch
+                                        checked={product.isAvailable}
+                                        onCheckedChange={() => handleToggleAvailability(product.id, product.isAvailable)}
+                                        disabled={togglingId === product.id}
+                                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300 scale-90"
+                                    />
+                                </div>
+                            </TableCell>
+                            <TableCell className="hidden sm:table-cell">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${product.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                     {product.isAvailable ? 'Active' : 'Inactive'}
                                 </span>
@@ -318,7 +383,7 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
                     ))}
                     {filteredAndSortedProducts.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={6} className="h-32 text-center text-slate-400">
+                            <TableCell colSpan={7} className="h-32 text-center text-slate-400">
                                 {products.length === 0 
                                     ? "No inventory items found. Add cameras or accessories above."
                                     : "No products match your filters. Try adjusting your search criteria."

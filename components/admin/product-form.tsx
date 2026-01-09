@@ -54,7 +54,9 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
         description: initialData?.description || '',
         image: initialData?.image || '',
         isAvailable: initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
-        features: parseFeatures(initialData?.features)
+        features: parseFeatures(initialData?.features),
+        discountPercentage: initialData?.discountPercentage?.toString() || '',
+        offerName: initialData?.offerName || ''
     })
 
     useEffect(() => {
@@ -69,7 +71,9 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
                 description: initialData.description || '',
                 image: initialData.image || '',
                 isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
-                features: parseFeatures(initialData.features)
+                features: parseFeatures(initialData.features),
+                discountPercentage: initialData.discountPercentage?.toString() || '',
+                offerName: initialData.offerName || ''
             })
         }
     }, [initialData])
@@ -91,6 +95,8 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
                 ...formData,
                 price: parseFloat(formData.price) || 0,
                 basePrice: formData.basePrice ? parseFloat(formData.basePrice) : undefined,
+                discountPercentage: formData.discountPercentage ? parseFloat(formData.discountPercentage) : 0,
+                offerName: formData.offerName || null,
                 // Ensure features is an array
                 features: formData.features
             }
@@ -130,7 +136,9 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
                         description: '',
                         image: '',
                         isAvailable: true,
-                        features: []
+                        features: [],
+                        discountPercentage: '',
+                        offerName: ''
                     })
                     if (onSuccess) onSuccess()
                 }
@@ -152,7 +160,7 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 {/* Left Column: Core Details */}
                 <div className="space-y-6">
                     <div className="space-y-2">
@@ -165,7 +173,7 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label>Category</Label>
                             <Select 
@@ -192,7 +200,7 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label>Daily Price (₹)</Label>
                             <Input 
@@ -211,6 +219,59 @@ export function ProductForm({ categories, onSuccess, initialData, action = 'crea
                                 onChange={e => setFormData({ ...formData, type: e.target.value })} 
                             />
                         </div>
+                    </div>
+
+                    {/* Discount Section */}
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6 space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Sparkles className="h-5 w-5 text-amber-600" />
+                            <h3 className="text-lg font-semibold text-amber-900">Discount & Offers</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Discount Percentage (%)</Label>
+                                <Input 
+                                    type="number" 
+                                    placeholder="0" 
+                                    min="0" 
+                                    max="100" 
+                                    step="0.1"
+                                    value={formData.discountPercentage} 
+                                    onChange={e => setFormData({ ...formData, discountPercentage: e.target.value })} 
+                                />
+                                <p className="text-xs text-amber-600">Enter discount percentage (0-100)</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Offer Name <span className="text-gray-400 font-normal">(Optional)</span></Label>
+                                <Input 
+                                    placeholder="e.g. Summer Sale, Weekend Special" 
+                                    value={formData.offerName} 
+                                    onChange={e => setFormData({ ...formData, offerName: e.target.value })} 
+                                />
+                                <p className="text-xs text-amber-600">Custom offer name for display</p>
+                            </div>
+                        </div>
+
+                        {/* Price Calculation Preview */}
+                        {(formData.discountPercentage && parseFloat(formData.discountPercentage) > 0) && (
+                            <div className="bg-white rounded-lg p-4 border border-amber-100">
+                                <div className="text-sm space-y-1">
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-600">Original Price:</span>
+                                        <span className="font-medium">₹{formData.price || '0'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-600">Discount ({formData.discountPercentage}%):</span>
+                                        <span className="font-medium text-red-600">-₹{((parseFloat(formData.price) || 0) * (parseFloat(formData.discountPercentage) || 0) / 100).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between pt-2 border-t border-amber-100">
+                                        <span className="font-semibold text-amber-900">Final Price:</span>
+                                        <span className="font-bold text-lg text-green-600">₹{((parseFloat(formData.price) || 0) * (1 - (parseFloat(formData.discountPercentage) || 0) / 100)).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     
                     <div className="space-y-2">

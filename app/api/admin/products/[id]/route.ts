@@ -21,7 +21,9 @@ export async function PUT(
                 image: body.image,
                 isAvailable: body.isAvailable,
                 specs: body.specs ? (typeof body.specs === 'string' ? JSON.parse(body.specs) : body.specs) : undefined,
-                features: body.features ? (Array.isArray(body.features) ? body.features : (typeof body.features === 'string' ? JSON.parse(body.features) : [body.features])) : undefined
+                features: body.features ? (Array.isArray(body.features) ? body.features : (typeof body.features === 'string' ? JSON.parse(body.features) : [body.features])) : undefined,
+                discountPercentage: body.discountPercentage ? parseFloat(body.discountPercentage) : 0,
+                offerName: body.offerName || null
             }
         })
 

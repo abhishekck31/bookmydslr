@@ -45,7 +45,9 @@ export async function POST(request: Request) {
                 type: body.type,
                 image: body.image || '', // Required by schema basically, using placeholder or passed URL
                 specs: body.specs ? (typeof body.specs === 'string' ? JSON.parse(body.specs) : body.specs) : null,
-                features: body.features ? (Array.isArray(body.features) ? body.features : (typeof body.features === 'string' ? JSON.parse(body.features) : [body.features])) : null
+                features: body.features ? (Array.isArray(body.features) ? body.features : (typeof body.features === 'string' ? JSON.parse(body.features) : [body.features])) : null,
+                discountPercentage: body.discountPercentage ? parseFloat(body.discountPercentage) : 0,
+                offerName: body.offerName || null
             }
             // Note: ProductImage creation might need a separate call or nested create if supported
         })
