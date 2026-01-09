@@ -5,12 +5,16 @@ export async function PUT(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    let body: any;
+    let productId: string = '';
+    
     try {
-        const { id } = await params
-        const body = await request.json()
+        const resolvedParams = await params;
+        productId = resolvedParams.id;
+        body = await request.json()
 
         const product = await prisma.product.update({
-            where: { id },
+            where: { id: productId },
             data: {
                 name: body.name,
                 description: body.description,
@@ -28,9 +32,18 @@ export async function PUT(
         })
 
         return NextResponse.json({ success: true, product })
-    } catch (error) {
+    } catch (error: any) {
         console.error("Admin Update Product Error:", error)
-        return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
+        console.error("Error details:", {
+            message: error?.message || 'Unknown error',
+            stack: error?.stack || 'No stack trace',
+            body: body,
+            id: productId
+        })
+        return NextResponse.json({ 
+            error: 'Failed to update product', 
+            details: error?.message || 'Unknown error' 
+        }, { status: 500 })
     }
 }
 
@@ -38,15 +51,26 @@ export async function DELETE(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    let productId: string = '';
+    
     try {
-        const { id } = await params
+        const resolvedParams = await params;
+        productId = resolvedParams.id;
         await prisma.product.delete({
-            where: { id }
+            where: { id: productId }
         })
 
         return NextResponse.json({ success: true })
-    } catch (error) {
+    } catch (error: any) {
         console.error("Admin Delete Product Error:", error)
-        return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 })
+        console.error("Error details:", {
+            message: error?.message || 'Unknown error',
+            stack: error?.stack || 'No stack trace',
+            id: productId
+        })
+        return NextResponse.json({ 
+            error: 'Failed to delete product', 
+            details: error?.message || 'Unknown error' 
+        }, { status: 500 })
     }
 }

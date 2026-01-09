@@ -26,24 +26,26 @@ model Category {
 }
 
 model Product {
-  id           String         @id @default(uuid())
-  name         String
-  description  String
-  price        Float
-  brand        String?
-  type         String?
-  categoryId   String
-  isAvailable  Boolean        @default(true)
-  specs        Json?
-  features     Json?
-  rating       Float?
-  reviews      Int?           @default(0)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  image        String?
-  availability Availability[]
-  category     Category       @relation(fields: [categoryId], references: [id])
-  images       ProductImage[]
+  id                 String         @id @default(uuid())
+  name               String
+  description        String
+  price              Float
+  brand              String?
+  type               String?
+  categoryId         String
+  isAvailable        Boolean        @default(true)
+  specs              Json?
+  features           Json?
+  rating             Float?
+  reviews            Int?           @default(0)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  image              String?
+  discountPercentage Float?         @default(0)
+  offerName          String?
+  availability       Availability[]
+  category           Category       @relation(fields: [categoryId], references: [id])
+  images             ProductImage[]
 
   @@index([name])
   @@index([categoryId])
