@@ -3,6 +3,9 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
+import { MobileBottomNav } from "@/components/mobile-bottom-nav"
+import { MobileTopBar } from "@/components/mobile-top-bar"
+import { Navbar } from "@/components/navbar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -41,7 +44,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <MobileTopBar />
+          <MobileBottomNav />
+        </div>
+        
+        {/* Desktop Navigation */}
+        <div className="hidden md:block">
+          <Navbar />
+        </div>
+        
+        {/* Main Content with Bottom Padding for Mobile */}
+        <main className="min-h-screen pb-20 md:pb-0">
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   )

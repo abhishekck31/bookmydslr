@@ -30,46 +30,47 @@ export function ProductCard({ product }: ProductCardProps) {
 
     return (
         <Link href={`/product/${product.id}`} className="group block h-full">
-            <Card className="h-full border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-white rounded-xl group-hover:-translate-y-1">
-                <div className="relative h-64 bg-gray-50 overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center p-6">
+            <Card className="h-full border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden bg-white rounded-xl group-hover:-translate-y-1">
+                {/* Product Image - Optimized for Mobile Grid */}
+                <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center p-3">
                         <Image
-                            src={product.image || "/placeholder.svg?height=400&width=400"}
+                            src={product.image || "/placeholder.svg?height=200&width=200"}
                             alt={product.name}
                             fill
-                            className="object-contain transition-transform duration-500 group-hover:scale-105"
+                            className="object-contain transition-transform duration-500 group-hover:scale-105 max-w-full max-h-full"
+                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                         />
                     </div>
 
+                    {/* Category Tag */}
+                    {product.category && (
+                        <Badge variant="secondary" className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-gray-700 font-medium border-0 text-[10px] shadow-sm px-2 py-0.5 rounded-full">
+                            {product.category}
+                        </Badge>
+                    )}
+
                     {product.isNew && (
-                        <Badge className="absolute top-3 left-3 bg-amber-500 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0">
+                        <Badge className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0 rounded-full">
                             New
                         </Badge>
                     )}
 
                     {product.brand && (
-                        <Badge variant="secondary" className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 font-medium border-0 text-[10px] shadow-sm px-2 py-0.5">
+                        <Badge variant="secondary" className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-gray-900 font-medium border-0 text-[10px] shadow-sm px-2 py-0.5 rounded-full">
                             {product.brand}
                         </Badge>
                     )}
                 </div>
 
-                <CardContent className="p-5">
-                    <div className="flex items-center gap-1.5 mb-2">
-                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-semibold text-gray-900">{product.rating || "4.8"}</span>
-                        <span className="text-xs text-gray-400">({product.reviews || 24})</span>
-                    </div>
-
-                    <h3 className="text-base font-bold text-gray-900 mb-1.5 group-hover:text-amber-600 transition-colors line-clamp-1">
+                <CardContent className="p-4">
+                    {/* Product Name */}
+                    <h3 className="text-sm font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2 leading-tight">
                         {product.name}
                     </h3>
 
-                    <p className="text-xs text-gray-500 mb-4 line-clamp-2 h-8 leading-relaxed">
-                        {product.description || "Professional grade equipment for your photography needs."}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+                    {/* Price Section */}
+                    <div className="flex items-center justify-between mt-auto">
                         <div className="flex flex-col">
                             <span className="text-[10px] text-gray-400 uppercase font-semibold tracking-wide">Daily Rate</span>
                             <div className="flex items-baseline gap-1">
@@ -79,7 +80,7 @@ export function ProductCard({ product }: ProductCardProps) {
                                 )}
                             </div>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-amber-500 transition-colors duration-300">
+                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-amber-500 transition-colors duration-300 touch-manipulation">
                             <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
                         </div>
                     </div>
