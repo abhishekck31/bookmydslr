@@ -112,6 +112,220 @@ export function ProductsClient({ initialProducts, categories, brands, globalSett
 
     return (
         <main className="min-h-screen bg-white pt-16 md:pt-0">
+            {/* Search Bar - Desktop */}
+            <div className="hidden md:block bg-white border-b border-gray-100 shadow-sm">
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                    <div className="flex flex-col lg:flex-row gap-4">
+                        {/* Search Input */}
+                        <div className="relative flex-1 max-w-2xl">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search cameras, lenses, accessories..."
+                                className="pl-10 pr-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:border-amber-300 focus:ring-2 focus:ring-amber-500/20 text-base"
+                            />
+                            {searchTerm && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSearchTerm("")}
+                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+
+                        {/* Sort Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="h-12 rounded-lg border-gray-200 px-4">
+                                    Sort: {sortBy === 'featured' ? 'Featured' : sortBy === 'price-low' ? 'Price: Low to High' : sortBy === 'price-high' ? 'Price: High to Low' : sortBy === 'rating' ? 'Rating' : 'Newest'}
+                                    <ChevronDown className="h-4 w-4 ml-2" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setSortBy("featured")}>Featured</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortBy("price-low")}>Price: Low to High</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortBy("price-high")}>Price: High to Low</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortBy("rating")}>Rating</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortBy("newest")}>Newest</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* Category Selection */}
+                    <div className="flex items-center gap-2 mt-4 overflow-x-auto">
+                        <Button
+                            variant={selectedCategories.length === 0 ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSelectedCategories([])}
+                            className="whitespace-nowrap rounded-full bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700 text-sm font-medium"
+                        >
+                            All
+                        </Button>
+                        {categories.map((category) => (
+                            <Button
+                                key={category}
+                                variant={selectedCategories.includes(category) ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleCategory(category)}
+                                className={`whitespace-nowrap rounded-full text-sm font-medium transition-all ${
+                                    selectedCategories.includes(category)
+                                        ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-500"
+                                        : "bg-gray-100 hover:bg-gray-200 border-gray-200 text-gray-700"
+                                }`}
+                            >
+                                {category}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Desktop Layout with Sidebar */}
+            <div className="hidden md:flex max-w-7xl mx-auto px-6 py-6 gap-6">
+                {/* Filter Sidebar */}
+                <div className="w-64 flex-shrink-0">
+                    <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+                            {isFilterApplied && (
+                                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-gray-600 hover:text-gray-900">
+                                    Clear All
+                                </Button>
+                            )}
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Categories */}
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-900 mb-3">Categories</h3>
+                                <div className="space-y-2">
+                                    {categories.map((category) => (
+                                        <div key={category} className="flex items-center">
+                                            <Checkbox
+                                                id={`desktop-cat-${category}`}
+                                                checked={selectedCategories.includes(category)}
+                                                onCheckedChange={() => toggleCategory(category)}
+                                            />
+                                            <Label htmlFor={`desktop-cat-${category}`} className="ml-3 text-sm text-gray-700">
+                                                {category}
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Brands */}
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-900 mb-3">Brands</h3>
+                                <div className="space-y-2">
+                                    {brands.map((brand) => (
+                                        <div key={brand} className="flex items-center">
+                                            <Checkbox
+                                                id={`desktop-brand-${brand}`}
+                                                checked={selectedBrands.includes(brand)}
+                                                onCheckedChange={() => toggleBrand(brand)}
+                                            />
+                                            <Label htmlFor={`desktop-brand-${brand}`} className="ml-3 text-sm text-gray-700">
+                                                {brand}
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Price Range */}
+                            <div>
+                                <Label className="text-sm font-bold text-gray-900 mb-3 block">Price Range</Label>
+                                <Slider value={priceRange} min={0} max={5000} step={100} onValueChange={setPriceRange} />
+                                <div className="flex justify-between text-xs mt-2 text-gray-500">
+                                    <span>₹{priceRange[0]}</span>
+                                    <span>₹{priceRange[1]}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Product Grid */}
+                <div className="flex-1">
+                    {/* Results Count */}
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="text-sm text-gray-500">
+                            {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
+                        </div>
+                    </div>
+
+                    <AnimatePresence mode="popLayout">
+                        {paginatedProducts.length > 0 ? (
+                            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {paginatedProducts.map((product: any, idx) => (
+                                    <motion.div
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                                        key={product.id}
+                                        className="touch-manipulation"
+                                    >
+                                        <ProductCard product={{
+                                            ...product,
+                                            rating: product.rating || 4.8,
+                                            reviews: product.reviews || 24,
+                                            discountedPrice: getDiscountedPrice(product.price) !== product.price ? getDiscountedPrice(product.price) : undefined
+                                        }} />
+                                    </motion.div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-16 text-center">
+                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                    <Search className="h-8 w-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
+                                <p className="text-gray-500 text-sm mb-6 max-w-sm">
+                                    Try adjusting your filters or search terms to find what you're looking for.
+                                </p>
+                                <Button onClick={clearFilters} className="bg-amber-500 hover:bg-amber-600">
+                                    Clear Filters
+                                </Button>
+                            </div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center mt-8">
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="h-10 rounded-lg"
+                                >
+                                    Previous
+                                </Button>
+                                <span className="flex items-center px-4 font-medium text-sm text-gray-600">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="h-10 rounded-lg"
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* Search Bar - Mobile Only */}
             <div className="md:hidden px-4 pt-2 pb-3 bg-white border-b border-gray-100 shadow-sm">
                 <div className="relative mb-2">
@@ -266,8 +480,8 @@ export function ProductsClient({ initialProducts, categories, brands, globalSett
                 </div>
             )}
 
-            {/* Product Grid - Mobile First 2-Column */}
-            <div className="px-4 py-6">
+            {/* Product Grid - Mobile Only */}
+            <div className="md:hidden px-4 py-6">
                 <AnimatePresence mode="popLayout">
                     {paginatedProducts.length > 0 ? (
                         <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
