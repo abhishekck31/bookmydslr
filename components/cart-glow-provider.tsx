@@ -27,7 +27,11 @@ export function CartGlowProvider({ children }: { children: ReactNode }) {
 export function useCartGlow() {
   const context = useContext(CartGlowContext)
   if (context === undefined) {
-    throw new Error("useCartGlow must be used within a CartGlowProvider")
+    // Return default values for server-side rendering
+    return {
+      showCartGlow: false,
+      triggerCartGlow: () => {},
+    }
   }
   return context
 }

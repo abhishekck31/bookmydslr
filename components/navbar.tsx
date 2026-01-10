@@ -73,8 +73,8 @@ export default function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md" : "bg-transparent",
+        "fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 md:sticky",
+        isScrolled ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md" : "bg-white",
       )}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -190,46 +190,10 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="container py-4 grid gap-4">
-              {mainRoutes.map((route) => {
-                if (route.name === "Products") {
-                  return (
-                    <button
-                      key={route.path}
-                      onClick={(e) => {
-                        handleProductsClick(e)
-                      }}
-                      className={cn(
-                        "text-sm font-medium transition-colors hover:text-amber-500 cursor-pointer text-left",
-                        pathname === route.path
-                          ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
-                          : "text-foreground",
-                      )}
-                    >
-                      {route.name}
-                    </button>
-                  )
-                }
-                return (
-                  <Link
-                    key={route.path}
-                    href={route.path}
-                    className={cn(
-                      "text-sm font-medium transition-colors hover:text-amber-500",
-                      pathname === route.path
-                        ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
-                        : "text-foreground",
-                    )}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {route.name}
-                  </Link>
-                )
-              })}
-
+            <div className="container py-4">
               <Link
                 href="/terms"
-                className="text-sm font-medium transition-colors hover:text-amber-500"
+                className="text-sm font-medium transition-colors hover:text-amber-500 block"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Terms & Conditions

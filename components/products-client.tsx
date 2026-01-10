@@ -113,8 +113,8 @@ export function ProductsClient({ initialProducts, categories, brands, globalSett
     return (
         <main className="min-h-screen bg-white pt-16 md:pt-0">
             {/* Search Bar - Mobile Only */}
-            <div className="md:hidden px-4 py-4 bg-white border-b border-gray-100 shadow-sm">
-                <div className="relative mb-4">
+            <div className="md:hidden px-4 pt-2 pb-3 bg-white border-b border-gray-100 shadow-sm">
+                <div className="relative mb-2">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                         value={searchTerm}

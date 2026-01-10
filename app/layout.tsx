@@ -43,12 +43,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* Main Content with Bottom Padding for Mobile */}
-        <main className="min-h-screen pb-20 md:pb-0">
+        {/* Main Content */}
+        <main className="min-h-screen pt-16 pb-20 md:pt-0 md:pb-0">
           <Providers>
-            {/* Mobile Navigation */}
+            {/* Mobile Bottom Navigation Only */}
             <div className="md:hidden">
-              <MobileTopBar />
               <MobileBottomNav />
             </div>
             {children}
