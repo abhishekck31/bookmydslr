@@ -19,6 +19,8 @@ import {
 import { toast } from 'sonner'
 import { useState, useMemo } from 'react'
 import { Switch } from '@/components/ui/switch'
+import { cn } from '@/lib/utils'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 
 interface Product {
     id: string
@@ -45,9 +47,11 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [togglingId, setTogglingId] = useState<string | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState<string>('all')
-    const [selectedStatus, setSelectedStatus] = useState<string>('all')
-    const [sortBy, setSortBy] = useState<string>('newest')
+    const [selectedCategory, setSelectedCategory] = useState('all')
+    const [selectedStatus, setSelectedStatus] = useState('all')
+    const [sortBy, setSortBy] = useState('newest')
+    const [showAlertDialog, setShowAlertDialog] = useState(false)
+    const [productToDelete, setProductToDelete] = useState<{ id: string, name: string } | null>(null)
 
     // Filter and sort products
     const filteredAndSortedProducts = useMemo(() => {
@@ -137,11 +141,16 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
     }
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+        setProductToDelete({ id, name })
+        setShowAlertDialog(true)
+    }
 
-        setDeletingId(id)
+    const confirmDelete = async () => {
+        if (!productToDelete) return
+        
+        setDeletingId(productToDelete.id)
         try {
-            const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' })
+            const res = await fetch(`/api/admin/products/${productToDelete.id}`, { method: 'DELETE' })
             if (res.ok) {
                 toast.success('Product removed')
                 onUpdate()
@@ -152,10 +161,13 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
             toast.error('Error deleting product')
         } finally {
             setDeletingId(null)
+            setShowAlertDialog(false)
+            setProductToDelete(null)
         }
     }
 
     return (
+        <>
         <Card className="border-slate-200 overflow-hidden">
             <CardHeader className="bg-slate-50 border-b border-slate-100">
                 <div className="flex items-center justify-between">
@@ -277,21 +289,21 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
             <Table>
                 <TableHeader>
                     <TableRow className="bg-slate-50/50">
-                        <TableHead className="w-[300px] min-w-[200px]">Item Details</TableHead>
-                        <TableHead className="hidden md:table-cell">Category</TableHead>
-                        <TableHead className="hidden lg:table-cell">Specs</TableHead>
-                        <TableHead className="min-w-[120px]">Price / Day</TableHead>
-                        <TableHead className="min-w-[100px]">Available</TableHead>
-                        <TableHead className="hidden sm:table-cell">Status</TableHead>
-                        <TableHead className="text-right min-w-[100px]">Actions</TableHead>
+                        <TableHead className="w-[30px] min-w-[25px]">Item Details</TableHead>
+                        <TableHead className="hidden md:table-cell w-10">Category</TableHead>
+                        <TableHead className="hidden lg:table-cell w-8">Specs</TableHead>
+                        <TableHead className="min-w-[45px] w-8">Price / Day</TableHead>
+                        <TableHead className="min-w-[25px] w-6">Available</TableHead>
+                        <TableHead className="hidden sm:table-cell w-6">Status</TableHead>
+                        <TableHead className="text-right min-w-[25px] w-6">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {filteredAndSortedProducts.map((product) => (
                         <TableRow key={product.id} className="hover:bg-slate-50/50 transition-colors">
-                            <TableCell>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden relative">
+                            <TableCell className="p-1">
+                                <div className="flex items-center gap-2">
+                                    <div className="h-8 w-8 rounded bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden relative">
                                         {product.image ? (
                                             <Image 
                                                 src={product.image} 
@@ -301,41 +313,36 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
                                             />
                                         ) : (
                                             product.category?.name === 'Cameras' ? 
-                                                <Camera className="h-5 w-5 text-slate-400" /> : 
-                                                <Package className="h-5 w-5 text-slate-400" />
+                                                <Camera className="h-4 w-4 text-slate-400" /> : 
+                                                <Package className="h-4 w-4 text-slate-400" />
                                         )}
                                     </div>
-                                    <div className="flex flex-col min-w-0 flex-1">
-                                        <span className="font-semibold text-slate-900 text-sm truncate">{product.name}</span>
-                                        <span className="text-xs text-slate-500 truncate">{product.brand || 'No Brand'}</span>
-                                        {/* Mobile-only category and specs */}
-                                        <div className="md:hidden flex flex-col gap-1 mt-1">
-                                            <span className="text-xs text-slate-600">{product.category?.name || 'Uncategorized'}</span>
-                                            {product.type && <span className="text-xs text-slate-500">{product.type}</span>}
-                                        </div>
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-medium text-slate-900 truncate max-w-[100px]">{product.name}</p>
+                                        <p className="text-xs text-slate-500 truncate max-w-[100px]">{product.brand}</p>
                                     </div>
                                 </div>
                             </TableCell>
-                            <TableCell className="hidden md:table-cell">
+                            <TableCell className="hidden md:table-cell p-1">
                                 <span className="text-sm font-medium text-slate-600">{product.category?.name || 'Uncategorized'}</span>
                             </TableCell>
-                            <TableCell className="hidden lg:table-cell">
+                            <TableCell className="hidden lg:table-cell p-1">
                                 <span className="text-sm text-slate-500">{product.type || '--'}</span>
                             </TableCell>
-                            <TableCell>
-                                <div className="space-y-1 min-w-[120px]">
+                            <TableCell className="p-1">
+                                <div className="space-y-1 min-w-[35px]">
                                     {product.discountPercentage && product.discountPercentage > 0 ? (
                                         <>
                                             <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-1">
                                                     <span className="text-xs text-slate-400 line-through">₹{product.price}</span>
                                                     <span className="font-bold text-green-600 text-sm">₹{(product.price * (1 - product.discountPercentage / 100)).toFixed(2)}</span>
                                                 </div>
-                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 w-fit">
+                                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 w-fit">
                                                     -{product.discountPercentage}%
                                                 </span>
                                                 {product.offerName && (
-                                                    <div className="text-xs text-amber-600 font-medium truncate max-w-[120px]" title={product.offerName}>
+                                                    <div className="text-xs text-amber-600 font-medium truncate max-w-[35px]" title={product.offerName}>
                                                         {product.offerName}
                                                     </div>
                                                 )}
@@ -346,36 +353,40 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
                                     )}
                                 </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="p-1">
                                 <div className="flex items-center justify-center">
                                     <Switch
                                         checked={product.isAvailable}
-                                        onCheckedChange={() => handleToggleAvailability(product.id, product.isAvailable)}
-                                        disabled={togglingId === product.id}
-                                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300 scale-90"
+                                        onCheckedChange={() => handleToggleAvailability(product.id, !product.isAvailable)}
+                                        className="data-[state=checked]:bg-green-500"
                                     />
                                 </div>
                             </TableCell>
-                            <TableCell className="hidden sm:table-cell">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${product.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            <TableCell className="hidden sm:table-cell p-1">
+                                <Badge
+                                    className={cn(
+                                        "px-2 py-0.5 text-xs font-medium",
+                                        product.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                    )}
+                                >
                                     {product.isAvailable ? 'Active' : 'Inactive'}
-                                </span>
+                                </Badge>
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right p-1">
                                 <div className="flex items-center justify-end gap-1">
                                     <Link href={`/admin/products/${product.id}/edit`}>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-amber-600">
-                                            <Pencil className="h-4 w-4" />
+                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-amber-600">
+                                            <Pencil className="h-3.5 w-3.5" />
                                         </Button>
                                     </Link>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-slate-400 hover:text-red-600"
+                                        className="h-7 w-7 text-slate-400 hover:text-red-600"
                                         onClick={() => handleDelete(product.id, product.name)}
                                         disabled={deletingId === product.id}
                                     >
-                                        {deletingId === product.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                        {deletingId === product.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                                     </Button>
                                 </div>
                             </TableCell>
@@ -394,6 +405,27 @@ export function ProductTable({ products, onUpdate, categories = [] }: ProductTab
                 </TableBody>
             </Table>
         </Card>
+
+        {/* Custom Alert Dialog */}
+        <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setShowAlertDialog(false)}>
+                        Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                        Delete
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        </>
     )
 }
 
