@@ -20,7 +20,7 @@ interface ProductCardProps {
         description?: string | null
         isNew?: boolean
         featured?: boolean
-        category?: string | null
+        category?: string | { name: string } | null
     }
 }
 
@@ -46,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     {/* Category Tag */}
                     {product.category && (
                         <Badge variant="secondary" className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-gray-700 font-medium border-0 text-[10px] shadow-sm px-2 py-0.5 rounded-full">
-                            {product.category}
+                            {typeof product.category === 'string' ? product.category : product.category.name}
                         </Badge>
                     )}
 
