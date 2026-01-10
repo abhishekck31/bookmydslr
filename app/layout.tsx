@@ -5,7 +5,7 @@ import "./globals.css"
 import { Providers } from "@/components/providers"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
 import { MobileTopBar } from "@/components/mobile-top-bar"
-import { Navbar } from "@/components/navbar"
+import Navbar from "@/components/navbar"
 
 const inter = Inter({ subsets: ["latin"] })
 
