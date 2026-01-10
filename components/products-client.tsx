@@ -227,8 +227,10 @@ export function ProductsClient({ initialProducts, categories, brands, globalSett
                                             <span>₹{priceRange[0]}</span>
                                             <span>₹{priceRange[1]}</span>
                                         </div>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
 
                     <div className="text-sm text-gray-500">
