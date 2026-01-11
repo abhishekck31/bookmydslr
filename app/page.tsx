@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/homepage/hero-section"
 import { FeaturedCameras } from "@/components/homepage/featured-cameras"
 import { WhyUs } from "@/components/homepage/why-us"
 import { HowItWorks } from "@/components/homepage/how-it-works"
+import { ReviewSection } from "@/components/homepage/review-section"
 import { CTASection } from "@/components/homepage/cta-section"
 import { prisma } from "@/lib/prisma"
 
@@ -72,6 +73,7 @@ export default async function HomePage() {
       <FeaturedCameras cameras={cameras} globalSettings={globalSettings} />
       <HowItWorks />
       <WhyUs />
+      <ReviewSection />
       <CTASection />
     </main>
   )
