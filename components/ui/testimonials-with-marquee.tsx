@@ -1,5 +1,8 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { TestimonialCard, TestimonialAuthor } from "@/components/ui/testimonial-card"
+import { motion } from "framer-motion"
 
 interface TestimonialsSectionProps {
   title: string
@@ -12,12 +15,16 @@ interface TestimonialsSectionProps {
   className?: string
 }
 
-export function TestimonialsSection({ 
+export function TestimonialsSection({
   title,
   description,
   testimonials,
-  className 
+  className
 }: TestimonialsSectionProps) {
+  // Ensure we have enough copies to fill screen and loop seamlessly
+  // Duplicating the list X times ensures we always have content while scrolling
+  const tripledTestimonials = [...testimonials, ...testimonials, ...testimonials, ...testimonials]
+
   return (
     <section className={cn(
       "bg-background text-foreground",
@@ -35,17 +42,40 @@ export function TestimonialsSection({
         </div>
 
         <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-          <div className="group flex overflow-hidden p-2 [--gap:1rem] [gap:var(--gap)] flex-row [--duration:40s]">
-            <div className="flex shrink-0 justify-around [gap:var(--gap)] animate-marquee flex-row group-hover:[animation-play-state:paused]">
-              {[...Array(4)].map((_, setIndex) => (
-                testimonials.map((testimonial, i) => (
-                  <TestimonialCard 
-                    key={`${setIndex}-${i}`}
+          {/* Marquee Container */}
+          <div className="flex w-full overflow-hidden">
+            <motion.div
+              className="flex flex-nowrap gap-4 py-4"
+              initial={{ x: 0 }}
+              animate={{ x: "-50%" }}
+              transition={{
+                repeat: Infinity,
+                ease: "linear",
+                duration: 60, // slower for readability
+              }}
+              style={{ width: "max-content" }}
+            >
+              {/* We use 2 sets of the 'tripled' list to ensure enough width for -50% translation */}
+              {/* Actually, just putting 2 sets of a sufficiently long list is enough. */}
+              {/* Set 1 */}
+              <div className="flex gap-4 shrink-0">
+                {tripledTestimonials.map((testimonial, i) => (
+                  <TestimonialCard
+                    key={`set1-${i}`}
                     {...testimonial}
                   />
-                ))
-              ))}
-            </div>
+                ))}
+              </div>
+              {/* Set 2 (Identical Clone for loop) */}
+              <div className="flex gap-4 shrink-0">
+                {tripledTestimonials.map((testimonial, i) => (
+                  <TestimonialCard
+                    key={`set2-${i}`}
+                    {...testimonial}
+                  />
+                ))}
+              </div>
+            </motion.div>
           </div>
 
           <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-1/3 bg-gradient-to-r from-background sm:block" />
