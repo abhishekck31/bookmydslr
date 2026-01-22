@@ -86,6 +86,18 @@ export function ProductsTable({ products }: ProductsTableProps) {
 
     return (
         <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={toggleSelectAll}
+                >
+                    {products.length > 0 && selectedIds.length === products.length
+                        ? 'Deselect All'
+                        : 'Select All'}
+                </Button>
+            </div>
+
             {selectedIds.length > 0 && (
                 <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-md flex items-center justify-between">
                     <span className="text-sm font-medium text-slate-900 dark:text-white">{selectedIds.length} selected</span>
