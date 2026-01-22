@@ -3,19 +3,30 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ShoppingCart } from "lucide-react"
+import { Menu, X, ShoppingCart, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/components/cart-provider"
 import { useCartGlow } from "@/components/cart-glow-provider"
 import { motion, AnimatePresence } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { WHATSAPP_NUMBER } from "@/config/constants"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMaintenanceDialogOpen, setIsMaintenanceDialogOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { itemCount } = useCart()
   const { showCartGlow } = useCartGlow()
 
@@ -39,11 +50,31 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const handleProductsClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsMaintenanceDialogOpen(true)
+    setIsMenuOpen(false) // Close mobile menu if open
+  }
+
+  const handleMaintenanceWhatsApp = () => {
+    const message = `Hello, I'm interested in your products. Could you please provide more details?`
+    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+    window.open(whatsappLink, "_blank")
+  }
+
+  const handleDialogClose = (open: boolean) => {
+    setIsMaintenanceDialogOpen(open)
+    // Navigate to products page when dialog is closed
+    if (!open) {
+      router.push("/products")
+    }
+  }
+
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md" : "bg-transparent",
+        "fixed top-0 left-0 right-0 z-40 w-full transition-all duration-300 md:sticky",
+        isScrolled ? "bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md" : "bg-white",
       )}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -58,20 +89,38 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-6 items-center">
-          {mainRoutes.map((route) => (
-            <Link
-              key={route.path}
-              href={route.path}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-amber-500",
-                pathname === route.path
-                  ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
-                  : "text-foreground",
-              )}
-            >
-              {route.name}
-            </Link>
-          ))}
+          {mainRoutes.map((route) => {
+            if (route.name === "Products") {
+              return (
+                <button
+                  key={route.path}
+                  onClick={handleProductsClick}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-amber-500 cursor-pointer",
+                    pathname === route.path
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
+                      : "text-foreground",
+                  )}
+                >
+                  {route.name}
+                </button>
+              )
+            }
+            return (
+              <Link
+                key={route.path}
+                href={route.path}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-amber-500",
+                  pathname === route.path
+                    ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
+                    : "text-foreground",
+                )}
+              >
+                {route.name}
+              </Link>
+            )
+          })}
 
           <Link href="/terms" className="text-sm font-medium transition-colors hover:text-amber-500">
             Terms & Conditions
@@ -141,26 +190,10 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="container py-4 grid gap-4">
-              {mainRoutes.map((route) => (
-                <Link
-                  key={route.path}
-                  href={route.path}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-amber-500",
-                    pathname === route.path
-                      ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
-                      : "text-foreground",
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {route.name}
-                </Link>
-              ))}
-
+            <div className="container py-4">
               <Link
                 href="/terms"
-                className="text-sm font-medium transition-colors hover:text-amber-500"
+                className="text-sm font-medium transition-colors hover:text-amber-500 block"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Terms & Conditions
@@ -169,6 +202,28 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Maintenance Dialog */}
+      <Dialog open={isMaintenanceDialogOpen} onOpenChange={handleDialogClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Maintenance Notice</DialogTitle>
+            <DialogDescription className="text-base pt-2">
+              Images of some products are missing as our platform is on maintenance. 
+              Please contact us via WhatsApp for more details.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center pt-4">
+            <Button 
+              onClick={handleMaintenanceWhatsApp}
+              className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+            >
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Contact via WhatsApp
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   )
 }

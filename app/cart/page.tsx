@@ -30,16 +30,24 @@ const formatDate = (dateString: string) => {
 }
 
 // --- Helper function to calculate rental days ---
-const calculateRentalDays = (pickup: string, returns: string): number => {
+const calculateRentalDays = (pickup: string, returns: string, bookingDetails: any): number => {
   if (!pickup || !returns) return 0;
-  const pDate = new Date(pickup);
-  const rDate = new Date(returns);
+  
+  // Combine date and time strings
+  const pickupDateTime = new Date(`${pickup}T${bookingDetails.pickupTime || "00:00"}`);
+  const returnDateTime = new Date(`${returns}T${bookingDetails.returnTime || "00:00"}`);
 
-  if (rDate > pDate) {
-    const timeDiff = rDate.getTime() - pDate.getTime();
-    return Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-  }
-  return 0; // Return 0 if invalid range or same day (assuming min 1 day usually, but simplified logic)
+  // If return is before pickup, return 0
+  if (returnDateTime <= pickupDateTime) return 0;
+
+  // Calculate time difference in hours
+  const timeDiffInHours = (returnDateTime.getTime() - pickupDateTime.getTime()) / (1000 * 3600);
+  
+  // Round up to nearest day - any part of a day counts as a full day
+  // Minimum 1 day even if it's just 1 hour
+  const rentalDays = Math.ceil(timeDiffInHours / 24);
+  
+  return Math.max(1, rentalDays); // Minimum 1 day
 }
 
 
@@ -72,8 +80,8 @@ export default function CartPage() {
 
   // --- Calculations ---
   const rentalDays = useMemo(() => {
-    return calculateRentalDays(bookingDetails.pickupDate, bookingDetails.returnDate);
-  }, [bookingDetails.pickupDate, bookingDetails.returnDate]);
+    return calculateRentalDays(bookingDetails.pickupDate, bookingDetails.returnDate, bookingDetails);
+  }, [bookingDetails.pickupDate, bookingDetails.returnDate, bookingDetails.pickupTime, bookingDetails.returnTime]);
 
   // Price Calculation with Progressive Discount
   const calculateTotal = (basePrice: number, days: number) => {

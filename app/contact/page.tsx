@@ -78,7 +78,7 @@ export default function ContactPage() {
                   <div>
                     <p className="font-bold text-lg text-gray-900 mb-1">Phone</p>
                     <p className="text-gray-600 font-medium">+91 99721 22462</p>
-                    <p className="text-xs text-gray-400 mt-1">Mon-Sat 10am to 8pm</p>
+                    <p className="text-xs text-gray-400 mt-1">Mon-Sun 8am to 10pm</p>
                   </div>
                 </div>
                 <div className="flex gap-5 group">
@@ -112,12 +112,8 @@ export default function ContactPage() {
               <h3 className="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">Business Hours</h3>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600 font-medium">Monday - Saturday</span>
-                  <span className="font-bold text-gray-900 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">10:00 AM - 8:00 PM</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600 font-medium">Sunday</span>
-                  <span className="font-bold text-gray-900 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">10:00 AM - 2:00 PM</span>
+                  <span className="text-gray-600 font-medium">Monday - Sunday</span>
+                  <span className="font-bold text-gray-900 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">8:00 AM - 10:00 PM</span>
                 </div>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ShoppingCart, Star, Calendar, Check, ShieldCheck, Truck, Clock } from "lucide-react"
+import { ChevronLeft, ShoppingCart, Star, Calendar, Check, ShieldCheck, Truck, Clock, MessageCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,15 @@ import { useToast } from "@/hooks/use-toast"
 import { useCart } from "@/components/cart-provider"
 import { useCartGlow } from "@/components/cart-glow-provider"
 import { ProductCard } from "@/components/product-card"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { WHATSAPP_NUMBER } from "@/config/constants"
 
 interface Product {
     id: string
@@ -49,6 +58,7 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
     const [returnDate, setReturnDate] = useState<string>(new Date(Date.now() + 4 * 86400000).toISOString().split("T")[0])
     const [rentalDays, setRentalDays] = useState(3)
     const [activeImage, setActiveImage] = useState<string | null>(product.image)
+    const [isDialogOpen, setIsDialogOpen] = useState(true)
 
     useEffect(() => {
         if (pickupDate && returnDate) {
@@ -93,11 +103,39 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
         window.open(whatsappUrl, "_blank")
     }
 
+    const handleMaintenanceWhatsApp = () => {
+        const message = `Hello, I'm interested in ${product.name}. Could you please provide more details?`
+        const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+        window.open(whatsappLink, "_blank")
+    }
+
     const discountedDailyPrice = getDiscountedPrice(product.price)
     const finalTotal = Math.round(discountedDailyPrice * rentalDays)
 
     return (
-        <main className="min-h-screen bg-white pb-20">
+        <>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold">Maintenance Notice</DialogTitle>
+                        <DialogDescription className="text-base pt-2">
+                            Images of some products are missing as our platform is on maintenance. 
+                            Please contact us via WhatsApp for more details.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="sm:justify-center pt-4">
+                        <Button 
+                            onClick={handleMaintenanceWhatsApp}
+                            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                        >
+                            <MessageCircle className="mr-2 h-4 w-4" />
+                            Contact via WhatsApp
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <main className="min-h-screen bg-white pb-20">
             <div className="border-b border-gray-100 bg-gray-50/30 sticky top-16 z-20 backdrop-blur-sm">
                 <div className="container py-4">
                     <button onClick={() => router.back()} className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors group">
@@ -223,5 +261,6 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
                 </section>
             </div>
         </main>
+        </>
     )
 }

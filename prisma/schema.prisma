@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -21,45 +20,33 @@ model Category {
   name      String    @unique
   slug      String    @unique
   image     String?
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  image       String?
-  brand       String?
-  type        String?
-  
-  // Relations
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  
-  images      ProductImage[]
-  
-  // Status
-  isAvailable Boolean  @default(true)
-  availability Availability[]
+  id                 String         @id @default(uuid())
+  name               String
+  description        String
+  price              Float
+  brand              String?
+  type               String?
+  categoryId         String
+  isAvailable        Boolean        @default(true)
+  specs              Json?
+  features           Json?
+  rating             Float?
+  reviews            Int?           @default(0)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  image              String?
+  discountPercentage Float? @default(0)
+  offerName          String?
+  availability       Availability[]
+  category           Category       @relation(fields: [categoryId], references: [id])
+  images             ProductImage[]
 
-  // SEO / Extra (Stored as Json for flexibility in Postgres)
-  specs       Json?
-  features    Json?
-  
-  // Legacy fields
-  rating      Float?
-  reviews     Int?     @default(0)
-
-  // Use Strings for rich text or simple text? 
-  // Let's keep simple types.
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Index for search optimization
   @@index([name])
   @@index([categoryId])
 }
@@ -72,15 +59,15 @@ model ProductImage {
 }
 
 model Availability {
-   id        String   @id @default(uuid())
-   productId String
-   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-   startDate DateTime
-   endDate   DateTime
-   reason    String? // e.g., "Maintenance", "Rented"
-   
-   @@index([productId])
-   @@index([startDate, endDate])
+  id        String   @id @default(uuid())
+  productId String
+  startDate DateTime
+  endDate   DateTime
+  reason    String?
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([startDate, endDate])
 }
 
 model Lead {
@@ -88,15 +75,21 @@ model Lead {
   name      String
   phone     String
   city      String
-  details   Json?   // JSON with requested items/dates
-  source    String? // e.g., "WhatsApp Flow"
-  status    String   @default("NEW") // NEW, CONTACTED, CLOSED
+  details   Json?
+  source    String?
+  status    String   @default("NEW")
   createdAt DateTime @default(now())
 }
 
 model GlobalSettings {
-  id                String   @id @default("singleton")
-  discountPercent   Float    @default(0)
-  isDiscountActive  Boolean  @default(false)
-  updatedAt         DateTime @updatedAt
+  id               String   @id @default("singleton")
+  discountPercent  Float    @default(0)
+  isDiscountActive Boolean  @default(false)
+  updatedAt        DateTime @updatedAt
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
 }

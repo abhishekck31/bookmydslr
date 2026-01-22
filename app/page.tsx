@@ -2,10 +2,12 @@ import { HeroSection } from "@/components/homepage/hero-section"
 import { FeaturedCameras } from "@/components/homepage/featured-cameras"
 import { WhyUs } from "@/components/homepage/why-us"
 import { HowItWorks } from "@/components/homepage/how-it-works"
+import { ReviewSection } from "@/components/homepage/review-section"
 import { CTASection } from "@/components/homepage/cta-section"
 import { prisma } from "@/lib/prisma"
 
-// Metadata is kept intact as requested
+import { LensScrollLoader } from "@/components/LensScrollLoader"
+
 export const metadata = {
   title: "Book My DSLR - Camera & Lens Rental in Bangalore | Kalyan Nagar, Hennur & More",
   description: "Rent cameras, lenses, and accessories in Bangalore. Located in Kalyan Nagar/Hennur. Fast delivery across the city.",
@@ -36,15 +38,13 @@ export const metadata = {
   }
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamicParams = true // Ensure this doesn't conflict with variable name
 
 export default async function HomePage() {
   // Fetch featured cameras from DB
   const cameras = await prisma.product.findMany({
     where: {
       isAvailable: true,
-      // We can use a specific category or just a "featured" flag if we had one
-      // For now, let's just get the latest 4 cameras
       category: {
         name: {
           contains: 'Camera',
@@ -69,9 +69,11 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen bg-white">
       <HeroSection />
+      <LensScrollLoader />
       <FeaturedCameras cameras={cameras} globalSettings={globalSettings} />
       <HowItWorks />
       <WhyUs />
+      <ReviewSection />
       <CTASection />
     </main>
   )

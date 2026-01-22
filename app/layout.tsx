@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
+import { MobileBottomNav } from "@/components/mobile-bottom-nav"
+import { MobileTopBar } from "@/components/mobile-top-bar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -39,9 +41,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        {/* Main Content */}
+        <main className="min-h-screen pt-16 pb-20 md:pt-0 md:pb-0">
+          <Providers>
+            {/* Mobile Bottom Navigation Only */}
+            <div className="md:hidden">
+              <MobileBottomNav />
+            </div>
+            {children}
+          </Providers>
+        </main>
       </body>
     </html>
   )
