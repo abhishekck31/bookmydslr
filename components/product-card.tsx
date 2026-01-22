@@ -41,13 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         />
                     </div>
 
-                    {isDiscounted && (
-                        <Badge className="absolute top-3 left-3 bg-red-500 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0">
-                            Sale
-                        </Badge>
-                    )}
-
-                    {product.isNew && !isDiscounted && (
+                    {product.isNew && (
                         <Badge className="absolute top-3 left-3 bg-amber-500 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0">
                             New
                         </Badge>

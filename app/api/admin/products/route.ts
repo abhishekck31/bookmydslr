@@ -39,3 +39,27 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const body = await request.json()
+        const { ids } = body
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return NextResponse.json({ error: 'No IDs provided' }, { status: 400 })
+        }
+
+        const result = await prisma.product.deleteMany({
+            where: {
+                id: {
+                    in: ids
+                }
+            }
+        })
+
+        return NextResponse.json({ success: true, count: result.count })
+    } catch (error) {
+        console.error("Admin Batch Delete Error:", error)
+        return NextResponse.json({ error: 'Failed to delete products' }, { status: 500 })
+    }
+}
