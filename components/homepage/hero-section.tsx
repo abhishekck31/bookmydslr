@@ -68,11 +68,11 @@ const FloatingCard = ({ children, className, delay }: { children: React.ReactNod
 )
 
 // Glass Card Component
-const GlassCard = ({ icon: Icon, title, description, delay }: { 
-  icon: any; 
-  title: string; 
-  description: string; 
-  delay: number; 
+const GlassCard = ({ icon: Icon, title, description, delay }: {
+  icon: any;
+  title: string;
+  description: string;
+  delay: number;
 }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.9 }}
@@ -94,19 +94,19 @@ export function HeroSection() {
     <div className="relative min-h-screen overflow-hidden bg-white">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <AnimatedGradientBlob 
+        <AnimatedGradientBlob
           className="w-[600px] h-[600px] bg-yellow-200/30 -top-48 -left-48"
           delay={0}
         />
-        <AnimatedGradientBlob 
+        <AnimatedGradientBlob
           className="w-[500px] h-[500px] bg-yellow-100/40 top-1/4 right-0"
           delay={1}
         />
-        <AnimatedGradientBlob 
+        <AnimatedGradientBlob
           className="w-[400px] h-[400px] bg-amber-100/30 bottom-0 left-1/4"
           delay={2}
         />
-        
+
         {/* Grid Pattern Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#f5f5f5f12_1px,transparent_1px),linear-gradient(to_bottom,#f5f5f5f12_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
@@ -148,7 +148,7 @@ export function HeroSection() {
                 <span className="text-black">Camera Gear</span>
               </h1>
               <p className="text-xl text-gray-800 max-w-lg leading-relaxed">
-                Access professional photography and videography equipment at affordable prices. 
+                Access professional photography and videography equipment at affordable prices.
                 From DSLRs to cinema cameras, we've got you covered.
               </p>
             </motion.div>
@@ -160,19 +160,19 @@ export function HeroSection() {
               transition={{ delay: 0.4 }}
               className="flex flex-wrap gap-4"
             >
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="text-lg px-8 py-6 bg-yellow-500 hover:bg-yellow-400 text-black rounded-full transition-all shadow-lg hover:shadow-yellow-500/25 group"
                 asChild
               >
-                <Link href="/products">
+                <Link href="/rental-equipment">
                   Browse Equipment
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="text-lg px-8 py-6 border-yellow-300 text-black hover:bg-yellow-50 rounded-full"
                 asChild
               >

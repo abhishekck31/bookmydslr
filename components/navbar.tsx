@@ -3,36 +3,25 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ShoppingCart, MessageCircle } from "lucide-react"
+import { Menu, X, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/components/cart-provider"
 import { useCartGlow } from "@/components/cart-glow-provider"
 import { motion, AnimatePresence } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import { WHATSAPP_NUMBER } from "@/config/constants"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isMaintenanceDialogOpen, setIsMaintenanceDialogOpen] = useState(false)
   const pathname = usePathname()
-  const router = useRouter()
   const { itemCount } = useCart()
   const { showCartGlow } = useCartGlow()
 
   const mainRoutes = [
     { name: "Home", path: "/" },
-    { name: "Products", path: "/products" },
+    { name: "Products", path: "/rental-equipment" },
     { name: "Services", path: "/services" },
     { name: "Contact", path: "/contact" },
   ]
@@ -49,26 +38,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
-  const handleProductsClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsMaintenanceDialogOpen(true)
-    setIsMenuOpen(false) // Close mobile menu if open
-  }
-
-  const handleMaintenanceWhatsApp = () => {
-    const message = `Hello, I'm interested in your products. Could you please provide more details?`
-    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
-    window.open(whatsappLink, "_blank")
-  }
-
-  const handleDialogClose = (open: boolean) => {
-    setIsMaintenanceDialogOpen(open)
-    // Navigate to products page when dialog is closed
-    if (!open) {
-      router.push("/products")
-    }
-  }
 
   return (
     <header
@@ -89,38 +58,20 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-6 items-center">
-          {mainRoutes.map((route) => {
-            if (route.name === "Products") {
-              return (
-                <button
-                  key={route.path}
-                  onClick={handleProductsClick}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-amber-500 cursor-pointer",
-                    pathname === route.path
-                      ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
-                      : "text-foreground",
-                  )}
-                >
-                  {route.name}
-                </button>
-              )
-            }
-            return (
-              <Link
-                key={route.path}
-                href={route.path}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-amber-500",
-                  pathname === route.path
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
-                    : "text-foreground",
-                )}
-              >
-                {route.name}
-              </Link>
-            )
-          })}
+          {mainRoutes.map((route) => (
+            <Link
+              key={route.path}
+              href={route.path}
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-amber-500",
+                pathname === route.path
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-300 font-semibold"
+                  : "text-foreground",
+              )}
+            >
+              {route.name}
+            </Link>
+          ))}
 
           <Link href="/terms" className="text-sm font-medium transition-colors hover:text-amber-500">
             Terms & Conditions
@@ -129,8 +80,8 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-4">
           <Link href="/cart" className="relative">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className={cn(
                 "transition-all duration-500",
@@ -154,8 +105,8 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
           <Link href="/cart" className="relative mr-2">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className={cn(
                 "transition-all duration-500",
@@ -190,7 +141,22 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="container py-4">
+            <div className="container py-4 flex flex-col gap-4">
+              {mainRoutes.map((route) => (
+                <Link
+                  key={route.path}
+                  href={route.path}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-amber-500",
+                    pathname === route.path
+                      ? "text-amber-600 font-semibold"
+                      : "text-foreground",
+                  )}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {route.name}
+                </Link>
+              ))}
               <Link
                 href="/terms"
                 className="text-sm font-medium transition-colors hover:text-amber-500 block"
@@ -202,28 +168,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Maintenance Dialog */}
-      <Dialog open={isMaintenanceDialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Maintenance Notice</DialogTitle>
-            <DialogDescription className="text-base pt-2">
-              Images of some products are missing as our platform is on maintenance. 
-              Please contact us via WhatsApp for more details.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="sm:justify-center pt-4">
-            <Button 
-              onClick={handleMaintenanceWhatsApp}
-              className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-            >
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Contact via WhatsApp
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </header>
   )
 }

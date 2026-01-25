@@ -31,7 +31,7 @@ export function CTASection() {
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                         <Button asChild size="lg" className="h-12 px-8 text-base bg-white text-black hover:bg-gray-100 hover:scale-105 transition-all duration-300 font-semibold rounded-full">
-                            <Link href="/products">
+                            <Link href="/rental-equipment">
                                 Start Renting Now <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                         </Button>

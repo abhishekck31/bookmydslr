@@ -11,7 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.bookmydslr.com"; // Make sure this is your correct domain
 
   const staticPages = [
-    "", "/products", "/about", "/contact", "/terms", "/privacy"
+    "", "/rental-equipment", "/cameras", "/lenses", "/accessories", "/about", "/contact", "/terms", "/privacy"
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),

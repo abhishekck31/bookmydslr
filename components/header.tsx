@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils"
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Cameras", href: "/products?category=DSLR%20Camera" },
-  { name: "Lenses", href: "/products?category=Camera%20Lens" },
+  { name: "Cameras", href: "/cameras" },
+  { name: "Lenses", href: "/lenses" },
   { name: "Services", href: "/services" },
   { name: "About", href: "/about" },
 ]
