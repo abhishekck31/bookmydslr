@@ -1,23 +1,24 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronRight } from "lucide-react"
-import { prisma } from "@/lib/prisma"
+import { fetchAPI } from "@/lib/api"
+import { Product, Category } from "@/types"
 
 export const dynamic = 'force-dynamic'
 
 export default async function RentalEquipmentPage() {
-  // Fetch all categories and some products for preview
-  const categories = await prisma.category.findMany({
-    include: {
-      products: {
-        take: 3,
-        orderBy: {
-          updatedAt: 'desc'
-        }
-      }
-    },
-    orderBy: {
-      name: 'asc'
+  const categoriesList = await fetchAPI<Category[]>('/categories') || []
+  const products = await fetchAPI<Product[]>('/products') || []
+
+  const categories = categoriesList.map((c) => {
+    const topProducts = products
+      .filter(p => p.category?.slug === c.slug)
+      .slice(0, 3)
+
+    return {
+      ...c,
+      id: c.id,
+      products: topProducts
     }
   })
 

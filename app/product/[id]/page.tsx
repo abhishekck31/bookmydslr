@@ -1,16 +1,7 @@
-import { prisma } from "@/lib/prisma"
+import { fetchAPI } from "@/lib/api"
+import { Product, GlobalSettings } from "@/types"
 import { notFound } from "next/navigation"
 import { ProductClient } from "@/components/product-client"
-
-// Helper function to add timeout to queries
-const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`Query timeout after ${timeoutMs}ms`)), timeoutMs)
-    ),
-  ])
-}
 
 export default async function ProductDetailPage({
   params
@@ -20,44 +11,19 @@ export default async function ProductDetailPage({
   const { id } = await params
 
   try {
-    // Fetch all data in parallel to reduce connection pool usage
-    const [product, globalSettings] = await Promise.all([
-      withTimeout(
-        prisma.product.findUnique({
-          where: { id },
-          include: {
-            category: true
-          }
-        }),
-        8000
-      ),
-      withTimeout(
-        prisma.globalSettings.findUnique({
-          where: { id: 'singleton' }
-        }),
-        5000
-      )
-    ])
+    const product = await fetchAPI<Product>(`/products/${id}`)
 
     if (!product) {
       notFound()
     }
 
-    // Fetch related products after we have the product
-    const relatedProducts = await withTimeout(
-      prisma.product.findMany({
-        where: {
-          categoryId: product.categoryId,
-          id: { not: product.id },
-          isAvailable: true
-        },
-        take: 4,
-        include: {
-          category: true
-        }
-      }),
-      8000
-    )
+    const allProducts = await fetchAPI<Product[]>('/products') || []
+    const relatedProducts = allProducts
+      .filter(p => p.category?.id === product.category?.id && p.id !== id)
+      .slice(0, 4);
+
+    const settingsData = await fetchAPI<GlobalSettings>('/settings/global')
+    const globalSettings = settingsData || { id: 'default', discountPercent: 0, isDiscountActive: false }
 
     return (
       <ProductClient
@@ -68,7 +34,6 @@ export default async function ProductDetailPage({
     )
   } catch (error) {
     console.error('Error fetching product:', error)
-    // Return a more user-friendly error or retry
     throw error
   }
 }

@@ -4,67 +4,25 @@ import { WhyUs } from "@/components/homepage/why-us"
 import { HowItWorks } from "@/components/homepage/how-it-works"
 import { ReviewSection } from "@/components/homepage/review-section"
 import { CTASection } from "@/components/homepage/cta-section"
-import { prisma } from "@/lib/prisma"
-
 import { LensScrollLoader } from "@/components/LensScrollLoader"
 
 export const metadata = {
   title: "Book My DSLR - Camera & Lens Rental in Bangalore | Kalyan Nagar, Hennur & More",
   description: "Rent cameras, lenses, and accessories in Bangalore. Located in Kalyan Nagar/Hennur. Fast delivery across the city.",
-  keywords: [
-    "camera rental Bangalore",
-    "lens rental Bangalore",
-    "DSLR rental",
-    "Kalyan Nagar",
-    "Hennur",
-    "Kammanahalli",
-    "Indiranagar",
-    "HSR Layout",
-    "Whitefield"
-  ],
-  openGraph: {
-    title: "Book My DSLR - Camera & Lens Rental in Bangalore",
-    description: "Rent cameras, lenses, and accessories in all Bangalore locations. Fast delivery and best prices.",
-    url: "https://yourdomain.com/",
-    type: "website",
-    images: [
-      {
-        url: "https://yourdomain.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Book My DSLR Bangalore"
-      }
-    ]
-  }
 }
 
-export const dynamicParams = true // Ensure this doesn't conflict with variable name
+import { fetchAPI } from "@/lib/api"
+import { Product, GlobalSettings } from "@/types"
 
 export default async function HomePage() {
-  // Fetch featured cameras from DB
-  const cameras = await prisma.product.findMany({
-    where: {
-      isAvailable: true,
-      category: {
-        name: {
-          contains: 'Camera',
-          mode: 'insensitive'
-        }
-      }
-    },
-    take: 4,
-    orderBy: {
-      updatedAt: 'desc'
-    },
-    include: {
-      category: true
-    }
-  })
+  const products = await fetchAPI<Product[]>('/products') || []
 
-  // Fetch global settings
-  const globalSettings = await prisma.globalSettings.findUnique({
-    where: { id: 'singleton' }
-  })
+  const cameras = products
+    .filter(p => p.category?.name.toLowerCase().includes("camera"))
+    .slice(0, 4)
+
+  const settingsData = await fetchAPI<GlobalSettings>('/settings/global')
+  const globalSettings = settingsData || { id: 'default', discountPercent: 0, isDiscountActive: false }
 
   return (
     <main className="min-h-screen bg-white">

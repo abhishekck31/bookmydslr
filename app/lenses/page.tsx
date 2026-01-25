@@ -1,41 +1,13 @@
-import { prisma } from "@/lib/prisma"
+import { fetchAPI } from "@/lib/api"
+import { Product, GlobalSettings } from "@/types"
 import { LensesClient } from "@/components/lenses-client"
 
+export const dynamic = 'force-dynamic'
+
 export default async function LensesPage() {
-  // Fetch lenses from DB
-  const lenses = await prisma.product.findMany({
-    where: {
-      category: {
-        name: 'Lenses'
-      }
-    },
-    include: {
-      category: true
-    },
-    orderBy: {
-      updatedAt: 'desc'
-    }
-  })
+  const products = await fetchAPI<Product[]>('/products') || []
+  const lenses = products.filter(p => p.category?.name.toLowerCase().includes("lens"))
+  const settings = await fetchAPI<GlobalSettings>('/settings/global')
 
-  // Fetch global settings
-  const globalSettings = await prisma.globalSettings.findUnique({
-    where: { id: 'singleton' }
-  })
-
-  // Map to client format
-  const mappedLenses = lenses.map(l => ({
-    id: l.id,
-    name: l.name,
-    brand: l.brand,
-    type: l.type,
-    mount: (l.specs as any)?.mount || null,
-    price: l.price,
-    image: l.image,
-    description: l.description,
-    isAvailable: l.isAvailable,
-    rating: 4.9,
-    reviews: 32
-  }))
-
-  return <LensesClient initialLenses={mappedLenses} globalSettings={globalSettings} />
+  return <LensesClient initialLenses={lenses as any} globalSettings={settings} />
 }

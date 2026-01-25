@@ -17,16 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from 'sonner'
 import { DeleteProductButton } from '@/components/admin/delete-product-button'
 
-interface Product {
-    id: string
-    name: string
-    category: {
-        name: string
-    }
-    price: number
-    isAvailable: boolean
-    image: string | null
-}
+import { Product } from '@/types'
 
 interface ProductsTableProps {
     products: Product[]
@@ -156,7 +147,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
                                     </div>
                                 </TableCell>
                                 <TableCell className="font-medium text-slate-900 dark:text-slate-100">{product.name}</TableCell>
-                                <TableCell>{product.category.name}</TableCell>
+                                <TableCell>{product.category?.name || 'Uncategorized'}</TableCell>
                                 <TableCell>₹{product.price}</TableCell>
                                 <TableCell>
                                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${product.isAvailable ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>

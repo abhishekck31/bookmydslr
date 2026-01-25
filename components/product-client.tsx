@@ -23,21 +23,7 @@ import {
 } from "@/components/ui/dialog"
 import { WHATSAPP_NUMBER } from "@/config/constants"
 
-interface Product {
-    id: string
-    name: string
-    brand: string | null
-    type: string | null
-    price: number
-    image: string | null
-    description: string
-    isAvailable: boolean
-    category: { name: string }
-    specs?: any
-    features?: any
-    technicalDetails?: any
-    gallery?: string[]
-}
+import { Product } from '@/types'
 
 interface ProductClientProps {
     product: Product
@@ -58,7 +44,7 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
     const [returnDate, setReturnDate] = useState<string>(new Date(Date.now() + 4 * 86400000).toISOString().split("T")[0])
     const [rentalDays, setRentalDays] = useState(3)
     const [activeImage, setActiveImage] = useState<string | null>(product.image)
-    const [isDialogOpen, setIsDialogOpen] = useState(true)
+
 
     useEffect(() => {
         if (pickupDate && returnDate) {
@@ -85,7 +71,7 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
             price: discountedPrice,
             image: product.image || "/placeholder.svg",
             days: rentalDays,
-            category: product.category.name.toLowerCase() + "s",
+            category: (product.category?.name || "Item").toLowerCase() + "s",
         })
 
         toast({
@@ -103,164 +89,141 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
         window.open(whatsappUrl, "_blank")
     }
 
-    const handleMaintenanceWhatsApp = () => {
-        const message = `Hello, I'm interested in ${product.name}. Could you please provide more details?`
-        const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
-        window.open(whatsappLink, "_blank")
-    }
+
 
     const discountedDailyPrice = getDiscountedPrice(product.price)
     const finalTotal = Math.round(discountedDailyPrice * rentalDays)
 
     return (
         <>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold">Maintenance Notice</DialogTitle>
-                        <DialogDescription className="text-base pt-2">
-                            Images of some products are missing as our platform is on maintenance. 
-                            Please contact us via WhatsApp for more details.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="sm:justify-center pt-4">
-                        <Button 
-                            onClick={handleMaintenanceWhatsApp}
-                            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-                        >
-                            <MessageCircle className="mr-2 h-4 w-4" />
-                            Contact via WhatsApp
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+
 
             <main className="min-h-screen bg-white pb-20">
-            <div className="border-b border-gray-100 bg-gray-50/30 sticky top-16 z-20 backdrop-blur-sm">
-                <div className="container py-4">
-                    <button onClick={() => router.back()} className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors group">
-                        <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
-                        Back
-                    </button>
-                </div>
-            </div>
-
-            <div className="container py-10 lg:py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-                    {/* Left: Imagery */}
-                    <div className="space-y-6 lg:sticky lg:top-32">
-                        <div className="relative aspect-square rounded-3xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center p-8 shadow-sm">
-                            <AnimatePresence mode="wait">
-                                <motion.div key={activeImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative w-full h-full">
-                                    <Image src={activeImage || "/placeholder.svg"} alt={product.name} fill className="object-contain" priority />
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-                        {/* More imagery USP etc (simplified for now to match structure) */}
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl gap-2">
-                                <ShieldCheck className="h-6 w-6 text-amber-600" />
-                                <span className="text-[10px] uppercase font-bold text-gray-500">Insured</span>
-                            </div>
-                            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl gap-2">
-                                <Truck className="h-6 w-6 text-amber-600" />
-                                <span className="text-[10px] uppercase font-bold text-gray-500">Fast Delivery</span>
-                            </div>
-                            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl gap-2">
-                                <Clock className="h-6 w-6 text-amber-600" />
-                                <span className="text-[10px] uppercase font-bold text-gray-500">24/7 Support</span>
-                            </div>
-                        </div>
+                <div className="border-b border-gray-100 bg-gray-50/30 sticky top-16 z-20 backdrop-blur-sm">
+                    <div className="container py-4">
+                        <button onClick={() => router.back()} className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors group">
+                            <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
+                            Back
+                        </button>
                     </div>
+                </div>
 
-                    {/* Right: Details */}
-                    <div>
-                        <div className="mb-2 text-amber-600 uppercase tracking-widest text-xs font-bold">
-                            {product.brand} • {product.category.name}
+                <div className="container py-10 lg:py-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+                        {/* Left: Imagery */}
+                        <div className="space-y-6 lg:sticky lg:top-32">
+                            <div className="relative aspect-square rounded-3xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center p-8 shadow-sm">
+                                <AnimatePresence mode="wait">
+                                    <motion.div key={activeImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative w-full h-full">
+                                        <Image src={activeImage || "/placeholder.svg"} alt={product.name} fill className="object-contain" priority />
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
+                            {/* More imagery USP etc (simplified for now to match structure) */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl gap-2">
+                                    <ShieldCheck className="h-6 w-6 text-amber-600" />
+                                    <span className="text-[10px] uppercase font-bold text-gray-500">Insured</span>
+                                </div>
+                                <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl gap-2">
+                                    <Truck className="h-6 w-6 text-amber-600" />
+                                    <span className="text-[10px] uppercase font-bold text-gray-500">Fast Delivery</span>
+                                </div>
+                                <div className="flex flex-col items-center p-4 bg-gray-50 rounded-2xl gap-2">
+                                    <Clock className="h-6 w-6 text-amber-600" />
+                                    <span className="text-[10px] uppercase font-bold text-gray-500">24/7 Support</span>
+                                </div>
+                            </div>
                         </div>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">{product.name}</h1>
 
-                        {/* Compact features for Accessories */}
-                        {product.category.name !== 'Cameras' && product.features && Array.isArray(product.features) && product.features.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                {product.features.map((feature: string, idx: number) => (
-                                    <span key={idx} className="inline-flex items-center text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100 italic">
-                                        • {feature}
-                                    </span>
-                                ))}
+                        {/* Right: Details */}
+                        <div>
+                            <div className="mb-2 text-amber-600 uppercase tracking-widest text-xs font-bold">
+                                {product.brand} • {product.category?.name}
                             </div>
-                        )}
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">{product.name}</h1>
 
-                        <p className="text-gray-600 leading-relaxed mb-8">{product.description}</p>
-
-                        {/* Key Features for Cameras */}
-                        {product.category.name === 'Cameras' && product.features && Array.isArray(product.features) && product.features.length > 0 && (
-                            <div className="mb-8 space-y-4">
-                                <h3 className="text-lg font-bold text-gray-900 border-l-4 border-amber-500 pl-3">Key Features</h3>
-                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
+                            {/* Compact features for Accessories */}
+                            {product.category?.name !== 'Cameras' && product.features && Array.isArray(product.features) && product.features.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-6">
                                     {product.features.map((feature: string, idx: number) => (
-                                        <li key={idx} className="flex items-start gap-3 text-gray-600 group">
-                                            <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0 group-hover:scale-125 transition-transform" />
-                                            <span className="text-sm font-medium leading-tight">{feature}</span>
-                                        </li>
+                                        <span key={idx} className="inline-flex items-center text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100 italic">
+                                            • {feature}
+                                        </span>
                                     ))}
-                                </ul>
-                            </div>
-                        )}
+                                </div>
+                            )}
 
-                        <div className="bg-white border boundary-gray-100 rounded-3xl shadow-sm p-6 space-y-6">
-                            <div className="flex justify-between items-end border-b pb-6">
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">Daily Rate</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-3xl font-bold text-gray-900">₹{discountedDailyPrice}</span>
-                                        {globalSettings?.isDiscountActive && (
-                                            <span className="text-sm text-gray-400 line-through">₹{product.price}</span>
-                                        )}
-                                        <span className="text-sm text-gray-500">/ day</span>
+                            <p className="text-gray-600 leading-relaxed mb-8">{product.description}</p>
+
+                            {/* Key Features for Cameras */}
+                            {product.category?.name === 'Cameras' && product.features && Array.isArray(product.features) && product.features.length > 0 && (
+                                <div className="mb-8 space-y-4">
+                                    <h3 className="text-lg font-bold text-gray-900 border-l-4 border-amber-500 pl-3">Key Features</h3>
+                                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
+                                        {product.features.map((feature: string, idx: number) => (
+                                            <li key={idx} className="flex items-start gap-3 text-gray-600 group">
+                                                <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0 group-hover:scale-125 transition-transform" />
+                                                <span className="text-sm font-medium leading-tight">{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            <div className="bg-white border boundary-gray-100 rounded-3xl shadow-sm p-6 space-y-6">
+                                <div className="flex justify-between items-end border-b pb-6">
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">Daily Rate</p>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-3xl font-bold text-gray-900">₹{discountedDailyPrice}</span>
+                                            {globalSettings?.isDiscountActive && (
+                                                <span className="text-sm text-gray-400 line-through">₹{product.price}</span>
+                                            )}
+                                            <span className="text-sm text-gray-500">/ day</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Pickup</label>
-                                    <input type="date" value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="w-full bg-gray-50 border p-3 rounded-xl text-sm" />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase">Pickup</label>
+                                        <input type="date" value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="w-full bg-gray-50 border p-3 rounded-xl text-sm" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase">Return</label>
+                                        <input type="date" value={returnDate} min={pickupDate} onChange={e => setReturnDate(e.target.value)} className="w-full bg-gray-50 border p-3 rounded-xl text-sm" />
+                                    </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Return</label>
-                                    <input type="date" value={returnDate} min={pickupDate} onChange={e => setReturnDate(e.target.value)} className="w-full bg-gray-50 border p-3 rounded-xl text-sm" />
+
+                                <div className="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
+                                    <span className="text-sm font-medium text-gray-600">Duration:</span>
+                                    <span className="font-bold">{rentalDays} Days</span>
                                 </div>
-                            </div>
 
-                            <div className="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-600">Duration:</span>
-                                <span className="font-bold">{rentalDays} Days</span>
-                            </div>
-
-                            <div className="flex gap-3">
-                                <Button size="lg" onClick={handleAddToCart} className="flex-1 h-14 bg-gray-900 hover:bg-black rounded-full font-bold">
-                                    Rent for ₹{finalTotal}
-                                </Button>
-                                <Button size="lg" variant="outline" onClick={handleWhatsAppInquiry} className="h-14 px-6 rounded-full font-bold">
-                                    WhatsApp
-                                </Button>
+                                <div className="flex gap-3">
+                                    <Button size="lg" onClick={handleAddToCart} className="flex-1 h-14 bg-gray-900 hover:bg-black rounded-full font-bold">
+                                        Rent for ₹{finalTotal}
+                                    </Button>
+                                    <Button size="lg" variant="outline" onClick={handleWhatsAppInquiry} className="h-14 px-6 rounded-full font-bold">
+                                        WhatsApp
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Related Products */}
-                <section className="mt-20 pt-16 border-t">
-                    <h2 className="text-2xl font-bold mb-8">You might also like</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {relatedProducts.map(p => (
-                            <ProductCard key={p.id} product={p} />
-                        ))}
-                    </div>
-                </section>
-            </div>
-        </main>
+                    {/* Related Products */}
+                    <section className="mt-20 pt-16 border-t">
+                        <h2 className="text-2xl font-bold mb-8">You might also like</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {relatedProducts.map(p => (
+                                <ProductCard key={p.id} product={p} />
+                            ))}
+                        </div>
+                    </section>
+                </div>
+            </main>
         </>
     )
 }

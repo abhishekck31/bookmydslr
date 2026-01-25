@@ -6,45 +6,24 @@ import { PricingSection } from '@/components/admin/pricing-section'
 import { ProductTable } from '@/components/admin/product-table'
 import { Loader2, LayoutDashboard } from 'lucide-react'
 
+import { fetchAPI } from "@/lib/api"
+import { Product, Category } from "@/types"
+
 export default function AdminDashboard() {
-    const [products, setProducts] = useState([])
-    const [categories, setCategories] = useState([])
+    const [products, setProducts] = useState<Product[]>([])
+    const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
 
     const fetchData = useCallback(async () => {
         try {
-            const [prodRes, catRes] = await Promise.all([
-                fetch('/api/admin/products'),
-                fetch('/api/admin/categories') // Assuming this exists or returns basics
+            const [prods, cats] = await Promise.all([
+                fetchAPI<Product[]>('/products'),
+                fetchAPI<Category[]>('/categories')
             ])
 
-            if (prodRes.ok) {
-                const data = await prodRes.json()
-                // Defensive check to ensure array
-                const validProducts = Array.isArray(data) ? data : (data.products && Array.isArray(data.products) ? data.products : [])
-                console.log("Dashboard Products:", validProducts)
-                setProducts(validProducts)
-            }
+            setProducts(prods || [])
+            setCategories(cats || [])
 
-            if (catRes.ok) {
-                const data = await catRes.json()
-                // Defensive check - if API returns object or null, fallback
-                if (Array.isArray(data)) {
-                    console.log("Dashboard Categories:", data)
-                    setCategories(data)
-                } else {
-                    console.error("Categories API did not return an array:", data)
-                    // Fallback to empty to prevent crash
-                    setCategories([])
-                }
-            } else {
-                console.error("Categories API failed:", catRes.status)
-                // Fallback categories if API fails or doesn't exist yet
-                setCategories([
-                    { id: 'cam-cat-id', name: 'Cameras' },
-                    { id: 'acc-cat-id', name: 'Accessories' }
-                ])
-            }
         } catch (error) {
             console.error("Dashboard Fetch Error:", error)
         } finally {

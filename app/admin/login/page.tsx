@@ -8,8 +8,6 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { Lock } from 'lucide-react'
-import { signIn } from 'next-auth/react'
-
 export default function AdminLogin() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -21,18 +19,15 @@ export default function AdminLogin() {
         setLoading(true)
 
         try {
-            const result = await signIn('credentials', {
-                email,
-                password,
-                redirect: false,
-            })
+            await new Promise(r => setTimeout(r, 800)) // Mock delay
 
-            if (result?.error) {
-                toast.error("Invalid credentials")
-            } else {
-                toast.success("Login successful")
+            // Hardcoded check (same as before but client side now)
+            if (email === "bookmydslr@gmail.com" && password === "bookmydslr@2015") {
+                toast.success("Login successful (Mock)")
                 router.push('/admin/dashboard')
                 router.refresh()
+            } else {
+                toast.error("Invalid credentials")
             }
         } catch (error) {
             console.error("Login client error:", error)

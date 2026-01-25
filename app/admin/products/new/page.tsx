@@ -1,10 +1,16 @@
-import { prisma } from '@/lib/prisma'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { fetchAPI } from '@/lib/api'
+import { Category } from '@/types'
 import { ProductForm } from '@/components/admin/product-form'
 
-export default async function NewProductPage() {
-    const categories = await prisma.category.findMany({
-        orderBy: { name: 'asc' }
-    })
+export default function NewProductPage() {
+    const [categories, setCategories] = useState<Category[]>([])
+
+    useEffect(() => {
+        fetchAPI<Category[]>('/categories').then(data => setCategories(data || []))
+    }, [])
 
     return (
         <div className="max-w-4xl mx-auto">

@@ -57,22 +57,14 @@ export function ProductForm({ categories, initialData, onSuccess, action = 'crea
 
         setIsCreatingCategory(true)
         try {
-            const res = await fetch('/api/categories', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newCategoryName })
-            })
+            await new Promise(r => setTimeout(r, 800)) // Mock delay
+            const newCategory = { id: `cat_${Date.now()}`, name: newCategoryName } // Mock ID
 
-            if (res.ok) {
-                const newCategory = await res.json()
-                setAvailableCategories([...availableCategories, newCategory])
-                setFormData({ ...formData, categoryId: newCategory.id })
-                setNewCategoryName('')
-                setIsCategoryOpen(false)
-                toast({ title: "Category created successfully" })
-            } else {
-                toast({ title: "Failed to create category", variant: "destructive" })
-            }
+            setAvailableCategories([...availableCategories, newCategory])
+            setFormData({ ...formData, categoryId: newCategory.id })
+            setNewCategoryName('')
+            setIsCategoryOpen(false)
+            toast({ title: "Mock: Category created successfully" })
         } catch (error) {
             toast({ title: "Error creating category", variant: "destructive" })
         } finally {
@@ -140,62 +132,37 @@ export function ProductForm({ categories, initialData, onSuccess, action = 'crea
 
         setLoading(true)
         try {
-            const payload = {
-                ...formData,
-                price: parseFloat(formData.price) || 0,
-                basePrice: formData.basePrice ? parseFloat(formData.basePrice) : undefined,
-                discountPercentage: formData.discountPercentage ? parseFloat(formData.discountPercentage) : 0,
-                offerName: formData.offerName || null,
-                features: formData.features
-            }
+            await new Promise(r => setTimeout(r, 1000)) // Mock delay
 
-            let url = '/api/admin/products'
-            let method = 'POST'
+            toast({ title: action === 'update' ? "Mock: Product updated 🚀" : "Mock: Product added 🚀" })
 
-            if (action === 'update' && initialData?.id) {
-                url = `/api/admin/products/${initialData.id}`
-                method = 'PUT'
-            }
-
-            const res = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-
-            if (res.ok) {
-                toast({ title: action === 'update' ? "Product updated successfully 🚀" : "Product added successfully! 🚀" })
-
-                if (action === 'create' && nextAction === 'save_and_new') {
-                    // Reset form
-                    setFormData({
-                        name: '',
-                        categoryId: '',
-                        brand: '',
-                        type: '',
-                        price: '',
-                        basePrice: '',
-                        description: '',
-                        image: '',
-                        isAvailable: true,
-                        features: [],
-                        discountPercentage: '',
-                        offerName: ''
-                    })
-                    // Ensure we are at top
-                    window.scrollTo(0, 0)
-                } else {
-                    if (onSuccess) {
-                        onSuccess()
-                    } else {
-                        router.push('/admin/products')
-                        router.refresh()
-                    }
-                }
+            if (action === 'create' && nextAction === 'save_and_new') {
+                // Reset form
+                setFormData({
+                    name: '',
+                    categoryId: '',
+                    brand: '',
+                    type: '',
+                    price: '',
+                    basePrice: '',
+                    description: '',
+                    image: '',
+                    isAvailable: true,
+                    features: [],
+                    discountPercentage: '',
+                    offerName: ''
+                })
+                // Ensure we are at top
+                window.scrollTo(0, 0)
             } else {
-                const data = await res.json()
-                toast({ title: data.error || "Failed to save product", variant: "destructive" })
+                if (onSuccess) {
+                    onSuccess()
+                } else {
+                    router.push('/admin/products')
+                    router.refresh()
+                }
             }
+
         } catch (error) {
             console.error(error)
             toast({ title: "Error submitting form", variant: "destructive" })

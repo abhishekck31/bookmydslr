@@ -1,20 +1,27 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { prisma } from '@/lib/prisma'
+import { fetchAPI } from "@/lib/api"
+import { Product } from "@/types"
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Loader2 } from 'lucide-react'
 import { ProductsTable } from '@/components/admin/products-table'
 
-export const dynamic = 'force-dynamic'
+export default function AdminProductsPage() {
+    const [products, setProducts] = useState<Product[]>([])
+    const [loading, setLoading] = useState(true)
 
-export default async function AdminProductsPage() {
-    const products = await prisma.product.findMany({
-        include: {
-            category: true
-        },
-        orderBy: {
-            updatedAt: 'desc'
-        }
-    })
+    useEffect(() => {
+        fetchAPI<Product[]>('/products').then(data => {
+            setProducts(data || [])
+            setLoading(false)
+        })
+    }, [])
+
+    if (loading) {
+        return <div className="flex h-96 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-amber-500" /></div>
+    }
 
     return (
         <div className="space-y-6">

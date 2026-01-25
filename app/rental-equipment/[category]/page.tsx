@@ -1,7 +1,8 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft } from "lucide-react"
-import { prisma } from "@/lib/prisma"
+import { fetchAPI } from "@/lib/api"
+import { Product, Category } from "@/types"
 import { notFound } from "next/navigation"
 
 export const dynamic = 'force-dynamic'
@@ -18,36 +19,27 @@ export default async function CategoryPage({
 
   const categorySlug = resolvedParams.category
 
-  // Find category in DB
-  const category = await prisma.category.findUnique({
-    where: { slug: categorySlug }
-  })
+  // Fetch categories from API
+  const categories = await fetchAPI<Category[]>('/categories') || []
+  const category = categories.find(c => c.slug === categorySlug)
 
   if (!category) {
     return notFound()
   }
 
-  // Fetch products for this category
-  let whereClause: any = { categoryId: category.id }
+  // Fetch products
+  const products = await fetchAPI<Product[]>('/products') || []
+  let list = products.filter(p => p.category?.slug === categorySlug)
 
   if (resolvedSearchParams.subcategory) {
     const subcategoryName = resolvedSearchParams.subcategory.replace(/-/g, " ")
-    whereClause.brand = { contains: subcategoryName, mode: 'insensitive' }
+    list = list.filter(p => p.brand.toLowerCase().includes(subcategoryName.toLowerCase()))
   }
 
-  const products = await prisma.product.findMany({
-    where: whereClause,
-    orderBy: {
-      updatedAt: 'desc'
-    }
-  })
+  const mappedProducts = list
 
-  // Get unique brands for subcategory filtering
-  const allCategoryProducts = await prisma.product.findMany({
-    where: { categoryId: category.id },
-    select: { brand: true }
-  })
-  const brands = Array.from(new Set(allCategoryProducts.map(p => p.brand).filter(Boolean))) as string[]
+  // Get unique brands
+  const brands = Array.from(new Set(list.map(p => p.brand).filter(Boolean))) as string[]
 
   return (
     <div className="container py-10">
@@ -60,7 +52,7 @@ export default async function CategoryPage({
         {category.name}
         {resolvedSearchParams.subcategory && ` - ${resolvedSearchParams.subcategory.replace(/-/g, " ")}`}
       </h1>
-      <p className="text-muted-foreground mb-8">{products.length} items available for rent</p>
+      <p className="text-muted-foreground mb-8">{mappedProducts.length} items available for rent</p>
 
       {brands.length > 0 && !resolvedSearchParams.subcategory && (
         <div className="flex flex-wrap gap-2 mb-8">
@@ -77,7 +69,7 @@ export default async function CategoryPage({
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((item) => (
+        {mappedProducts.map((item: any) => (
           <Link href={`/product/${item.id}`} key={item.id} className="group">
             <div className="border rounded-lg overflow-hidden bg-white p-4 h-full flex flex-col transition-all duration-200 hover:shadow-md">
               <div className="relative">
