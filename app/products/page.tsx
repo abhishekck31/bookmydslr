@@ -15,7 +15,12 @@ export default async function ProductsPage() {
   })
 
   // Fetch unique categories and brands for filters
-  const categories = Array.from(new Set(products.map(p => p.category.name).filter(Boolean))) as string[]
+  // const categories = Array.from(new Set(products.map(p => p.category.name).filter(Boolean))) as string[]
+  const allCategories = await prisma.category.findMany({
+    select: { name: true },
+    orderBy: { name: 'asc' }
+  })
+  const categories = allCategories.map(c => c.name)
   const brands = Array.from(new Set(products.map(p => p.brand).filter(Boolean))) as string[]
 
   // Fetch global settings
