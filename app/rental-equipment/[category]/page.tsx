@@ -32,7 +32,7 @@ export default async function CategoryPage({
 
   if (resolvedSearchParams.subcategory) {
     const subcategoryName = resolvedSearchParams.subcategory.replace(/-/g, " ")
-    whereClause.brand = { contains: subcategoryName, mode: 'insensitive' }
+    whereClause.brand = { contains: subcategoryName }
   }
 
   const products = await prisma.product.findMany({

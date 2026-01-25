@@ -2,8 +2,8 @@ name: Keep Neon DB Alive
 
 on:
   schedule:
-    # Run every 6 hours to keep the database active
-    - cron: '0 */6 * * *'
+    # Run every 4 hours to keep the database active
+    - cron: '0 */4 * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
