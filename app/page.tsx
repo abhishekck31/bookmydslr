@@ -47,7 +47,8 @@ export default async function HomePage() {
       isAvailable: true,
       category: {
         name: {
-          contains: 'Camera'
+          contains: 'Camera',
+          mode: 'insensitive'
         }
       }
     },

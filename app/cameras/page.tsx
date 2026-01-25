@@ -9,7 +9,8 @@ export default async function CamerasPage() {
     where: {
       category: {
         name: {
-          contains: 'Camera'
+          contains: 'Camera',
+          mode: 'insensitive'
         }
       }
     },
