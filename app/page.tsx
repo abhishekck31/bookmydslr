@@ -11,18 +11,17 @@ export const metadata = {
   description: "Rent cameras, lenses, and accessories in Bangalore. Located in Kalyan Nagar/Hennur. Fast delivery across the city.",
 }
 
-import { fetchAPI } from "@/lib/api"
+import { fetchProducts, fetchGlobalSettings } from "@/lib/api"
 import { Product, GlobalSettings } from "@/types"
 
 export default async function HomePage() {
-  const products = await fetchAPI<Product[]>('/products') || []
+  const products = await fetchProducts()
 
   const cameras = products
     .filter(p => p.category?.name.toLowerCase().includes("camera"))
     .slice(0, 4)
 
-  const settingsData = await fetchAPI<GlobalSettings>('/settings/global')
-  const globalSettings = settingsData || { id: 'default', discountPercent: 0, isDiscountActive: false }
+  const globalSettings = await fetchGlobalSettings()
 
   return (
     <main className="min-h-screen bg-white">

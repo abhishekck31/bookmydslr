@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { fetchAPI } from "@/lib/api"
+import { fetchProducts } from "@/lib/api"
 import { Product } from "@/types"
 import { Button } from '@/components/ui/button'
 import { Plus, Loader2 } from 'lucide-react'
@@ -13,7 +13,7 @@ export default function AdminProductsPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetchAPI<Product[]>('/products').then(data => {
+        fetchProducts().then(data => {
             setProducts(data || [])
             setLoading(false)
         })

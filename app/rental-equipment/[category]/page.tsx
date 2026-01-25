@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft } from "lucide-react"
-import { fetchAPI } from "@/lib/api"
+import { fetchCategories, fetchProducts } from "@/lib/api"
 import { Product, Category } from "@/types"
 import { notFound } from "next/navigation"
 
@@ -20,7 +20,7 @@ export default async function CategoryPage({
   const categorySlug = resolvedParams.category
 
   // Fetch categories from API
-  const categories = await fetchAPI<Category[]>('/categories') || []
+  const categories = await fetchCategories()
   const category = categories.find(c => c.slug === categorySlug)
 
   if (!category) {
@@ -28,7 +28,7 @@ export default async function CategoryPage({
   }
 
   // Fetch products
-  const products = await fetchAPI<Product[]>('/products') || []
+  const products = await fetchProducts()
   let list = products.filter(p => p.category?.slug === categorySlug)
 
   if (resolvedSearchParams.subcategory) {

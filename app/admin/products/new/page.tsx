@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { fetchAPI } from '@/lib/api'
+import { fetchCategories } from '@/lib/api'
 import { Category } from '@/types'
 import { ProductForm } from '@/components/admin/product-form'
 
@@ -9,7 +9,7 @@ export default function NewProductPage() {
     const [categories, setCategories] = useState<Category[]>([])
 
     useEffect(() => {
-        fetchAPI<Category[]>('/categories').then(data => setCategories(data || []))
+        fetchCategories().then(data => setCategories(data || []))
     }, [])
 
     return (

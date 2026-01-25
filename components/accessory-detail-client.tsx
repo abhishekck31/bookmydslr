@@ -8,15 +8,16 @@ import { ChevronLeft, ShoppingCart, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { accessories } from "@/data/accessories"
 import { useCart, type CartItem } from "@/components/cart-provider"
 import { useToast } from "@/hooks/use-toast"
+import { Product } from "@/types"
 
 interface AccessoryDetailClientProps {
-    accessory: typeof accessories[0]
+    accessory: Product
+    relatedProducts: Product[]
 }
 
-export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps) {
+export function AccessoryDetailClient({ accessory, relatedProducts }: AccessoryDetailClientProps) {
     const [rentalDays, setRentalDays] = useState(3)
     const { addItem } = useCart()
     const { toast } = useToast()
@@ -28,7 +29,7 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
             price: accessory.price,
             image: accessory.image || "/placeholder.svg?height=200&width=200",
             days: rentalDays,
-            category: "accessories",
+            category: "accessories", // This might need to be dynamic or from accessory.category
             brand: accessory.brand,
         }
 
@@ -65,21 +66,6 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
                             className="object-contain max-h-full"
                         />
                     </div>
-                    {accessory.gallery && (
-                        <div className="grid grid-cols-5 gap-2">
-                            {accessory.gallery.slice(0, 5).map((img, i) => (
-                                <div key={i} className="border rounded-md overflow-hidden bg-white p-1">
-                                    <Image
-                                        src={img || "/placeholder.svg?height=100&width=100"}
-                                        alt={`${accessory.name} view ${i + 1}`}
-                                        width={100}
-                                        height={100}
-                                        className="object-contain"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 <div className="space-y-6">
@@ -148,8 +134,8 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
 
                     <div className="border-t pt-4">
                         <h3 className="font-medium mb-2">Availability</h3>
-                        <p className={`font-medium ${accessory.available ? "text-green-600" : "text-red-600"}`}>
-                            {accessory.available ? "In Stock" : "Currently Unavailable"}
+                        <p className={`font-medium ${accessory.isAvailable ? "text-green-600" : "text-red-600"}`}>
+                            {accessory.isAvailable ? "In Stock" : "Currently Unavailable"}
                         </p>
                     </div>
                 </div>
@@ -180,13 +166,15 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
                     <Card className="p-6">
                         <h3 className="text-xl font-semibold mb-4">Technical Specifications</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
-                            {accessory.specs &&
+                            {accessory.specs ?
                                 Object.entries(accessory.specs).map(([key, value]) => (
                                     <div key={key} className="flex justify-between border-b pb-2">
                                         <span className="font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                                        <span>{value}</span>
+                                        <span>{value as any}</span>
                                     </div>
-                                ))}
+                                )) : (
+                                    <p>No specifications available.</p>
+                                )}
                         </div>
                     </Card>
                 </TabsContent>
@@ -194,13 +182,13 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
                     <Card className="p-6">
                         <h3 className="text-xl font-semibold mb-4">Key Features</h3>
                         <ul className="space-y-2">
-                            {accessory.features &&
+                            {accessory.features && accessory.features.length > 0 ?
                                 accessory.features.map((feature: any, index: any) => (
                                     <li key={index} className="flex items-start">
                                         <div className="mr-2 mt-1 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                                         <span>{feature}</span>
                                     </li>
-                                ))}
+                                )) : <p>No features listed.</p>}
                         </ul>
                     </Card>
                 </TabsContent>
@@ -242,10 +230,8 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
             <div className="mt-12">
                 <h2 className="text-2xl font-bold mb-6">You might also like</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {accessories
-                        .filter((item) => item.id !== accessory.id)
-                        .slice(0, 4)
-                        .map((item) => (
+                    {relatedProducts.length > 0 ? (
+                        relatedProducts.map((item) => (
                             <Link href={`/accessories/${item.id}`} key={item.id} className="group">
                                 <div className="border rounded-lg overflow-hidden bg-white p-4 h-full flex flex-col transition-all duration-200 hover:shadow-md">
                                     <div className="flex items-center justify-center h-48 mb-4">
@@ -258,11 +244,14 @@ export function AccessoryDetailClient({ accessory }: AccessoryDetailClientProps)
                                         />
                                     </div>
                                     <h3 className="font-medium group-hover:text-primary transition-colors">{item.name}</h3>
-                                    <p className="text-sm text-muted-foreground mt-1 flex-grow">{item.description}</p>
+                                    <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-2">{item.description}</p>
                                     <p className="font-bold mt-2">₹{item.price}/day</p>
                                 </div>
                             </Link>
-                        ))}
+                        ))
+                    ) : (
+                        <p className="col-span-full text-center text-muted-foreground">No related items found.</p>
+                    )}
                 </div>
             </div>
         </div>

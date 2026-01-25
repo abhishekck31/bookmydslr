@@ -1,4 +1,4 @@
-import { fetchAPI } from "@/lib/api"
+import { fetchProduct, fetchCategories } from "@/lib/api"
 import { Product, Category } from "@/types"
 import { ProductForm } from '@/components/admin/product-form'
 import { notFound } from 'next/navigation'
@@ -9,13 +9,13 @@ import { ArrowLeft } from 'lucide-react'
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
-    const product = await fetchAPI<Product>(`/products/${id}`)
+    const product = await fetchProduct(id)
 
     if (!product) {
         notFound()
     }
 
-    const categories = await fetchAPI<Category[]>('/categories') || []
+    const categories = await fetchCategories()
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,17 +1,30 @@
 import { notFound } from "next/navigation"
-import { accessories } from "@/data/accessories"
+import { fetchProduct, fetchProducts } from "@/lib/api"
 import { AccessoryDetailClient } from "@/components/accessory-detail-client"
 
 export default async function AccessoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params
-  
-  // Find the accessory by ID (string comparison since accessory IDs might be strings)
-  const accessory = accessories.find((a) => a.id.toString() === resolvedParams.id)
+
+  // Fetch accessory from API
+  const accessory = await fetchProduct(resolvedParams.id)
 
   // If accessory not found, show 404
   if (!accessory) {
     notFound()
   }
 
-  return <AccessoryDetailClient accessory={accessory} />
+  // Fetch related products (e.g. other accessories)
+  // Assuming 'accessories' is generally products that are not cameras/lenses or specifically categorized.
+  // For now, let's fetch all products and filter out the current one.
+  const allProducts = await fetchProducts()
+
+  // Simple "related" logic: same category if available, or just random others
+  const relatedProducts = allProducts
+    .filter(p => p.id !== accessory.id && p.category?.id === accessory.category?.id)
+    .slice(0, 4)
+
+  // If no related products in same category, just take any 4 others
+  const finalRelated = relatedProducts.length > 0 ? relatedProducts : allProducts.filter(p => p.id !== accessory.id).slice(0, 4)
+
+  return <AccessoryDetailClient accessory={accessory} relatedProducts={finalRelated} />
 }

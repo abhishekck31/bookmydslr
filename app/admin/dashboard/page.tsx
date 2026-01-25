@@ -6,7 +6,7 @@ import { PricingSection } from '@/components/admin/pricing-section'
 import { ProductTable } from '@/components/admin/product-table'
 import { Loader2, LayoutDashboard } from 'lucide-react'
 
-import { fetchAPI } from "@/lib/api"
+import { fetchProducts, fetchCategories } from "@/lib/api"
 import { Product, Category } from "@/types"
 
 export default function AdminDashboard() {
@@ -17,8 +17,8 @@ export default function AdminDashboard() {
     const fetchData = useCallback(async () => {
         try {
             const [prods, cats] = await Promise.all([
-                fetchAPI<Product[]>('/products'),
-                fetchAPI<Category[]>('/categories')
+                fetchProducts(),
+                fetchCategories()
             ])
 
             setProducts(prods || [])

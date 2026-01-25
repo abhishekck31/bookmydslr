@@ -83,9 +83,22 @@ export function ProductClient({ product, relatedProducts, globalSettings }: Prod
     }
 
     const handleWhatsAppInquiry = () => {
-        const message = `Hi, I'm interested in renting the ${product.name} for ${rentalDays} days. Is it available?`
+        const categoryName = product.category?.name || "Equipment"
+        const brandName = product.brand || "Generic"
+
+        const message = `Hello Book My DSLR Team 👋
+
+I want to rent the following product:
+
+📷 Product: ${product.name}
+🏷 Brand: ${brandName}
+📂 Category: ${categoryName}
+💰 Price per day: ₹${product.price}
+
+Please share availability and next steps.`
+
         const encodedMessage = encodeURIComponent(message)
-        const whatsappUrl = `https://wa.me/919972122462?text=${encodedMessage}`
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`
         window.open(whatsappUrl, "_blank")
     }
 
