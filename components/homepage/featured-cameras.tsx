@@ -27,7 +27,7 @@ export function FeaturedCameras({ cameras, globalSettings }: FeaturedCamerasProp
     }
 
     return (
-        <section className="py-16 bg-white border-t border-gray-100">
+        <section className="py-16 bg-white border border-gray-100 rounded-[3rem] mx-2 md:mx-4 my-4 shadow-sm">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
                     <div className="max-w-xl space-y-1">

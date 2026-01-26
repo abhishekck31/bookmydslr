@@ -32,7 +32,7 @@ const steps = [
 
 export function HowItWorks() {
     return (
-        <section id="how-it-works" className="py-20 bg-gray-950 text-white overflow-hidden relative">
+        <section id="how-it-works" className="py-20 bg-gray-950 text-white overflow-hidden relative rounded-[3rem] mx-2 md:mx-4 my-4 shadow-xl">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-15">
                 <div className="absolute top-0 -left-1/4 w-[600px] h-[600px] bg-amber-900/40 rounded-full blur-[100px]" />

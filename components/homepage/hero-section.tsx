@@ -91,7 +91,7 @@ export function HeroSection() {
   const mousePosition = useMotionValue({ x: 0, y: 0 })
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white">
+    <div className="relative min-h-[90vh] overflow-hidden bg-white rounded-b-[3rem] shadow-sm mb-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <AnimatedGradientBlob
