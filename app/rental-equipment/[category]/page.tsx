@@ -1,28 +1,173 @@
-import Link from "next/link"
-import Image from "next/image"
-import { ChevronLeft } from "lucide-react"
-import { fetchCategories, fetchProducts } from "@/lib/api"
-import { Product, Category } from "@/types"
-import { notFound } from "next/navigation"
-import { CategoryTabs } from "@/components/rental/category-tabs"
-import { ProductListingCard } from "@/components/rental/product-listing-card"
+"use client"
 
+import { Suspense, useState } from "react"
+import Link from "next/link"
+import { ChevronRight } from "lucide-react"
+import { PLPHeader } from "@/components/rental/plp-header"
+import { CategoryRail } from "@/components/rental/category-rail"
+import { SmartFilterDrawer, FilterButton } from "@/components/rental/smart-filter-drawer"
+import { PremiumProductCard } from "@/components/rental/premium-product-card"
+import { Product, Category } from "@/types"
+
+interface ClientPLPProps {
+  category: Category
+  categories: Category[]
+  initialProducts: Product[]
+  brands: string[]
+}
+
+function ClientPLP({ category, categories, initialProducts, brands }: ClientPLPProps) {
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [filteredProducts, setFilteredProducts] = useState(initialProducts)
+  const [activeFilterCount, setActiveFilterCount] = useState(0)
+
+  const handleApplyFilters = (filters: any) => {
+    // Filter logic
+    let filtered = [...initialProducts]
+
+    // Brand filter
+    if (filters.brands.length > 0) {
+      filtered = filtered.filter(p => filters.brands.includes(p.brand))
+    }
+
+    // Price range filter
+    filtered = filtered.filter(p =>
+      p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+    )
+
+    // Camera type filter (would need to add type field to product)
+    if (filters.cameraTypes.length > 0) {
+      filtered = filtered.filter(p =>
+        filters.cameraTypes.some((type: string) =>
+          p.name.toLowerCase().includes(type.toLowerCase()) ||
+          p.type?.toLowerCase().includes(type.toLowerCase())
+        )
+      )
+    }
+
+    // Availability filter
+    if (filters.availability.length > 0) {
+      // For now, just filter by isAvailable
+      if (filters.availability.includes("Available Today")) {
+        filtered = filtered.filter(p => p.isAvailable)
+      }
+    }
+
+    setFilteredProducts(filtered)
+
+    // Calculate active filter count
+    const count =
+      filters.brands.length +
+      filters.cameraTypes.length +
+      filters.mounts.length +
+      filters.availability.length +
+      (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000 ? 1 : 0)
+    setActiveFilterCount(count)
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Header */}
+      <PLPHeader cartItemCount={0} />
+
+      {/* Category Rail */}
+      <CategoryRail categories={categories} activeSlug={category.slug} />
+
+      {/* Main Content */}
+      <div className="w-full max-w-[1320px] mx-auto px-4 py-6 md:py-8">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+          <Link href="/" className="hover:text-amber-600 transition-colors">
+            Home
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/rental-equipment" className="hover:text-amber-600 transition-colors">
+            Equipment
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="font-semibold text-gray-900">{category.name}</span>
+        </div>
+
+        {/* Page Header + Filter Bar */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
+              {category.name}
+            </h1>
+            <p className="text-sm md:text-base text-gray-600">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} available
+            </p>
+          </div>
+
+          {/* Filter Button */}
+          <FilterButton
+            onClick={() => setIsFilterOpen(true)}
+            activeCount={activeFilterCount}
+          />
+        </div>
+
+        {/* Product Grid - STRICT 4 COLUMNS ON DESKTOP */}
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-[1320px] mx-auto">
+            {filteredProducts.map((product) => (
+              <PremiumProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <div className="mb-4">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">📷</span>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                No products found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your filters or browse other categories
+              </p>
+              <Link
+                href="/rental-equipment"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-full transition-colors"
+              >
+                View All Equipment
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Smart Filter Drawer */}
+      <SmartFilterDrawer
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={handleApplyFilters}
+        availableBrands={brands}
+        resultCount={filteredProducts.length}
+      />
+
+      {/* Mobile Bottom Spacing */}
+      <div className="h-20 md:hidden" />
+    </div>
+  )
+}
+
+// Server Component Wrapper
+import { fetchCategories, fetchProducts } from "@/lib/api"
+import { notFound } from "next/navigation"
 
 export const dynamic = 'force-dynamic'
 
 export default async function CategoryPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ category: string }>
-  searchParams: Promise<{ subcategory?: string }>
 }) {
   const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
-
   const categorySlug = resolvedParams.category
 
-  // Fetch categories from API
+  // Fetch data
   const categories = await fetchCategories()
   const category = categories.find(c => c.slug === categorySlug)
 
@@ -30,83 +175,18 @@ export default async function CategoryPage({
     return notFound()
   }
 
-  // Fetch products
   const products = await fetchProducts()
-  let list = products.filter(p => p.category?.slug === categorySlug)
-
-  if (resolvedSearchParams.subcategory) {
-    const subcategoryName = resolvedSearchParams.subcategory.replace(/-/g, " ")
-    list = list.filter(p => p.brand.toLowerCase().includes(subcategoryName.toLowerCase()))
-  }
-
-  const mappedProducts = list
+  const categoryProducts = products.filter(p => p.category?.slug === categorySlug)
 
   // Get unique brands
-  const brands = Array.from(new Set(list.map(p => p.brand).filter(Boolean))) as string[]
+  const brands = Array.from(new Set(categoryProducts.map(p => p.brand).filter(Boolean))) as string[]
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Top Navigation / Breadcrumbs Area */}
-      <div className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="container py-4">
-          <CategoryTabs categories={categories} activeSlug={categorySlug} />
-        </div>
-      </div>
-
-      <div className="container py-8">
-        {/* Breadcrumb & Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-            <Link href="/" className="hover:text-primary">Home</Link>
-            <ChevronLeft className="h-3 w-3" />
-            <Link href="/rental-equipment" className="hover:text-primary">Equipment</Link>
-            <ChevronLeft className="h-3 w-3" />
-            <span className="font-semibold text-gray-900">{category.name}</span>
-          </div>
-
-          <h1 className="text-3xl font-bold text-gray-900">
-            {category.name}
-            <span className="text-muted-foreground font-normal text-lg ml-3">
-              {resolvedSearchParams.subcategory ? `/ ${resolvedSearchParams.subcategory.replace(/-/g, " ")}` : "> Equipment"}
-            </span>
-          </h1>
-        </div>
-
-        {/* Subcategory Filter Pills (Keep existing logic if brands exist) */}
-        {brands.length > 0 && !resolvedSearchParams.subcategory && (
-          <div className="mb-10">
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Filter by Brand</h3>
-            <div className="flex flex-wrap gap-3">
-              {brands.map((brand) => (
-                <Link
-                  key={brand}
-                  href={`/rental-equipment/${categorySlug}?subcategory=${brand.toLowerCase().replace(/\s+/g, "-")}`}
-                  className="px-5 py-2 rounded-full bg-white border border-gray-200 hover:border-amber-400 hover:text-amber-600 transition-all font-medium text-sm shadow-sm"
-                >
-                  {brand}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {mappedProducts.map((item: any) => (
-            <ProductListingCard key={item.id} product={item} />
-          ))}
-        </div>
-
-        {mappedProducts.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No products found in this category.</p>
-            <Link href="/rental-equipment" className="text-primary hover:underline mt-2 inline-block">
-              View all equipment
-            </Link>
-          </div>
-        )}
-      </div>
-
-    </div>
+    <ClientPLP
+      category={category}
+      categories={categories}
+      initialProducts={categoryProducts}
+      brands={brands}
+    />
   )
 }

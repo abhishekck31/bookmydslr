@@ -1,6 +1,5 @@
 import { fetchCategories, fetchProducts } from "@/lib/api"
-import { ProductBrowser } from "@/components/rental/product-browser"
-
+import { RentalEquipmentListing } from "@/components/rental/rental-equipment-listing"
 
 export const dynamic = 'force-dynamic'
 
@@ -11,8 +10,9 @@ export default async function RentalEquipmentPage() {
   ])
 
   return (
-    <>
-      <ProductBrowser initialProducts={products} categories={categories} />
-    </>
+    <RentalEquipmentListing
+      initialProducts={products}
+      categories={categories}
+    />
   )
 }
