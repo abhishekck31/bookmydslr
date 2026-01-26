@@ -13,7 +13,9 @@ export const metadata = {
 
 import { fetchProducts, fetchGlobalSettings, fetchCategories } from "@/lib/api"
 import { Product, GlobalSettings } from "@/types"
-import { QuickSelectGrid } from "@/components/homepage/quick-select-grid"
+
+
+import { BrandSelection } from "@/components/homepage/brand-selection"
 
 export default async function HomePage() {
   const [products, categories, globalSettings] = await Promise.all([
@@ -30,7 +32,7 @@ export default async function HomePage() {
     <main className="min-h-screen bg-white">
       <HeroSection />
       <LensScrollLoader />
-      <QuickSelectGrid categories={categories} products={products} />
+      <BrandSelection />
       <FeaturedCameras cameras={cameras} globalSettings={globalSettings} />
       <HowItWorks />
       <WhyUs />

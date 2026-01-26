@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail, ArrowRight } from "lucide-react"
+import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -22,10 +22,16 @@ export function Footer() {
               Bangalore's premium camera rental service. We empower creators with professional gear at accessible prices.
             </p>
             <div className="flex gap-4 pt-4">
-              {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+              {[
+                { Icon: Facebook, href: "https://www.facebook.com/bookmydslr" },
+                { Icon: Instagram, href: "https://www.instagram.com/book_my__dslr?igsh=MTQ3MDVwcjA2NmZpOA==" },
+                { Icon: Twitter, href: "https://x.com/bookmydslr" },
+              ].map(({ Icon, href }, i) => (
                 <Link
                   key={i}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-amber-500 hover:text-white transition-all duration-300 hover:scale-110"
                 >
                   <Icon className="h-4 w-4" />
