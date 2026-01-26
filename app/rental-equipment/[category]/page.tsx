@@ -6,7 +6,7 @@ import { Product, Category } from "@/types"
 import { notFound } from "next/navigation"
 import { CategoryTabs } from "@/components/rental/category-tabs"
 import { ProductListingCard } from "@/components/rental/product-listing-card"
-import { DateSelectionBar } from "@/components/rental/date-selection-bar"
+
 
 export const dynamic = 'force-dynamic'
 
@@ -107,7 +107,6 @@ export default async function CategoryPage({
         )}
       </div>
 
-      <DateSelectionBar />
     </div>
   )
 }

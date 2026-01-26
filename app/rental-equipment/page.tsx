@@ -1,6 +1,6 @@
 import { fetchCategories, fetchProducts } from "@/lib/api"
 import { ProductBrowser } from "@/components/rental/product-browser"
-import { DateSelectionBar } from "@/components/rental/date-selection-bar"
+
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +13,6 @@ export default async function RentalEquipmentPage() {
   return (
     <>
       <ProductBrowser initialProducts={products} categories={categories} />
-      <DateSelectionBar />
     </>
   )
 }
