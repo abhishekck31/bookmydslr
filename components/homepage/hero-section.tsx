@@ -140,7 +140,7 @@ export function HeroSection() {
               transition={{ delay: 0.3 }}
               className="space-y-4"
             >
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-black">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight text-black">
                 <span className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 bg-clip-text text-transparent">
                   Rent Premium
                 </span>

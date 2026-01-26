@@ -16,10 +16,14 @@ function slugify(text: string): string {
 // Generic fetch wrapper
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T | null> {
     try {
-        const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        // Remove trailing slash from base if present, add to path
-        const baseUrl = API_BASE_URL.replace(/\/$/, '');
-        const url = `${baseUrl}${path}`;
+        let url: string;
+        if (endpoint.startsWith('http')) {
+            url = endpoint;
+        } else {
+            const baseUrl = API_BASE_URL.replace(/\/$/, '');
+            const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+            url = `${baseUrl}${path}`;
+        }
 
         console.log(`[API] Fetching ${url}`);
 
@@ -115,20 +119,33 @@ function mapCategory(item: ApiCategory): Category {
 // Exported Data Fetchers
 
 export async function fetchCategories(): Promise<Category[]> {
-    // Should we use /categories/ (trailing slash)?
-    const data = await fetchAPI<PaginatedResponse<ApiCategory>>('/categories/');
-    if (!data || !data.results) return [];
-    return data.results.map(mapCategory);
+    let allCategories: ApiCategory[] = [];
+    let nextUrl: string | null = '/categories/';
+
+    while (nextUrl) {
+        const data: PaginatedResponse<ApiCategory> | null = await fetchAPI<PaginatedResponse<ApiCategory>>(nextUrl);
+        if (!data || !data.results) break;
+
+        allCategories = [...allCategories, ...data.results];
+        nextUrl = data.next;
+    }
+
+    return allCategories.map(mapCategory);
 }
 
 export async function fetchProducts(): Promise<Product[]> {
-    const data = await fetchAPI<PaginatedResponse<ApiProduct>>('/products/');
-    if (!data || !data.results) return [];
+    let allProducts: ApiProduct[] = [];
+    let nextUrl: string | null = '/products/';
 
-    // We might need to fetch brands if brand_detail is missing, but for now let's hope it's there 
-    // or just fallback. The user said "Basic fetch".
+    while (nextUrl) {
+        const data: PaginatedResponse<ApiProduct> | null = await fetchAPI<PaginatedResponse<ApiProduct>>(nextUrl);
+        if (!data || !data.results) break;
 
-    return data.results.map(mapProduct);
+        allProducts = [...allProducts, ...data.results];
+        nextUrl = data.next;
+    }
+
+    return allProducts.map(mapProduct);
 }
 
 

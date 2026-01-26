@@ -40,7 +40,7 @@ export function FeaturedCameras({ cameras, globalSettings }: FeaturedCamerasProp
                         </p>
                     </div>
                     <Button asChild variant="ghost" className="hidden md:flex text-gray-900 hover:text-amber-600 hover:bg-transparent p-0 font-medium">
-                        <Link href="/products" className="flex items-center gap-2">
+                        <Link href="/rental-equipment" className="flex items-center gap-2">
                             View All Equipment <ArrowRight className="w-4 h-4" />
                         </Link>
                     </Button>
@@ -82,7 +82,7 @@ export function FeaturedCameras({ cameras, globalSettings }: FeaturedCamerasProp
 
                 <div className="mt-10 text-center md:hidden">
                     <Button asChild variant="outline" className="w-full border-gray-200 text-gray-900 font-medium">
-                        <Link href="/products">
+                        <Link href="/rental-equipment">
                             View All Equipment
                         </Link>
                     </Button>

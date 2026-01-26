@@ -44,7 +44,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         {/* Main Content */}
-        <main className="min-h-screen pt-16 pb-20 md:pt-0 md:pb-0">
+        <div className="min-h-screen pt-16 pb-20 md:pt-0 md:pb-0">
           <Providers>
             {/* Mobile Bottom Navigation Only */}
             <div className="md:hidden">
@@ -52,7 +52,7 @@ export default function RootLayout({
             </div>
             {children}
           </Providers>
-        </main>
+        </div>
       </body>
     </html>
   )

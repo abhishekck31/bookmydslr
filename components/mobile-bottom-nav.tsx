@@ -42,6 +42,11 @@ const navItems: NavItem[] = [
 export function MobileBottomNav() {
     const pathname = usePathname()
 
+    // Hide this global nav on the product listing page as it has its own specialized nav
+    if (pathname?.startsWith("/rental-equipment")) {
+        return null
+    }
+
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-100 shadow-lg">
             <div className="flex items-center justify-around py-2 px-4">
@@ -54,8 +59,8 @@ export function MobileBottomNav() {
                             key={item.name}
                             href={item.href}
                             className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 relative ${isActive
-                                    ? 'text-amber-600'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'text-amber-600'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             {/* Active indicator */}

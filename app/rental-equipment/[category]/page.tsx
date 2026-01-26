@@ -4,6 +4,9 @@ import { ChevronLeft } from "lucide-react"
 import { fetchCategories, fetchProducts } from "@/lib/api"
 import { Product, Category } from "@/types"
 import { notFound } from "next/navigation"
+import { CategoryTabs } from "@/components/rental/category-tabs"
+import { ProductListingCard } from "@/components/rental/product-listing-card"
+import { DateSelectionBar } from "@/components/rental/date-selection-bar"
 
 export const dynamic = 'force-dynamic'
 
@@ -42,59 +45,69 @@ export default async function CategoryPage({
   const brands = Array.from(new Set(list.map(p => p.brand).filter(Boolean))) as string[]
 
   return (
-    <div className="container py-10">
-      <Link href="/rental-equipment" className="flex items-center text-muted-foreground mb-6 hover:text-primary">
-        <ChevronLeft className="mr-1 h-4 w-4" />
-        Back to all equipment
-      </Link>
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Top Navigation / Breadcrumbs Area */}
+      <div className="bg-white shadow-sm sticky top-0 z-40">
+        <div className="container py-4">
+          <CategoryTabs categories={categories} activeSlug={categorySlug} />
+        </div>
+      </div>
 
-      <h1 className="text-3xl font-bold mb-2">
-        {category.name}
-        {resolvedSearchParams.subcategory && ` - ${resolvedSearchParams.subcategory.replace(/-/g, " ")}`}
-      </h1>
-      <p className="text-muted-foreground mb-8">{mappedProducts.length} items available for rent</p>
+      <div className="container py-8">
+        {/* Breadcrumb & Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <Link href="/" className="hover:text-primary">Home</Link>
+            <ChevronLeft className="h-3 w-3" />
+            <Link href="/rental-equipment" className="hover:text-primary">Equipment</Link>
+            <ChevronLeft className="h-3 w-3" />
+            <span className="font-semibold text-gray-900">{category.name}</span>
+          </div>
 
-      {brands.length > 0 && !resolvedSearchParams.subcategory && (
-        <div className="flex flex-wrap gap-2 mb-8">
-          {brands.map((brand) => (
-            <Link
-              key={brand}
-              href={`/rental-equipment/${categorySlug}?subcategory=${brand.toLowerCase().replace(/\s+/g, "-")}`}
-              className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
-            >
-              {brand}
-            </Link>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {category.name}
+            <span className="text-muted-foreground font-normal text-lg ml-3">
+              {resolvedSearchParams.subcategory ? `/ ${resolvedSearchParams.subcategory.replace(/-/g, " ")}` : "> Equipment"}
+            </span>
+          </h1>
+        </div>
+
+        {/* Subcategory Filter Pills (Keep existing logic if brands exist) */}
+        {brands.length > 0 && !resolvedSearchParams.subcategory && (
+          <div className="mb-10">
+            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Filter by Brand</h3>
+            <div className="flex flex-wrap gap-3">
+              {brands.map((brand) => (
+                <Link
+                  key={brand}
+                  href={`/rental-equipment/${categorySlug}?subcategory=${brand.toLowerCase().replace(/\s+/g, "-")}`}
+                  className="px-5 py-2 rounded-full bg-white border border-gray-200 hover:border-amber-400 hover:text-amber-600 transition-all font-medium text-sm shadow-sm"
+                >
+                  {brand}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {mappedProducts.map((item: any) => (
+            <ProductListingCard key={item.id} product={item} />
           ))}
         </div>
-      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {mappedProducts.map((item: any) => (
-          <Link href={`/product/${item.id}`} key={item.id} className="group">
-            <div className="border rounded-lg overflow-hidden bg-white p-4 h-full flex flex-col transition-all duration-200 hover:shadow-md">
-              <div className="relative">
-                <div className="flex items-center justify-center h-48 mb-4">
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.name}
-                    width={200}
-                    height={200}
-                    className="object-contain max-h-full"
-                  />
-                </div>
-              </div>
-              <h3 className="font-medium group-hover:text-primary transition-colors">{item.name}</h3>
-              <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-2">{item.description}</p>
-              <div className="mt-2 flex justify-between items-center">
-                <p className="font-bold">₹{item.price}/day</p>
-                <span className={`text-sm ${item.isAvailable ? "text-green-600" : "text-red-600"}`}>
-                  {item.isAvailable ? "Available" : "Unavailable"}
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
+        {mappedProducts.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">No products found in this category.</p>
+            <Link href="/rental-equipment" className="text-primary hover:underline mt-2 inline-block">
+              View all equipment
+            </Link>
+          </div>
+        )}
       </div>
+
+      <DateSelectionBar />
     </div>
   )
 }
