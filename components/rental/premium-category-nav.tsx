@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { Category } from "@/types"
 import { cn } from "@/lib/utils"
 import {
@@ -12,9 +12,7 @@ import {
     Video,
     Battery,
     Zap,
-    Settings,
-    ChevronDown,
-    Check
+    Settings
 } from "lucide-react"
 
 interface PremiumCategoryNavProps {
@@ -38,15 +36,9 @@ const getCategoryIcon = (name: string) => {
 }
 
 export function PremiumCategoryNav({ categories, activeCategory, onSelectCategory }: PremiumCategoryNavProps) {
-    const [showMore, setShowMore] = useState(false)
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const [showLeftGradient, setShowLeftGradient] = useState(false)
     const [showRightGradient, setShowRightGradient] = useState(false)
-
-    const DESKTOP_VISIBLE_LIMIT = 8
-    const hasOverflow = categories.length > DESKTOP_VISIBLE_LIMIT
-    const visibleCategories = hasOverflow ? categories.slice(0, DESKTOP_VISIBLE_LIMIT) : categories
-    const moreCategories = hasOverflow ? categories.slice(DESKTOP_VISIBLE_LIMIT) : []
 
     useEffect(() => {
         const container = scrollContainerRef.current
@@ -101,85 +93,16 @@ export function PremiumCategoryNav({ categories, activeCategory, onSelectCategor
 
     return (
         <div className="w-full max-w-[1320px] mx-auto">
-            {/* Desktop */}
+            {/* Desktop - Categories wrap to multiple lines */}
             <div className="hidden md:block px-4">
-                <div className="flex gap-1.5 py-2 items-center">
-                    {visibleCategories.map((category) => (
+                <div className="flex flex-wrap gap-1.5 py-2">
+                    {categories.map((category) => (
                         <CategoryButton key={category.id} category={category} />
                     ))}
-
-                    {hasOverflow && (
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowMore(!showMore)}
-                                className="flex flex-col items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg border-2 border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50 transition-all min-w-[72px]"
-                            >
-                                <Settings className="h-4 w-4 text-gray-500" />
-                                <div className="flex items-center gap-0.5">
-                                    <span className="text-[10px] font-medium">More</span>
-                                    <span className="text-[9px] text-gray-400">({moreCategories.length})</span>
-                                    <ChevronDown className={cn(
-                                        "h-2.5 w-2.5 transition-transform",
-                                        showMore && "rotate-180"
-                                    )} />
-                                </div>
-                            </button>
-
-                            {showMore && (
-                                <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)} />
-                                    <div className="absolute top-full right-0 mt-2 w-[380px] bg-white border border-gray-200 rounded-xl shadow-2xl z-50">
-                                        <div className="p-3">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <h3 className="text-xs font-bold text-gray-900">More Categories</h3>
-                                                <button onClick={() => setShowMore(false)} className="text-[10px] text-gray-500 hover:text-gray-700">
-                                                    Close
-                                                </button>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-1.5 max-h-[280px] overflow-y-auto">
-                                                {moreCategories.map((category) => {
-                                                    const Icon = getCategoryIcon(category.name)
-                                                    const isActive = activeCategory === category.slug
-
-                                                    return (
-                                                        <button
-                                                            key={category.id}
-                                                            onClick={() => {
-                                                                onSelectCategory(isActive ? null : category.slug)
-                                                                setShowMore(false)
-                                                            }}
-                                                            className={cn(
-                                                                "flex items-center gap-2 px-2.5 py-2 rounded-lg border-2 transition-all text-left",
-                                                                isActive
-                                                                    ? "border-amber-400 bg-amber-50 text-amber-600"
-                                                                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-                                                            )}
-                                                        >
-                                                            <Icon className={cn(
-                                                                "h-3.5 w-3.5 shrink-0",
-                                                                isActive ? "text-amber-500" : "text-gray-500"
-                                                            )} />
-                                                            <span className={cn(
-                                                                "text-[11px] line-clamp-2 flex-1",
-                                                                isActive ? "font-bold" : "font-medium"
-                                                            )}>
-                                                                {category.name}
-                                                            </span>
-                                                            {isActive && <Check className="h-3 w-3 text-amber-500 shrink-0" />}
-                                                        </button>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
                 </div>
             </div>
 
-            {/* Mobile */}
+            {/* Mobile - Horizontal scroll */}
             <div className="md:hidden relative">
                 {showLeftGradient && (
                     <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
