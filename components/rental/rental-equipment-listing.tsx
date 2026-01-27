@@ -191,7 +191,7 @@ export function RentalEquipmentListing({ initialProducts, categories }: RentalEq
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1320px] mx-auto">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-w-[1320px] mx-auto pb-24">
                         {filteredProducts.map((product) => (
                             <RentalProductCard key={product.id} product={product} />
                         ))}
@@ -229,11 +229,11 @@ function RentalProductCard({ product }: RentalProductCardProps) {
                         src={product.image || "/placeholder.svg"}
                         alt={product.name}
                         fill
-                        className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
+                        className="object-contain p-2 md:p-4 transition-transform duration-500 group-hover:scale-110"
                     />
 
                     {/* Availability Badge - PROMINENT */}
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-2 right-2 md:top-3 md:right-3">
                         {product.isAvailable ? (
                             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 rounded-full shadow-lg">
                                 <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -249,14 +249,14 @@ function RentalProductCard({ product }: RentalProductCardProps) {
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-col flex-1 p-4">
+                <div className="flex flex-col flex-1 p-2 md:p-4">
                     {/* Brand (muted) */}
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
                         {product.brand}
                     </p>
 
                     {/* Equipment Name */}
-                    <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem] group-hover:text-amber-600 transition-colors">
+                    <h3 className="text-sm md:text-base font-bold text-gray-900 mb-1 md:mb-2 line-clamp-2 min-h-[2rem] md:min-h-[2.5rem] group-hover:text-amber-600 transition-colors">
                         {product.name}
                     </h3>
 
@@ -275,7 +275,7 @@ function RentalProductCard({ product }: RentalProductCardProps) {
                     {/* ₹ Price / day - VERY PROMINENT */}
                     <div className="mb-4">
                         <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-gray-900">₹{product.price}</span>
+                            <span className="text-xl md:text-3xl font-bold text-gray-900">₹{product.price}</span>
                             <span className="text-sm text-gray-500 font-medium">/day</span>
                         </div>
                     </div>
@@ -289,7 +289,7 @@ function RentalProductCard({ product }: RentalProductCardProps) {
                             }}
                             disabled={!product.isAvailable}
                             className={cn(
-                                "w-full py-3 rounded-xl font-bold text-sm transition-all duration-200",
+                                "w-full py-2 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all duration-200",
                                 product.isAvailable
                                     ? "bg-amber-400 text-black hover:bg-amber-500 hover:shadow-lg active:scale-95"
                                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -303,7 +303,7 @@ function RentalProductCard({ product }: RentalProductCardProps) {
                                 e.preventDefault()
                                 // View details (or just let Link handle it)
                             }}
-                            className="w-full py-3 rounded-xl border-2 border-gray-200 font-bold text-sm text-gray-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition-all"
+                            className="w-full py-2 md:py-3 rounded-xl border-2 border-gray-200 font-bold text-xs md:text-sm text-gray-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition-all hidden md:block"
                         >
                             View Details
                         </button>

@@ -104,26 +104,6 @@ export default function Navbar() {
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
-          <Link href="/cart" className="relative mr-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "transition-all duration-500",
-                showCartGlow && "animate-pulse shadow-lg shadow-amber-500/50 bg-amber-50"
-              )}
-            >
-              <ShoppingCart className={cn(
-                "h-5 w-5 transition-all duration-500",
-                showCartGlow && "text-amber-600"
-              )} />
-              {itemCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-gradient-to-r from-amber-500 to-yellow-300 text-black">
-                  {itemCount}
-                </Badge>
-              )}
-            </Button>
-          </Link>
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             <span className="sr-only">Toggle menu</span>

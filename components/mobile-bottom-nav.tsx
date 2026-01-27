@@ -4,7 +4,7 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Home, Grid3x3, Search, ShoppingCart, User } from "lucide-react"
+import { Home, Grid3x3, Search, ShoppingCart, User, Camera } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NavItem {
@@ -27,38 +27,22 @@ export function MobileBottomNav() {
             label: "Home"
         },
         {
-            name: "categories",
-            href: "/rental-equipment",
-            icon: Grid3x3,
-            label: "Categories"
+            name: "cameras",
+            href: "/cameras",
+            icon: Camera,
+            label: "Cameras"
         },
         {
-            name: "search",
-            href: "#",
-            icon: Search,
-            label: "Search",
-            onClick: () => {
-                // Trigger search functionality
-                const searchInput = document.getElementById('plp-search-input') as HTMLInputElement
-                if (searchInput) {
-                    searchInput.focus()
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                } else {
-                    setShowSearchModal(true)
-                }
-            }
+            name: "equipments",
+            href: "/rental-equipment",
+            icon: Grid3x3,
+            label: "Equipments"
         },
         {
             name: "cart",
             href: "/cart",
             icon: ShoppingCart,
             label: "Cart"
-        },
-        {
-            name: "account",
-            href: "/account",
-            icon: User,
-            label: "Account"
         }
     ]
 
@@ -86,16 +70,7 @@ export function MobileBottomNav() {
                                         : 'text-gray-500 active:text-gray-700'
                                 )}
                             >
-                                {/* Active indicator */}
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="activeIndicator"
-                                        className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-1 bg-amber-500 rounded-full"
-                                        initial={false}
-                                        animate={true}
-                                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                    />
-                                )}
+                                {/* Active indicator removed */}
 
                                 <item.icon className="w-5 h-5" />
                                 <span className="text-xs font-medium">{item.label}</span>
@@ -115,16 +90,7 @@ export function MobileBottomNav() {
                                     : 'text-gray-500 active:text-gray-700'
                             )}
                         >
-                            {/* Active indicator */}
-                            {isActive && (
-                                <motion.div
-                                    layoutId="activeIndicator"
-                                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-1 bg-amber-500 rounded-full"
-                                    initial={false}
-                                    animate={true}
-                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                />
-                            )}
+                            {/* Active indicator removed */}
 
                             <item.icon className="w-5 h-5" />
                             <span className="text-xs font-medium">{item.label}</span>

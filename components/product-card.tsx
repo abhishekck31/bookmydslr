@@ -50,8 +50,15 @@ export function ProductCard({ product }: ProductCardProps) {
                         </Badge>
                     )}
 
+                    {/* Featured / Best Seller Badge */}
+                    {product.featured && (
+                        <Badge className="absolute top-2 left-2 bg-amber-500 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0 rounded-full z-10">
+                            Featured
+                        </Badge>
+                    )}
+
                     {product.isNew && (
-                        <Badge className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0 rounded-full">
+                        <Badge className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm border-0 rounded-full">
                             New
                         </Badge>
                     )}
@@ -63,9 +70,24 @@ export function ProductCard({ product }: ProductCardProps) {
                     )}
                 </div>
 
-                <CardContent className="p-4">
+                <CardContent className="p-2 md:p-4">
+                    {/* Rating Section - Amazon like yellow highlight */}
+                    {(product.rating || 0) > 0 && (
+                        <div className="flex items-center gap-1 mb-1.5">
+                            <div className="flex text-amber-500">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                        key={i}
+                                        className={`w-3 h-3 ${i < Math.floor(product.rating || 0) ? "fill-current" : "text-gray-300 fill-none"}`}
+                                    />
+                                ))}
+                            </div>
+                            <span className="text-[10px] text-gray-500 font-medium">({product.reviews || 0})</span>
+                        </div>
+                    )}
+
                     {/* Product Name */}
-                    <h3 className="text-sm font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2 leading-tight">
+                    <h3 className="text-sm font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2 leading-tight min-h-[2.5rem]">
                         {product.name}
                     </h3>
 

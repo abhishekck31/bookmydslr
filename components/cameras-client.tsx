@@ -208,7 +208,7 @@ export function CamerasClient({ initialCameras, globalSettings }: CamerasClientP
                     </div>
 
                     {sortedCameras.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 pb-24">
                             {sortedCameras.map((camera, index) => (
                                 <motion.div key={camera.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
                                     <ProductCard product={{

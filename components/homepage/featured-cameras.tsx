@@ -28,14 +28,14 @@ export function FeaturedCameras({ cameras, globalSettings }: FeaturedCamerasProp
 
     return (
         <section className="py-16 bg-white border border-gray-100 rounded-[3rem] mx-2 md:mx-4 my-4 shadow-sm">
-            <div className="container px-4 md:px-6">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+            <div className="container px-2 md:px-6">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 px-2 md:px-0">
                     <div className="max-w-xl space-y-1">
                         <span className="text-amber-600 font-bold text-xs tracking-wider uppercase">
                             Trending Gear
                         </span>
-                        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Featured Cameras</h2>
-                        <p className="text-gray-500 font-medium">
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Featured Cameras</h2>
+                        <p className="text-sm md:text-base text-gray-500 font-medium line-clamp-2 md:line-clamp-none">
                             Top-rated equipment chosen by professional photographers.
                         </p>
                     </div>
@@ -57,7 +57,7 @@ export function FeaturedCameras({ cameras, globalSettings }: FeaturedCamerasProp
                             transition: { staggerChildren: 0.05 }
                         }
                     }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                    className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
                 >
                     {cameras.map((camera, index) => {
                         const discountedPrice = getDiscountedPrice(camera.price)
