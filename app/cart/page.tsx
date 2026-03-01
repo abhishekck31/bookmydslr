@@ -141,11 +141,11 @@ export default function CartPage() {
       return;
     }
 
-    if (deliveryMethod === 'delivery' && !customerInfo.address) {
+    if (deliveryMethod === 'delivery' && (!customerInfo.address || !customerInfo.pincode)) {
       toast({
         variant: "destructive",
-        title: "Address Required",
-        description: "Please enter your full delivery address.",
+        title: "Delivery Details Required",
+        description: "Please enter your full delivery address and pincode.",
       })
       return;
     }
@@ -385,6 +385,38 @@ ${rentalDays >= 3 ? '\n(Long term discount applied)' : ''}
                     </div>
                   </RadioGroup>
                 </div>
+
+                <AnimatePresence>
+                  {deliveryMethod === 'delivery' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                      animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      className="space-y-4 overflow-hidden"
+                    >
+                      <div className="space-y-1.5 pt-2">
+                        <Label className="text-xs font-bold text-gray-500 uppercase">Complete Address</Label>
+                        <Textarea
+                          name="address"
+                          value={customerInfo.address}
+                          onChange={handleCustomerChange}
+                          placeholder="House/Flat No., Building, Street Area, Landmark..."
+                          className="bg-gray-50 border-transparent focus:bg-white focus:border-amber-500 min-h-[80px] rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-500 uppercase">Pincode</Label>
+                        <Input
+                          name="pincode"
+                          value={customerInfo.pincode}
+                          onChange={handleCustomerChange}
+                          placeholder="6-digit Pincode"
+                          className="bg-gray-50 border-transparent focus:bg-white focus:border-amber-500 h-11 rounded-xl"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Summary & Total */}
                 <div className="pt-2 space-y-3">
