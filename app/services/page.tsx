@@ -6,10 +6,27 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Camera, Wrench, ImageIcon, Check, Video, Aperture, ArrowRight } from "lucide-react"
+import { JsonLd } from "@/components/seo/json-ld"
+import { buildBreadcrumbSchema, buildCollectionPageSchema } from "@/lib/seo/schema"
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <JsonLd
+        data={[
+          buildCollectionPageSchema({
+            name: "Camera Rental Services Bangalore | Book My DSLR",
+            description:
+              "Explore camera rental, repair, and production support services from Book My DSLR in Bangalore.",
+            path: "/services",
+          }),
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Services", path: "/services" },
+          ]),
+        ]}
+      />
+      <div className="min-h-screen bg-white">
       {/* Header */}
       <section className="relative bg-slate-950 py-24 md:py-32 overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
@@ -158,6 +175,7 @@ export default function ServicesPage() {
 
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }

@@ -6,10 +6,28 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Camera, CreditCard, Truck, Clock, CheckCircle } from "lucide-react"
+import { JsonLd } from "@/components/seo/json-ld"
+import { buildBreadcrumbSchema, buildCollectionPageSchema, buildFaqSchema } from "@/lib/seo/schema"
 
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <JsonLd
+        data={[
+          buildCollectionPageSchema({
+            name: "How Camera Rental Works in Bangalore | Book My DSLR",
+            description:
+              "Understand the Book My DSLR rental process for camera, lens, and filmmaking gear bookings in Bangalore.",
+            path: "/how-it-works",
+          }),
+          buildFaqSchema(faqs),
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "How It Works", path: "/how-it-works" },
+          ]),
+        ]}
+      />
+      <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-slate-950 text-white py-24 md:py-32 overflow-hidden relative">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
@@ -102,7 +120,8 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   )
 }
 

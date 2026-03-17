@@ -130,7 +130,7 @@ function CategoryPillGrid({ categories, activeCategory, onSelectCategory }: Cate
                         >
                             {category.image && (
                                 <div className="w-5 h-5 relative rounded-full overflow-hidden bg-gray-200 shrink-0">
-                                    <Image src={category.image} alt="" fill className="object-cover" />
+                                    <Image src={category.image} alt={category.name} fill className="object-cover" />
                                 </div>
                             )}
                             {category.name}
@@ -590,7 +590,7 @@ function ProductBrowserContent({ initialProducts, categories }: ProductBrowserPr
                                 >
                                     {category.image ? (
                                         <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-200 shrink-0">
-                                            <Image src={category.image} alt="" fill className="object-cover" />
+                                            <Image src={category.image} alt={category.name} fill className="object-cover" />
                                         </div>
                                     ) : (
                                         <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />

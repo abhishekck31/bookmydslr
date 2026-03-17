@@ -1,6 +1,30 @@
 import { notFound } from "next/navigation"
 import { fetchProduct, fetchProducts } from "@/lib/api"
 import { AccessoryDetailClient } from "@/components/accessory-detail-client"
+import { buildMetadata } from "@/lib/seo/metadata"
+
+export const revalidate = 300
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
+  const accessory = await fetchProduct(resolvedParams.id)
+
+  if (!accessory) {
+    return buildMetadata({
+      title: "Accessory Detail | Book My DSLR",
+      description: "Accessory detail page not found.",
+      path: `/product/${resolvedParams.id}`,
+      noIndex: true,
+    })
+  }
+
+  return buildMetadata({
+    title: `${accessory.name} Rental Bangalore | Book My DSLR`,
+    description: `${accessory.name} is available on the canonical product page at Book My DSLR.`,
+    path: `/product/${accessory.id}`,
+    noIndex: true,
+  })
+}
 
 export default async function AccessoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params

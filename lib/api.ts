@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { API_BASE_URL } from "@/config/constants";
 import { Product, Category, GlobalSettings } from "@/types";
 
@@ -28,8 +29,11 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
         console.log(`[API] Fetching ${url}`);
 
         const res = await fetch(url, {
-            cache: 'no-store',
             ...options,
+            next: {
+                revalidate: 300,
+                ...("next" in options ? (options as RequestInit & { next?: { revalidate?: number } }).next : {}),
+            },
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -118,7 +122,7 @@ function mapCategory(item: ApiCategory): Category {
 
 // Exported Data Fetchers
 
-export async function fetchCategories(): Promise<Category[]> {
+export const fetchCategories = cache(async (): Promise<Category[]> => {
     let allCategories: ApiCategory[] = [];
     let nextUrl: string | null = '/categories/';
 
@@ -131,9 +135,9 @@ export async function fetchCategories(): Promise<Category[]> {
     }
 
     return allCategories.map(mapCategory);
-}
+});
 
-export async function fetchProducts(): Promise<Product[]> {
+export const fetchProducts = cache(async (): Promise<Product[]> => {
     let allProducts: ApiProduct[] = [];
     let nextUrl: string | null = '/products/';
 
@@ -146,16 +150,16 @@ export async function fetchProducts(): Promise<Product[]> {
     }
 
     return allProducts.map(mapProduct);
-}
+});
 
 
-export async function fetchProduct(id: string): Promise<Product | null> {
+export const fetchProduct = cache(async (id: string): Promise<Product | null> => {
     const data = await fetchAPI<ApiProduct>(`/products/${id}/`);
     if (!data) return null;
     return mapProduct(data);
-}
+});
 
-export async function fetchGlobalSettings(): Promise<GlobalSettings> {
+export const fetchGlobalSettings = cache(async (): Promise<GlobalSettings> => {
     // Determine what endpoint provides global settings or mock it for now if not available
     // Existing code used '/settings/global'
     const data = await fetchAPI<GlobalSettings>('/settings/global/');
@@ -163,7 +167,7 @@ export async function fetchGlobalSettings(): Promise<GlobalSettings> {
         return { id: 'default', discountPercent: 0, isDiscountActive: false };
     }
     return data;
-}
+});
 
 // Re-export generic if needed, but prefer specific
 export { fetchAPI as fetchGeneric };

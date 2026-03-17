@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
+import { JsonLd } from "@/components/seo/json-ld"
+import { buildBreadcrumbSchema, buildCollectionPageSchema, buildLocalBusinessSchema } from "@/lib/seo/schema"
 
 export default function ContactPage() {
   const { toast } = useToast()
@@ -35,7 +37,23 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <JsonLd
+        data={[
+          buildCollectionPageSchema({
+            name: "Contact Book My DSLR | Camera Rental Bangalore",
+            description:
+              "Contact Book My DSLR for camera rentals, lens rentals, filmmaking gear, and local support in Bangalore.",
+            path: "/contact",
+          }),
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ]),
+          buildLocalBusinessSchema("/contact"),
+        ]}
+      />
+      <main className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-slate-950 border-b border-gray-800 py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
@@ -209,6 +227,7 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </main>
+      </main>
+    </>
   )
 }

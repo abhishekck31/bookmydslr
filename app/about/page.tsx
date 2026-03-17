@@ -6,10 +6,27 @@ import { motion } from "framer-motion"
 import { ShieldCheck, Truck, Users, Award, Camera, Clapperboard, CheckCircle2, ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { JsonLd } from "@/components/seo/json-ld"
+import { buildBreadcrumbSchema, buildCollectionPageSchema } from "@/lib/seo/schema"
 
 export default function AboutPage() {
     return (
-        <main className="min-h-screen bg-white">
+        <>
+            <JsonLd
+                data={[
+                    buildCollectionPageSchema({
+                        name: "About Book My DSLR | Camera Rental Bangalore",
+                        description:
+                            "Learn about Book My DSLR, the Bangalore camera rental team helping creators, photographers, and filmmakers access professional gear.",
+                        path: "/about",
+                    }),
+                    buildBreadcrumbSchema([
+                        { name: "Home", path: "/" },
+                        { name: "About", path: "/about" },
+                    ]),
+                ]}
+            />
+            <main className="min-h-screen bg-white">
             {/* Hero Section */}
             <section className="relative pt-24 pb-24 md:pt-40 md:pb-40 overflow-hidden bg-slate-950 border-b border-white/5">
                 {/* Abstract Background */}
@@ -179,6 +196,7 @@ export default function AboutPage() {
                     </div>
                 </div>
             </section>
-        </main>
+            </main>
+        </>
     )
 }

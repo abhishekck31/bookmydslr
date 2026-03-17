@@ -1,7 +1,5 @@
 import Link from "next/link"
 import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 export function Footer() {
   return (
@@ -44,7 +42,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h3 className="text-sm font-semibold mb-6 text-white uppercase tracking-wider">Navigation</h3>
             <ul className="space-y-4 text-gray-400 text-sm font-medium">
-              {['Home', 'Cameras', 'Lenses', 'Services', 'About'].map((item) => (
+              {['Home', 'Cameras', 'Lenses', 'Services', 'About', 'Blog'].map((item) => (
                 <li key={item}>
                   <Link
                     href={item === 'Home' ? '/' : `/${item.toLowerCase().replace(/\s+/g, '-')}`}
@@ -61,13 +59,11 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h3 className="text-sm font-semibold mb-6 text-white uppercase tracking-wider">Support</h3>
             <ul className="space-y-4 text-gray-400 text-sm font-medium">
-              {['Contact Us', 'Rental Agreement', 'Terms', 'Privacy', 'FAQ'].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="hover:text-amber-400 transition-colors">
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              <li><Link href="/contact" className="hover:text-amber-400 transition-colors">Contact Us</Link></li>
+              <li><Link href="/how-it-works" className="hover:text-amber-400 transition-colors">How It Works</Link></li>
+              <li><Link href="/terms" className="hover:text-amber-400 transition-colors">Terms</Link></li>
+              <li><Link href="/camera-rental-bangalore" className="hover:text-amber-400 transition-colors">Camera Rental Bangalore</Link></li>
+              <li><Link href="/rentals/lens-rental-bangalore" className="hover:text-amber-400 transition-colors">Lens Rental Bangalore</Link></li>
             </ul>
           </div>
 
@@ -99,9 +95,9 @@ export function Footer() {
         <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
           <p>&copy; {new Date().getFullYear()} Book My DSLR. All rights reserved.</p>
           <div className="flex gap-8">
-            <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-white transition-colors">Sitemap</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
           </div>
         </div>
       </div>

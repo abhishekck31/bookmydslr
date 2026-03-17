@@ -1,6 +1,30 @@
 import { notFound } from "next/navigation"
 import { fetchProduct, fetchProducts } from "@/lib/api"
 import { CameraDetailClient } from "@/components/camera-detail-client"
+import { buildMetadata } from "@/lib/seo/metadata"
+
+export const revalidate = 300
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
+  const camera = await fetchProduct(resolvedParams.id)
+
+  if (!camera) {
+    return buildMetadata({
+      title: "Camera Detail | Book My DSLR",
+      description: "Camera detail page not found.",
+      path: `/product/${resolvedParams.id}`,
+      noIndex: true,
+    })
+  }
+
+  return buildMetadata({
+    title: `${camera.name} Rental Bangalore | Book My DSLR`,
+    description: `${camera.name} is available on the canonical product page at Book My DSLR.`,
+    path: `/product/${camera.id}`,
+    noIndex: true,
+  })
+}
 
 export default async function CameraDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params

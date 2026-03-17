@@ -1,66 +1,64 @@
-import { MetadataRoute } from 'next'
-import { fetchCategories, fetchProducts } from '@/lib/api'
-
-// SEO Landing Pages for Bangalore Locations
-const locations = [
-  "koramangala", "indiranagar", "whitefield", "jayanagar", "hsr-layout",
-  "marathahalli", "btm-layout", "malleshwaram", "rajajinagar", "banashankari",
-  "hebbal", "yelachenahalli", "electronic-city", "mg-road", "ulsoor",
-  "basavanagudi", "frazer-town", "kalyan-nagar", "kr-puram", "rt-nagar"
-];
+import { MetadataRoute } from "next"
+import { fetchCategories, fetchProducts } from "@/lib/api"
+import { marketingLandingPages, bangaloreLocationPages } from "@/data/seo/landing-pages"
+import { siteConfig } from "@/lib/seo/site"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://www.bookmydslr.com";
-
-  // 1. Static Pages
-  const staticPages = [
+  const staticPages: MetadataRoute.Sitemap = [
     "",
+    "/camera-rental-bangalore",
     "/rental-equipment",
+    "/cameras",
+    "/lenses",
+    "/accessories",
     "/services",
     "/about",
     "/contact",
-    "/terms"
+    "/how-it-works",
+    "/blog",
+    "/terms",
   ].map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: `${siteConfig.url}${route}`,
     lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: route === "" ? 1.0 : 0.8,
-  }));
+    changeFrequency: route === "" ? "daily" : "weekly",
+    priority: route === "" ? 1 : route === "/camera-rental-bangalore" ? 0.95 : 0.8,
+  }))
 
-  // 2. Fetch Dynamic Data
-  const [categories, products] = await Promise.all([
-    fetchCategories(),
-    fetchProducts()
-  ]);
+  const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()])
 
-  // 3. Category Pages
   const categoryPages = categories.map((category) => ({
-    url: `${baseUrl}/rental-equipment?category=${category.slug}`,
+    url: `${siteConfig.url}/rental-equipment/${category.slug}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
+    changeFrequency: "weekly" as const,
     priority: 0.8,
-  }));
+  }))
 
-  // 4. Product Pages
   const productPages = products.map((product) => ({
-    url: `${baseUrl}/product/${product.id}`,
-    lastModified: new Date(), // Ideally this would be product.updatedAt if available
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
-
-  // 5. Location Pages (SEO)
-  const locationPages = locations.map((loc) => ({
-    url: `${baseUrl}/camera-rental-bangalore/${loc}`, // Updated to likely SEO URL pattern if known, or keep generic
+    url: `${siteConfig.url}/product/${product.id}`,
     lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+  }))
+
+  const marketingPages = marketingLandingPages.map((page) => ({
+    url: `${siteConfig.url}/rentals/${page.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }))
+
+  const locationPages = bangaloreLocationPages.map((page) => ({
+    url: `${siteConfig.url}/camera-rental-bangalore/${page.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.78,
+  }))
 
   return [
     ...staticPages,
     ...categoryPages,
     ...productPages,
-    ...locationPages
-  ];
+    ...marketingPages,
+    ...locationPages,
+  ]
 }
