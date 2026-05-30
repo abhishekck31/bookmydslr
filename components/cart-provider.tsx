@@ -30,6 +30,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const { toast } = useToast()
 
+  type ToastPayload = {
+    title: string
+    description: string
+  }
+
   // Load cart from localStorage on client side
   useEffect(() => {
     const savedCart = localStorage.getItem("cart")
@@ -58,6 +63,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items])
 
   const addItem = (item: CartItem) => {
+    let toastPayload: ToastPayload | null = null
+
     setItems((prevItems) => {
       // Check if item already exists in cart
       const existingItemIndex = prevItems.findIndex((i) => i.id === item.id)
@@ -70,34 +77,40 @@ export function CartProvider({ children }: { children: ReactNode }) {
           days: item.days,
         }
 
-        toast({
+        toastPayload = {
           title: "Item updated in cart",
           description: `${item.name} rental days updated to ${item.days}`,
-        })
+        }
 
         return updatedItems
       } else {
         // Add new item
-        toast({
+        toastPayload = {
           title: "Item added to cart",
           description: `${item.name} added to your cart`,
-        })
+        }
 
         return [...prevItems, item]
       }
     })
+
+    if (toastPayload) {
+      toast(toastPayload)
+    }
   }
 
   const removeItem = (id: string) => {
+    let toastPayload: ToastPayload | null = null
+
     setItems((prevItems) => {
       const itemToRemove = prevItems.find((item) => item.id === id)
       const newItems = prevItems.filter((item) => item.id !== id)
 
       if (itemToRemove) {
-        toast({
+        toastPayload = {
           title: "Item removed from cart",
           description: `${itemToRemove.name} removed from your cart`,
-        })
+        }
       }
 
       if (newItems.length === 0) {
@@ -106,6 +119,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return newItems
     })
+
+    if (toastPayload) {
+      toast(toastPayload)
+    }
   }
 
   const updateItemDays = (id: string, days: number) => {
