@@ -53,6 +53,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.sony-asia.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'm.media-amazon.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.sigma-global.com',
+      },
     ],
   },
 }
