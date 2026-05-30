@@ -31,7 +31,7 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
         const res = await fetch(url, {
             ...options,
             next: {
-                revalidate: 300,
+                revalidate: 30,
                 ...("next" in options ? (options as RequestInit & { next?: { revalidate?: number } }).next : {}),
             },
             headers: {
