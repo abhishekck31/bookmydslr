@@ -241,7 +241,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 # STATIC_ROOT is only needed for production (collectstatic)
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Default primary key field type
