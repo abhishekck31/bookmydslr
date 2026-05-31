@@ -125,6 +125,15 @@ export function RentalEquipmentListing({
     return Array.from(brands).sort()
   }, [initialProducts])
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    initialProducts.forEach((p) => {
+      const slug = p.category?.slug
+      if (slug) counts[slug] = (counts[slug] ?? 0) + 1
+    })
+    return counts
+  }, [initialProducts])
+
   const activeFilterCount =
     filters.brands.length +
     filters.cameraTypes.length +
@@ -258,6 +267,8 @@ export function RentalEquipmentListing({
             categories={categories}
             activeCategory={activeCategory}
             onSelectCategory={setActiveCategory}
+            categoryCounts={categoryCounts}
+            totalCount={initialProducts.length}
           />
 
           {/* Active filter chips */}
