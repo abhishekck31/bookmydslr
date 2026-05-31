@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import { PLPHeader } from "@/components/rental/plp-header"
 import { CategoryRail } from "@/components/rental/category-rail"
-import { SmartFilterDrawer, FilterButton } from "@/components/rental/smart-filter-drawer"
+import { SmartFilterDrawer, FilterButton, FilterState } from "@/components/rental/smart-filter-drawer"
 import { PremiumProductCard } from "@/components/rental/premium-product-card"
 import { Product, Category } from "@/types"
 
@@ -22,11 +23,30 @@ export function CategoryPageClient({
   initialProducts,
   brands,
 }: CategoryPageClientProps) {
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [filteredProducts, setFilteredProducts] = useState(initialProducts)
-  const [activeFilterCount, setActiveFilterCount] = useState(0)
+  const router = useRouter()
+  const maxPrice = useMemo(
+    () => Math.max(...initialProducts.map((p) => p.price), 5000),
+    [initialProducts]
+  )
 
-  const handleApplyFilters = (filters: any) => {
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [filters, setFilters] = useState<FilterState>({
+    brands: [],
+    priceRange: [0, maxPrice],
+    cameraTypes: [],
+    mounts: [],
+    availability: [],
+  })
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    categories.forEach((c) => {
+      counts[c.slug] = initialProducts.filter((p) => p.category?.slug === c.slug).length
+    })
+    return counts
+  }, [categories, initialProducts])
+
+  const filteredProducts = useMemo(() => {
     let filtered = [...initialProducts]
 
     if (filters.brands.length > 0) {
@@ -37,29 +57,32 @@ export function CategoryPageClient({
       (p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
     )
 
-    if (filters.cameraTypes.length > 0) {
-      filtered = filtered.filter((p) =>
-        filters.cameraTypes.some(
-          (type: string) =>
-            p.name.toLowerCase().includes(type.toLowerCase()) ||
-            p.type?.toLowerCase().includes(type.toLowerCase())
-        )
-      )
-    }
-
-    if (filters.availability.length > 0 && filters.availability.includes("Available Today")) {
+    if (filters.availability.includes("Available Today")) {
       filtered = filtered.filter((p) => p.isAvailable)
     }
 
-    setFilteredProducts(filtered)
+    return filtered
+  }, [initialProducts, filters])
 
-    const count =
-      filters.brands.length +
-      filters.cameraTypes.length +
-      filters.mounts.length +
-      filters.availability.length +
-      (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000 ? 1 : 0)
-    setActiveFilterCount(count)
+  const activeFilterCount =
+    filters.brands.length +
+    filters.availability.length +
+    (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice ? 1 : 0)
+
+  const clearAll = () => {
+    setFilters({
+      brands: [],
+      priceRange: [0, maxPrice],
+      cameraTypes: [],
+      mounts: [],
+      availability: [],
+    })
+  }
+
+  const handleCategoryChange = (slug: string | null) => {
+    if (slug && slug !== category.slug) {
+      router.push(`/rental-equipment/${slug}`)
+    }
   }
 
   return (
@@ -121,9 +144,18 @@ export function CategoryPageClient({
       <SmartFilterDrawer
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
-        onApply={handleApplyFilters}
+        onApply={() => setIsFilterOpen(false)}
         availableBrands={brands}
         resultCount={filteredProducts.length}
+        maxPrice={maxPrice}
+        categories={categories}
+        activeCategory={category.slug}
+        onCategoryChange={handleCategoryChange}
+        categoryCounts={categoryCounts}
+        totalCount={initialProducts.length}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClearAll={clearAll}
       />
 
       <div className="h-20 md:hidden" />

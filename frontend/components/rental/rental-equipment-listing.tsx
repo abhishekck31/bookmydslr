@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { Product, Category } from "@/types"
-import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "framer-motion"
 import {
   Search,
@@ -10,11 +9,11 @@ import {
   SlidersHorizontal,
   ArrowUpDown,
   Sparkles,
-  RotateCcw,
 } from "lucide-react"
 import { SmartFilterDrawer } from "./smart-filter-drawer"
-import { PremiumCategoryNav } from "./premium-category-nav"
+import { ListingFiltersPanel } from "./listing-filters-panel"
 import { EquipmentProductCard } from "./equipment-product-card"
+import type { FilterState } from "./smart-filter-drawer"
 
 interface RentalEquipmentListingProps {
   initialProducts: Product[]
@@ -22,14 +21,6 @@ interface RentalEquipmentListingProps {
 }
 
 type SortOption = "recommended" | "price-asc" | "price-desc" | "name-az"
-
-interface FilterState {
-  brands: string[]
-  priceRange: [number, number]
-  cameraTypes: string[]
-  mounts: string[]
-  availability: string[]
-}
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "recommended", label: "Recommended" },
@@ -134,17 +125,8 @@ export function RentalEquipmentListing({
     return counts
   }, [initialProducts])
 
-  const activeFilterCount =
-    filters.brands.length +
-    filters.cameraTypes.length +
-    filters.mounts.length +
-    filters.availability.length +
-    (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice ? 1 : 0)
-
   const activeCategoryName =
-    activeCategory
-      ? categories.find((c) => c.slug === activeCategory)?.name
-      : null
+    activeCategory ? categories.find((c) => c.slug === activeCategory)?.name : null
 
   const clearAll = () => {
     setSearchQuery("")
@@ -160,11 +142,17 @@ export function RentalEquipmentListing({
     })
   }
 
-  const removeBrandFilter = (brand: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      brands: prev.brands.filter((b) => b !== brand),
-    }))
+  const filterPanelProps = {
+    categories,
+    activeCategory,
+    onCategoryChange: setActiveCategory,
+    categoryCounts,
+    totalCount: initialProducts.length,
+    filters,
+    onFiltersChange: setFilters,
+    availableBrands,
+    maxPrice,
+    onClearAll: clearAll,
   }
 
   return (
@@ -172,7 +160,7 @@ export function RentalEquipmentListing({
       {/* Hero */}
       <section className="border-b border-slate-200/60 bg-white">
         <div className="container-premium py-8 md:py-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200/60">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -182,8 +170,7 @@ export function RentalEquipmentListing({
                 {activeCategoryName ?? "Rental Equipment"}
               </h1>
               <p className="mt-2 max-w-xl text-sm text-slate-600 md:text-base">
-                Browse cameras, lenses, audio, lighting, and filmmaking gear. Pick your
-                dates and rent with fast Bangalore delivery.
+                Browse cameras, lenses, audio, lighting, and filmmaking gear in Bangalore.
               </p>
             </div>
             <div className="flex gap-6 rounded-2xl bg-slate-50 px-5 py-4 ring-1 ring-slate-200/70">
@@ -203,177 +190,128 @@ export function RentalEquipmentListing({
         </div>
       </section>
 
-      {/* Sticky toolbar */}
-      <div className="sticky top-[4.25rem] z-30 border-b border-slate-200/60 bg-[#f0f1f8]/95 backdrop-blur-xl sm:top-[4.75rem] md:top-20">
-        <div className="container-premium space-y-3 py-3 md:py-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search cameras, lenses, brands…"
-                className="h-12 w-full rounded-full border border-slate-200 bg-white pl-11 pr-11 text-sm text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
-                  aria-label="Clear search"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-
-            <div className="flex shrink-0 items-center gap-2">
-              <div className="relative">
-                <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="h-12 appearance-none rounded-full border border-slate-200 bg-white pl-9 pr-8 text-sm font-medium text-slate-700 shadow-sm outline-none transition-colors hover:border-amber-300 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
-                  aria-label="Sort products"
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <motion.button
+      <div className="container-premium py-6 md:py-8">
+        {/* Search + sort bar */}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search cameras, lenses, brands…"
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-10 text-sm text-slate-900 shadow-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
+            />
+            {searchQuery && (
+              <button
                 type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setIsFilterDrawerOpen(true)}
-                className="relative flex h-12 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-amber-300 hover:text-amber-700"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                aria-label="Clear search"
               >
-                <SlidersHorizontal className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
-                {activeFilterCount > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </motion.button>
-            </div>
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
-          <PremiumCategoryNav
-            categories={categories}
-            activeCategory={activeCategory}
-            onSelectCategory={setActiveCategory}
-            categoryCounts={categoryCounts}
-            totalCount={initialProducts.length}
-          />
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 sm:flex-none">
+              <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-8 text-sm font-medium text-slate-700 shadow-sm outline-none focus:border-amber-400 sm:w-auto"
+                aria-label="Sort products"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Active filter chips */}
-          {(activeFilterCount > 0 || debouncedSearch || activeCategory) && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="flex flex-wrap items-center gap-2"
+            <button
+              type="button"
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm lg:hidden"
             >
-              {debouncedSearch && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 ring-1 ring-slate-200">
-                  &ldquo;{debouncedSearch}&rdquo;
-                  <button type="button" onClick={() => setSearchQuery("")} aria-label="Remove search">
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              )}
-              {activeCategoryName && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800 ring-1 ring-amber-200">
-                  {activeCategoryName}
-                  <button type="button" onClick={() => setActiveCategory(null)} aria-label="Clear category">
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              )}
-              {filters.brands.map((brand) => (
-                <span
-                  key={brand}
-                  className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+            </button>
+          </div>
+        </div>
+
+        {/* Sidebar + products */}
+        <div className="flex gap-8">
+          {/* Desktop sidebar */}
+          <aside className="hidden w-64 shrink-0 lg:block">
+            <div className="sticky top-24 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+              <ListingFiltersPanel {...filterPanelProps} />
+            </div>
+          </aside>
+
+          {/* Product area */}
+          <div className="min-w-0 flex-1">
+            <p className="mb-4 text-sm text-slate-600">
+              Showing{" "}
+              <span className="font-semibold text-slate-900">{filteredProducts.length}</span>{" "}
+              {filteredProducts.length === 1 ? "item" : "items"}
+            </p>
+
+            <AnimatePresence mode="popLayout">
+              {filteredProducts.length === 0 ? (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center"
                 >
-                  {brand}
-                  <button type="button" onClick={() => removeBrandFilter(brand)} aria-label={`Remove ${brand}`}>
-                    <X className="h-3 w-3" />
+                  <Search className="mx-auto mb-3 h-10 w-10 text-slate-300" />
+                  <h3 className="text-lg font-bold text-slate-900">No equipment found</h3>
+                  <p className="mt-1 text-sm text-slate-500">Try adjusting your filters or search.</p>
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    className="mt-5 rounded-full bg-amber-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-amber-600"
+                  >
+                    Reset filters
                   </button>
-                </span>
-              ))}
-              <button
-                type="button"
-                onClick={clearAll}
-                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800"
-              >
-                <RotateCcw className="h-3 w-3" />
-                Clear all
-              </button>
-            </motion.div>
-          )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={`grid-${activeCategory}-${debouncedSearch}-${sortBy}`}
+                  layout
+                  className="grid grid-cols-2 gap-4 pb-8 md:gap-5 xl:grid-cols-3"
+                >
+                  {filteredProducts.map((product, index) => (
+                    <EquipmentProductCard key={product.id} product={product} index={index} />
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
-      {/* Product grid */}
-      <div className="container-premium py-6 md:py-10">
-        <div className="mb-5 flex items-center justify-between">
-          <p className="text-sm text-slate-600">
-            Showing{" "}
-            <span className="font-semibold text-slate-900">{filteredProducts.length}</span>{" "}
-            {filteredProducts.length === 1 ? "item" : "items"}
-          </p>
-        </div>
-
-        <AnimatePresence mode="popLayout">
-          {filteredProducts.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="rounded-3xl border border-dashed border-slate-300 bg-white py-20 text-center"
-            >
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                <Search className="h-7 w-7 text-slate-400" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">No equipment found</h3>
-              <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">
-                Try a different search term, category, or adjust your filters.
-              </p>
-              <button
-                type="button"
-                onClick={clearAll}
-                className="mt-6 rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
-              >
-                Reset filters
-              </button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key={`grid-${activeCategory}-${debouncedSearch}-${sortBy}`}
-              layout
-              className="grid grid-cols-2 gap-4 pb-8 md:gap-6 lg:grid-cols-3 xl:grid-cols-4"
-            >
-              {filteredProducts.map((product, index) => (
-                <EquipmentProductCard key={product.id} product={product} index={index} />
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
+      {/* Mobile filter drawer */}
       <SmartFilterDrawer
         isOpen={isFilterDrawerOpen}
         onClose={() => setIsFilterDrawerOpen(false)}
-        onApply={setFilters}
+        onApply={() => setIsFilterDrawerOpen(false)}
         availableBrands={availableBrands}
         resultCount={filteredProducts.length}
         maxPrice={maxPrice}
         initialFilters={filters}
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+        categoryCounts={categoryCounts}
+        totalCount={initialProducts.length}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClearAll={clearAll}
       />
     </div>
   )
