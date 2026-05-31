@@ -1,7 +1,7 @@
 import { fetchCategories, fetchProducts } from "@/lib/api"
 import { RentalEquipmentListing } from "@/components/rental/rental-equipment-listing"
 import { JsonLd } from "@/components/seo/json-ld"
-import { SeoContent } from "@/components/seo/seo-content"
+import { HomeSeoAccordion } from "@/components/homepage/home-seo-accordion"
 import { buildMetadata } from "@/lib/seo/metadata"
 import {
   buildBreadcrumbSchema,
@@ -28,10 +28,7 @@ export const metadata = buildMetadata({
 })
 
 export default async function RentalEquipmentPage() {
-  const [categories, products] = await Promise.all([
-    fetchCategories(),
-    fetchProducts()
-  ])
+  const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()])
 
   return (
     <>
@@ -51,8 +48,8 @@ export default async function RentalEquipmentPage() {
         ]}
       />
       <RentalEquipmentListing initialProducts={products} categories={categories} />
-      <SeoContent
-        eyebrow="Category Hub"
+      <HomeSeoAccordion
+        triggerLabel="Learn more about rental equipment in Bangalore"
         title="Rental equipment in Bangalore for photography, video, and production"
         intro="This inventory hub is designed to rank for broader equipment rental searches while helping visitors filter directly into the categories and products they need."
         sections={buildCollectionSections({

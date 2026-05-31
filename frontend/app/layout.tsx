@@ -40,7 +40,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <JsonLd data={[buildOrganizationSchema(), buildLocalBusinessSchema()]} />
         {/* Main Content */}
-        <div className="min-h-screen pt-16 pb-20 md:pt-0 md:pb-0">
+        <div className="min-h-screen pb-20 md:pb-0">
           <Providers>
             {/* Mobile Bottom Navigation Only */}
             <div className="md:hidden">

@@ -1,16 +1,54 @@
 "use client"
 
 import { useState } from "react"
-import { Send, MapPin, Phone, Mail, Clock, CheckCircle2, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import {
+  Send,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  CheckCircle2,
+  ArrowRight,
+  MessageCircle,
+} from "lucide-react"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { motion } from "framer-motion"
+import { PageHero } from "@/components/layout/page-hero"
 import { JsonLd } from "@/components/seo/json-ld"
-import { buildBreadcrumbSchema, buildCollectionPageSchema, buildLocalBusinessSchema } from "@/lib/seo/schema"
+import {
+  buildBreadcrumbSchema,
+  buildCollectionPageSchema,
+  buildLocalBusinessSchema,
+} from "@/lib/seo/schema"
+
+const contactMethods = [
+  {
+    icon: Phone,
+    title: "Phone",
+    value: "+91 99721 22462",
+    href: "tel:+919972122462",
+    note: "Mon–Sun, 8 AM – 10 PM",
+  },
+  {
+    icon: Mail,
+    title: "Email",
+    value: "bookmydslr@gmail.com",
+    href: "mailto:bookmydslr@gmail.com",
+    note: "We reply within 2 hours",
+  },
+  {
+    icon: MapPin,
+    title: "Studio",
+    value: "Kalyan Nagar, Bangalore",
+    href: "https://maps.google.com/?q=Book+My+DSLR+Kalyan+Nagar",
+    note: "2nd Floor, Hennur Main Road",
+  },
+]
 
 export default function ContactPage() {
   const { toast } = useToast()
@@ -20,20 +58,23 @@ export default function ContactPage() {
     subject: "",
     message: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate form submission
+    setIsSubmitting(true)
+    await new Promise((r) => setTimeout(r, 600))
     toast({
       title: "Message sent",
       description: "We've received your message and will get back to you shortly.",
     })
     setFormData({ name: "", email: "", subject: "", message: "" })
+    setIsSubmitting(false)
   }
 
   return (
@@ -53,180 +94,192 @@ export default function ContactPage() {
           buildLocalBusinessSchema("/contact"),
         ]}
       />
-      <main className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-slate-950 border-b border-gray-800 py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
 
-        <div className="container-premium text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-6">
-              Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Touch</span>
-            </h1>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
-              Have questions about gear availability or need a custom quote?
-              We are here to help you get the perfect setup.
-            </p>
-          </motion.div>
-        </div>
-      </div>
+      <main className="min-h-screen bg-[#f0f1f8]">
+        <PageHero
+          icon={MessageCircle}
+          badge="We're here to help"
+          title="Get in"
+          highlight="Touch"
+          description="Questions about gear availability, custom quotes, or delivery in Bangalore? Reach out — we typically respond within 2 hours during business hours."
+        />
 
-      <div className="container-premium py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-24 items-start">
-
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-1 space-y-12"
-          >
-            <div>
-              <h3 className="text-xs font-bold text-gray-400 mb-8 uppercase tracking-widest">Contact Info</h3>
-              <div className="space-y-8">
-                <div className="flex gap-5 group">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-amber-50 group-hover:text-amber-600 group-hover:border-amber-100 transition-all shrink-0 shadow-sm">
-                    <Phone className="w-6 h-6" />
+        <section className="container-premium pb-16 pt-8 md:pb-20">
+          <div className="grid gap-8 lg:grid-cols-5 lg:gap-10">
+            {/* Contact cards */}
+            <motion.div
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              className="space-y-4 lg:col-span-2"
+            >
+              {contactMethods.map((method, i) => (
+                <motion.a
+                  key={method.title}
+                  href={method.href}
+                  target={method.icon === MapPin ? "_blank" : undefined}
+                  rel={method.icon === MapPin ? "noopener noreferrer" : undefined}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 + i * 0.06 }}
+                  className="group flex gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white">
+                    <method.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="font-bold text-lg text-gray-900 mb-1">Phone</p>
-                    <p className="text-gray-600 font-medium">+91 99721 22462</p>
-                    <p className="text-xs text-gray-400 mt-1">Mon-Sun 8am to 10pm</p>
-                  </div>
-                </div>
-                <div className="flex gap-5 group">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-amber-50 group-hover:text-amber-600 group-hover:border-amber-100 transition-all shrink-0 shadow-sm">
-                    <Mail className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-lg text-gray-900 mb-1">Email</p>
-                    <p className="text-gray-600 font-medium">bookmydslr@gmail.com</p>
-                    <p className="text-xs text-gray-400 mt-1">Online support 24/7</p>
-                  </div>
-                </div>
-                <div className="flex gap-5 group">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-amber-50 group-hover:text-amber-600 group-hover:border-amber-100 transition-all shrink-0 shadow-sm">
-                    <MapPin className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-lg text-gray-900 mb-1">Studio Location</p>
-                    <p className="text-gray-600 leading-relaxed text-sm font-medium">
-                      2nd Floor, No- 212/1, Hennur Main Road,<br />
-                      Kalyan Nagar, Bengaluru, Karnataka 560043
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      {method.title}
                     </p>
+                    <p className="mt-0.5 font-bold text-slate-900">{method.value}</p>
+                    <p className="mt-1 text-sm text-slate-500">{method.note}</p>
                   </div>
+                </motion.a>
+              ))}
+
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center gap-2 text-slate-900">
+                  <Clock className="h-5 w-5 text-amber-500" />
+                  <span className="font-bold">Business Hours</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
+                  <span className="text-slate-600">Monday – Sunday</span>
+                  <span className="font-semibold text-slate-900">8 AM – 10 PM</span>
                 </div>
               </div>
-            </div>
 
-            <div className="h-px bg-gray-100 w-full" />
-
-            <div>
-              <h3 className="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">Business Hours</h3>
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600 font-medium">Monday - Sunday</span>
-                  <span className="font-bold text-gray-900 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">8:00 AM - 10:00 PM</span>
+              <div className="flex gap-3 rounded-2xl border border-amber-200/80 bg-amber-50 p-5">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-amber-600" />
+                <div>
+                  <p className="text-sm font-bold text-amber-900">Urgent rental?</p>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-800">
+                    Call us directly for same-day availability and fastest booking.
+                  </p>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex gap-4 items-start">
-              <div className="bg-amber-100 p-2 rounded-full shrink-0">
-                <CheckCircle2 className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <h4 className="font-bold text-amber-900 text-sm mb-1">Quick Response Promise</h4>
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  We typically reply to inquiries within 2 hours during business hours. For urgent rentals, please call us directly.
-                </p>
-              </div>
-            </div>
-          </motion.div>
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 w-full rounded-full border-green-200 bg-green-50 font-semibold text-green-800 hover:bg-green-100"
+              >
+                <Link
+                  href="https://wa.me/919972122462"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Chat on WhatsApp
+                </Link>
+              </Button>
+            </motion.div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
+            {/* Form */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+              className="lg:col-span-3"
             >
-              <Card className="border-gray-100 shadow-2xl shadow-gray-200/50 rounded-[2rem] overflow-hidden bg-white">
-                <div className="bg-gray-50/50 px-10 py-8 border-b border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-900">Send us a message</h2>
-                  <p className="text-gray-500 mt-1">Fill out the form below and we will get back to you.</p>
+              <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
+                <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 md:px-8 md:py-6">
+                  <h2 className="text-xl font-bold text-slate-900">Send us a message</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Fill out the form and we&apos;ll get back to you soon.
+                  </p>
                 </div>
-                <CardContent className="p-10">
-                  <form onSubmit={handleSubmit} className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Name</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          placeholder="John Doe"
-                          required
-                          value={formData.name}
-                          onChange={handleChange}
-                          className="h-14 bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl text-base px-5"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          placeholder="john@example.com"
-                          required
-                          value={formData.email}
-                          onChange={handleChange}
-                          className="h-14 bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl text-base px-5"
-                        />
-                      </div>
-                    </div>
 
+                <form onSubmit={handleSubmit} className="space-y-5 p-6 md:p-8">
+                  <div className="grid gap-5 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="subject" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Subject</Label>
+                      <Label htmlFor="name" className="text-sm font-medium text-slate-700">
+                        Name
+                      </Label>
                       <Input
-                        id="subject"
-                        name="subject"
-                        placeholder="Inquiry about Sony A7III..."
+                        id="name"
+                        name="name"
+                        placeholder="Your name"
                         required
-                        value={formData.subject}
+                        value={formData.name}
                         onChange={handleChange}
-                        className="h-14 bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl text-base px-5"
+                        className="h-12 rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
                       />
                     </div>
-
                     <div className="space-y-2">
-                      <Label htmlFor="message" className="text-xs uppercase text-gray-500 font-bold tracking-wider ml-1">Message</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        placeholder="Tell us what you need..."
+                      <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
                         required
-                        value={formData.message}
+                        value={formData.email}
                         onChange={handleChange}
-                        className="min-h-[200px] bg-gray-50 border-gray-200 focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-500/10 transition-all rounded-xl resize-none p-5 text-base"
+                        className="h-12 rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
                       />
                     </div>
+                  </div>
 
-                    <Button type="submit" size="lg" className="w-full h-16 text-lg bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-xl shadow-slate-900/20 hover:shadow-2xl hover:shadow-slate-900/30 transition-all transform hover:-translate-y-1">
-                      Send Message <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-sm font-medium text-slate-700">
+                      Subject
+                    </Label>
+                    <Input
+                      id="subject"
+                      name="subject"
+                      placeholder="Rental inquiry, repair, production…"
+                      required
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="h-12 rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="message" className="text-sm font-medium text-slate-700">
+                      Message
+                    </Label>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      placeholder="Tell us what you need — dates, gear, location…"
+                      required
+                      value={formData.message}
+                      onChange={handleChange}
+                      className="min-h-[160px] resize-none rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="h-12 w-full rounded-full bg-amber-500 text-base font-semibold text-white hover:bg-amber-600 disabled:opacity-70"
+                  >
+                    {isSubmitting ? "Sending…" : "Send Message"}
+                    <Send className="ml-2 h-4 w-4" />
+                  </Button>
+                </form>
+              </div>
             </motion.div>
           </div>
-        </div>
-      </div>
+        </section>
+
+        <section className="border-t border-slate-200/60 bg-white py-10">
+          <div className="container-premium flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p className="text-sm text-slate-600">
+              Prefer browsing first?{" "}
+              <Link href="/rental-equipment" className="font-semibold text-amber-600 hover:text-amber-700">
+                View all equipment
+              </Link>
+            </p>
+            <Button asChild variant="ghost" className="rounded-full font-semibold text-slate-700">
+              <Link href="/how-it-works">
+                How it works <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </section>
       </main>
     </>
   )

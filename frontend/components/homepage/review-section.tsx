@@ -1,70 +1,66 @@
-"use client"
-
-import { TestimonialsSection } from "@/components/ui/testimonials-with-marquee"
+import { Star } from "lucide-react"
 
 const testimonials = [
   {
-    author: {
-      name: "Rahul Sharma",
-      handle: "@rahulphoto",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-    },
+    name: "Rahul Sharma",
+    role: "Wedding Photographer",
+    initials: "RS",
+    color: "bg-amber-500",
     text: "Excellent service! The camera was in perfect condition and the pickup process was super smooth. Best rental service in Bangalore.",
-    href: "https://twitter.com/rahulphoto"
   },
   {
-    author: {
-      name: "Priya Nair",
-      handle: "@priyacreates",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
-    },
-    text: "I've been renting from Book My DSLR for 6 months now. Their equipment is always well-maintained and prices are unbeatable.",
-    href: "https://twitter.com/priyacreates"
+    name: "Priya Nair",
+    role: "Content Creator",
+    initials: "PN",
+    color: "bg-indigo-500",
+    text: "I've been renting from Book My DSLR for months. Equipment is always well-maintained and prices are unbeatable for professional gear.",
   },
   {
-    author: {
-      name: "Amit Kumar",
-      handle: "@amitevents",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-    },
-    text: "Great collection of lenses and cameras. The team is very helpful and delivery is always on time. Highly recommend!",
-    href: "https://twitter.com/amitevents"
+    name: "Amit Kumar",
+    role: "Cinematographer",
+    initials: "AK",
+    color: "bg-emerald-500",
+    text: "Great collection of lenses and cameras. The team is very helpful and delivery is always on time. Highly recommend for film shoots!",
   },
-  {
-    author: {
-      name: "Sneha Reddy",
-      handle: "@snehablog",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
-    },
-    text: "Perfect for my travel photography needs. The equipment quality is top-notch and rental process is hassle-free.",
-    href: "https://twitter.com/snehablog"
-  },
-  {
-    author: {
-      name: "Vikram Singh",
-      handle: "@vikramcomm",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-    },
-    text: "Professional service with excellent equipment. The team understands photography needs and always suggests the right gear.",
-    href: "https://twitter.com/vikramcomm"
-  },
-  {
-    author: {
-      name: "Anjali Menon",
-      handle: "@anjalivlog",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
-    },
-    text: "Great experience renting video equipment. The gear is always clean and well-maintained. Best rental service in Bangalore!",
-    href: "https://twitter.com/anjalivlog"
-  }
 ]
 
 export function ReviewSection() {
   return (
-    <TestimonialsSection
-      title="What Our Customers Say"
-      description="Join 500+ happy photographers who trust us for their equipment needs"
-      testimonials={testimonials}
-    />
+    <section className="bg-[#f0f1f8] py-16 md:py-20">
+      <div className="container-premium">
+        <h2 className="mb-12 text-center text-2xl font-bold text-slate-900 md:text-3xl">
+          What Creators Say
+        </h2>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {testimonials.map((item) => (
+            <article
+              key={item.name}
+              className="flex flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm"
+            >
+              <div className="mb-4 flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-amber-500 text-amber-500" />
+                ))}
+              </div>
+              <blockquote className="mb-6 flex-1 text-sm leading-relaxed text-slate-600">
+                &ldquo;{item.text}&rdquo;
+              </blockquote>
+              <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${item.color}`}
+                >
+                  {item.initials}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{item.name}</p>
+                  <p className="text-xs text-slate-500">{item.role}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }

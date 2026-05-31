@@ -1,12 +1,11 @@
 import { HeroSection } from "@/components/homepage/hero-section"
-import { FeaturedCameras } from "@/components/homepage/featured-cameras"
+import { FeaturedGearSection } from "@/components/homepage/featured-gear-section"
 import { WhyUs } from "@/components/homepage/why-us"
 import { HowItWorks } from "@/components/homepage/how-it-works"
 import { ReviewSection } from "@/components/homepage/review-section"
 import { CTASection } from "@/components/homepage/cta-section"
-import { LensScrollLoader } from "@/components/LensScrollLoader"
+import { HomeSeoAccordion } from "@/components/homepage/home-seo-accordion"
 import { fetchProducts, fetchGlobalSettings } from "@/lib/api"
-import { BrandSelection } from "@/components/homepage/brand-selection"
 import { buildMetadata } from "@/lib/seo/metadata"
 import { JsonLd } from "@/components/seo/json-ld"
 import {
@@ -16,7 +15,6 @@ import {
   buildLocalBusinessSchema,
 } from "@/lib/seo/schema"
 import { buildMainCityFaqs, buildMainCitySections } from "@/lib/seo/page-content"
-import { SeoContent } from "@/components/seo/seo-content"
 
 export const revalidate = 300
 
@@ -39,12 +37,8 @@ export const metadata = buildMetadata({
 export default async function HomePage() {
   const [products, globalSettings] = await Promise.all([
     fetchProducts(),
-    fetchGlobalSettings()
+    fetchGlobalSettings(),
   ])
-
-  const cameras = products
-    .filter(p => p.category?.name.toLowerCase().includes("camera"))
-    .slice(0, 4)
 
   return (
     <>
@@ -64,23 +58,32 @@ export default async function HomePage() {
 
       <main className="min-h-screen bg-white">
         <HeroSection />
-        <LensScrollLoader />
-        <BrandSelection />
-        <FeaturedCameras cameras={cameras} globalSettings={globalSettings} />
+        <FeaturedGearSection products={products} globalSettings={globalSettings} />
         <HowItWorks />
         <WhyUs />
         <ReviewSection />
         <CTASection />
-        <SeoContent
-          eyebrow="Homepage SEO"
+        <HomeSeoAccordion
           title="Bangalore camera rental built for creators, photographers, and production teams"
           intro="The homepage now works as an authority page for camera rental Bangalore by combining product discovery, trust signals, and long-form commercial content that supports the strongest keyword clusters."
           sections={buildMainCitySections()}
           faqs={homeFaqs}
           links={[
-            { href: "/camera-rental-bangalore", label: "Camera Rental Bangalore", description: "Explore the dedicated city landing page built for high-intent demand." },
-            { href: "/rentals/sony-camera-rental-bangalore", label: "Sony Camera Rentals", description: "Popular creator and filmmaker kits with strong commercial intent." },
-            { href: "/rental-equipment", label: "Rental Equipment", description: "Browse the complete inventory across all categories." },
+            {
+              href: "/camera-rental-bangalore",
+              label: "Camera Rental Bangalore",
+              description: "Explore the dedicated city landing page built for high-intent demand.",
+            },
+            {
+              href: "/rentals/sony-camera-rental-bangalore",
+              label: "Sony Camera Rentals",
+              description: "Popular creator and filmmaker kits with strong commercial intent.",
+            },
+            {
+              href: "/rental-equipment",
+              label: "Rental Equipment",
+              description: "Browse the complete inventory across all categories.",
+            },
           ]}
         />
       </main>
