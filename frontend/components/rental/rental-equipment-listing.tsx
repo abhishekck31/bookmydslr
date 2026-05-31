@@ -245,8 +245,8 @@ export function RentalEquipmentListing({
         {/* Sidebar + products */}
         <div className="flex gap-8">
           {/* Desktop sidebar */}
-          <aside className="hidden w-64 shrink-0 lg:block">
-            <div className="sticky top-24 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <aside className="hidden w-64 shrink-0 self-start lg:block">
+            <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-y-contain rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm scrollbar-thin">
               <ListingFiltersPanel {...filterPanelProps} />
             </div>
           </aside>
@@ -303,7 +303,6 @@ export function RentalEquipmentListing({
         availableBrands={availableBrands}
         resultCount={filteredProducts.length}
         maxPrice={maxPrice}
-        initialFilters={filters}
         categories={categories}
         activeCategory={activeCategory}
         onCategoryChange={setActiveCategory}

@@ -86,7 +86,7 @@ export function SmartFilterDrawer({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-5 py-5 scrollbar-thin">
               <ListingFiltersPanel
                 categories={categories}
                 activeCategory={activeCategory}

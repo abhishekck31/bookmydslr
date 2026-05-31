@@ -77,7 +77,7 @@ export function ListingFiltersPanel({
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
           Category
         </h3>
-        <ul className="space-y-0.5">
+        <ul className="max-h-56 space-y-0.5 overflow-y-auto overscroll-y-contain pr-1">
           <li>
             <button
               type="button"
@@ -125,7 +125,7 @@ export function ListingFiltersPanel({
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Brand
           </h3>
-          <ul className="max-h-48 space-y-1 overflow-y-auto pr-1">
+          <ul className="max-h-52 space-y-1 overflow-y-auto overscroll-y-contain pr-1">
             {availableBrands.map((brand) => {
               const checked = filters.brands.includes(brand)
               return (
