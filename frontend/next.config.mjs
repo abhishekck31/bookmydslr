@@ -61,6 +61,18 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.sigma-global.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.media.amplience.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
     ],
   },
 }
