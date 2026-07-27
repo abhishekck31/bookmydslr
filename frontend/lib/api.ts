@@ -14,8 +14,8 @@ function slugify(text: string): string {
         .replace(/-+$/, '');            // Trim - from end
 }
 
-// Generic fetch wrapper
-async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T | null> {
+// Generic fetch wrapper with automatic retry logic
+async function fetchAPI<T>(endpoint: string, options: RequestInit = {}, retries = 3): Promise<T | null> {
     try {
         let url: string;
         if (endpoint.startsWith('http')) {
@@ -26,7 +26,7 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
             url = `${baseUrl}${path}`;
         }
 
-        console.log(`[API] Fetching ${url}`);
+        console.log(`[API] Fetching ${url} (retries left: ${retries})`);
 
         const res = await fetch(url, {
             ...options,
@@ -42,12 +42,22 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
         });
 
         if (!res.ok) {
+            if (res.status >= 500 && retries > 0) {
+                console.warn(`[API] ${res.status} Error on ${url}. Retrying...`);
+                await new Promise(r => setTimeout(r, 800));
+                return fetchAPI<T>(endpoint, options, retries - 1);
+            }
             console.warn(`[API] ${res.status} Error fetching ${url}`);
             return null;
         }
 
         return await res.json();
     } catch (error) {
+        if (retries > 0) {
+            console.warn(`[API] Connection failed to ${endpoint} (${(error as Error)?.message || error}). Retrying in 800ms...`);
+            await new Promise(r => setTimeout(r, 800));
+            return fetchAPI<T>(endpoint, options, retries - 1);
+        }
         console.warn(`[API] Connection failed to ${endpoint}`, error);
         return null;
     }
@@ -124,7 +134,7 @@ function mapCategory(item: ApiCategory): Category {
 
 export const fetchCategories = cache(async (): Promise<Category[]> => {
     let allCategories: ApiCategory[] = [];
-    let nextUrl: string | null = '/categories/';
+    let nextUrl: string | null = '/categories/?page_size=250';
 
     while (nextUrl) {
         const data: PaginatedResponse<ApiCategory> | null = await fetchAPI<PaginatedResponse<ApiCategory>>(nextUrl);
@@ -139,7 +149,7 @@ export const fetchCategories = cache(async (): Promise<Category[]> => {
 
 export const fetchProducts = cache(async (): Promise<Product[]> => {
     let allProducts: ApiProduct[] = [];
-    let nextUrl: string | null = '/products/';
+    let nextUrl: string | null = '/products/?page_size=250';
 
     while (nextUrl) {
         const data: PaginatedResponse<ApiProduct> | null = await fetchAPI<PaginatedResponse<ApiProduct>>(nextUrl);
