@@ -752,6 +752,13 @@ export const LOCALITIES: Locality[] = [
 
 export const PUBLISHED_LOCALITIES = LOCALITIES.filter((l) => l.published)
 
+/**
+ * Pages pre-rendered at build time (the hand-written ones). The rest render
+ * on their first visit and are then cached, so a build doesn't fire 200+
+ * catalogue loads at the backend.
+ */
+export const PRERENDERED_LOCALITIES = PUBLISHED_LOCALITIES.filter((l) => PUBLISHED.includes(l))
+
 export const LOCALITY_BASE_PATH = "/camera-rental-bangalore"
 
 export function localityPath(l: Pick<Locality, "slug">): string {

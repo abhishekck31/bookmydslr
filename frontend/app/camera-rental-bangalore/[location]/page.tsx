@@ -3,7 +3,7 @@ import { fetchDurationTiers, fetchProducts } from "@/lib/api"
 import { JsonLd } from "@/components/seo/json-ld"
 import { LocalityPage } from "@/components/seo/locality-page"
 import {
-  PUBLISHED_LOCALITIES,
+  PRERENDERED_LOCALITIES,
   findPublishedLocality,
   localityPath,
   validateLocalities,
@@ -25,15 +25,18 @@ import {
 } from "@/lib/seo/locality-content"
 
 export const revalidate = 300
-/** Drafts and unknown slugs 404 instead of rendering on demand. */
-export const dynamicParams = false
+/**
+ * Published pages beyond PRERENDERED_LOCALITIES render on first request.
+ * Drafts and unknown slugs still 404 (findPublishedLocality → notFound).
+ */
+export const dynamicParams = true
 
 export async function generateStaticParams() {
   const problems = validateLocalities()
   if (problems.length) {
     throw new Error(`Locality dataset is invalid:\n- ${problems.join("\n- ")}`)
   }
-  return PUBLISHED_LOCALITIES.map((l) => ({ location: l.slug }))
+  return PRERENDERED_LOCALITIES.map((l) => ({ location: l.slug }))
 }
 
 type Params = { params: Promise<{ location: string }> }

@@ -32,8 +32,15 @@ export class ApiUnavailableError extends Error {
     }
 }
 
+/**
+ * On the server — at runtime AND during `next build` — a backend failure
+ * throws instead of returning an empty list:
+ * - at runtime, ISR keeps serving the last good page;
+ * - at build time, the build fails, so Vercel keeps the previous good
+ *   deployment live instead of publishing pages with no products.
+ */
 function shouldThrowOnFailure(): boolean {
-    return typeof window === "undefined" && process.env.NEXT_PHASE !== "phase-production-build";
+    return typeof window === "undefined";
 }
 
 const REQUEST_TIMEOUT_MS = 12_000;
