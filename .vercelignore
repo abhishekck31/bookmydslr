@@ -1,0 +1,4 @@
+backend/bookmydslradmin/venv
+**/node_modules
+**/.next
+**/__pycache__
