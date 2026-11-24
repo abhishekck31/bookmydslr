@@ -1,5 +1,5 @@
-import { fetchProducts, fetchGlobalSettings } from "@/lib/api"
-import { AccessoriesClient } from "@/components/accessories-client"
+import { fetchCategories, fetchProducts } from "@/lib/api"
+import { ProductBrowser } from "@/components/film/product-browser"
 import { JsonLd } from "@/components/seo/json-ld"
 import { SeoContent } from "@/components/seo/seo-content"
 import { buildMetadata } from "@/lib/seo/metadata"
@@ -27,13 +27,12 @@ export const metadata = buildMetadata({
 })
 
 export default async function AccessoriesPage() {
-  const products = await fetchProducts()
+  const [products, categories] = await Promise.all([fetchProducts(), fetchCategories()])
   const accessories = products.filter((product) => {
     const categoryName = product.category?.name.toLowerCase() ?? ""
     return !categoryName.includes("camera") && !categoryName.includes("lens")
   })
 
-  const settings = await fetchGlobalSettings()
 
   return (
     <>
@@ -52,9 +51,16 @@ export default async function AccessoriesPage() {
           ]),
         ]}
       />
-      <AccessoriesClient initialAccessories={accessories as any} globalSettings={settings} />
+      <ProductBrowser
+        products={accessories}
+        categories={categories}
+        title="Accessories to rent"
+        titleEmphasis="Accessories"
+        intro="Gimbals, drones, lights, mics, tripods, monitors and power — everything that turns a body into a working kit."
+        breadcrumb={[{ href: "/", label: "Home" }, { href: "/accessories", label: "Accessories" }]}
+      />
       <SeoContent
-        eyebrow="Accessory Category"
+        eyebrow="The long read"
         title="Accessory rentals in Bangalore for complete shoot-ready kits"
         intro="Accessories often decide whether a rental booking is complete enough for the shoot. This page is optimized to rank for support-gear searches while encouraging higher-value bundled rentals."
         sections={buildCollectionSections({

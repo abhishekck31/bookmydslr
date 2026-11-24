@@ -63,7 +63,12 @@ export default async function CameraRentalLocationPage({
   const products = await fetchProducts()
   const featuredProducts = pickProducts(products, undefined, 8)
   const faqs = buildLocationFaqs(page)
-  const title = `Camera Rental in ${page.name}, Bangalore`
+  const title = `Camera rental in ${page.name}, Bangalore`
+  const nearbyNames = new Set(page.nearbyAreas.map((n) => n.toLowerCase()))
+  const nearbyLinks = bangaloreLocationPages
+    .filter((p) => p.slug !== page.slug)
+    .sort((a, b) => Number(nearbyNames.has(b.name.toLowerCase())) - Number(nearbyNames.has(a.name.toLowerCase())))
+    .map((p) => ({ href: `/camera-rental-bangalore/${p.slug}`, label: p.name }))
   const description = `Rent cameras, lenses, and filmmaking equipment near ${page.name}, Bangalore with quick access from Book My DSLR.`
 
   return (
@@ -86,14 +91,17 @@ export default async function CameraRentalLocationPage({
       />
 
       <LandingPageTemplate
-        eyebrow="Local SEO Landing Page"
+        eyebrow="Camera rental · Bangalore"
         title={title}
+        titleEmphasis={page.name}
+        heroMarker={`Near ${page.nearbyAreas.join(" · ")}`}
         description={description}
         bullets={[
-          `Built for searchers looking for camera rental near ${page.name}`,
-          `Nearby demand also comes from ${page.nearbyAreas.join(", ")}`,
-          `Strong local context around ${page.landmarks.join(" and ")}`,
+          `Pickup from Kalyan Nagar or delivery to ${page.name}`,
+          `Also serving ${page.nearbyAreas.join(", ")}`,
+          `Close to ${page.landmarks.join(" and ")}`,
         ]}
+        nearby={nearbyLinks}
         products={featuredProducts}
         contentTitle={`Local camera rental intent around ${page.name}`}
         contentIntro={`This page helps Book My DSLR rank for neighborhood-level searches while giving renters in ${page.name} a direct path to the live Bangalore inventory.`}

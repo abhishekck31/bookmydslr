@@ -69,36 +69,36 @@ export default function BlogPage() {
         ]}
       />
 
-      <main className="min-h-screen bg-white">
-        <section className="bg-slate-950 py-24 text-white">
-          <div className="container-premium max-w-5xl">
-            <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-300">SEO Blog Roadmap</p>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-6xl">
+      <main className="min-h-screen bg-background">
+        <section className="bg-surface py-24 text-white">
+          <div className="film-container max-w-5xl">
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary">SEO Blog Roadmap</p>
+            <h1 className="mt-4 text-4xl font-serif font-normal md:text-6xl">
               50 blog topics built to grow camera rental traffic in Bangalore
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
               This blog hub now acts as an editorial roadmap for Book My DSLR. It is organized around long-tail queries
               that support commercial pages for camera rentals, lens rentals, local landing pages, and filmmaking gear
               searches.
             </p>
             <div className="mt-8 grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">50 planned topics aligned to search demand</div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">Every topic points at a commercial target page</div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">Clustered by informational, local, transactional, and comparison intent</div>
+              <div className="rounded-none border border-border bg-white/5 p-4 text-sm">50 planned topics aligned to search demand</div>
+              <div className="rounded-none border border-border bg-white/5 p-4 text-sm">Every topic points at a commercial target page</div>
+              <div className="rounded-none border border-border bg-white/5 p-4 text-sm">Clustered by informational, local, transactional, and comparison intent</div>
             </div>
           </div>
         </section>
 
         <section className="py-16">
-          <div className="container-premium space-y-16">
+          <div className="film-container space-y-16">
             {groups.map((group) => {
               const items = blogTopics.filter((topic) => topic.intent === group.key)
 
               return (
                 <section key={group.key}>
                   <div className="max-w-3xl">
-                    <h2 className="text-3xl font-bold text-slate-900">{group.label} Topics</h2>
-                    <p className="mt-3 text-base leading-7 text-slate-600">
+                    <h2 className="text-3xl font-serif font-normal text-foreground">{group.label} Topics</h2>
+                    <p className="mt-3 text-base leading-7 text-body">
                       These topics are designed to expand topical authority while feeding readers into high-intent
                       rental pages with purposeful internal linking.
                     </p>
@@ -108,20 +108,20 @@ export default function BlogPage() {
                     {items.map((topic, index) => (
                       <article
                         key={topic.slug}
-                        className="rounded-[2rem] border border-gray-200 bg-gray-50 p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                        className="rounded-none border border-border bg-surface p-6 transition hover:-translate-y-1"
                       >
                         <div className="flex items-center justify-between gap-4">
-                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-800">
+                          <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-primary">
                             {group.label}
                           </span>
-                          <span className="text-sm font-medium text-slate-500">#{index + 1}</span>
+                          <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
                         </div>
-                        <h3 className="mt-4 text-xl font-bold leading-8 text-slate-900">{topic.title}</h3>
-                        <p className="mt-3 text-sm font-semibold text-slate-700">Target keyword: {topic.primaryKeyword}</p>
-                        <p className="mt-4 text-sm leading-7 text-slate-600">{topic.summary}</p>
-                        <div className="mt-6 rounded-2xl border border-white bg-white p-4">
-                          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Internal link target</p>
-                          <Link href={topic.targetPage} className="mt-2 inline-block text-sm font-semibold text-amber-700 hover:text-amber-600">
+                        <h3 className="mt-4 text-xl font-bold leading-8 text-foreground">{topic.title}</h3>
+                        <p className="mt-3 text-sm font-semibold text-body">Target keyword: {topic.primaryKeyword}</p>
+                        <p className="mt-4 text-sm leading-7 text-body">{topic.summary}</p>
+                        <div className="mt-6 rounded-none border border-border bg-background p-4">
+                          <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Internal link target</p>
+                          <Link href={topic.targetPage} className="mt-2 inline-block text-sm font-semibold text-primary hover:text-primary">
                             {topic.targetPage}
                           </Link>
                         </div>

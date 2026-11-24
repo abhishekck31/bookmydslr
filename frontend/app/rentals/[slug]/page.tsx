@@ -76,7 +76,7 @@ export default async function MarketingRentalPage({
       />
 
       <LandingPageTemplate
-        eyebrow="Commercial Intent Page"
+        eyebrow="Rentals · Bangalore"
         title={page.h1}
         description={page.description}
         bullets={page.heroBullets}

@@ -17,8 +17,8 @@ export default function Error({
 
     return (
         <div className="container py-20 flex flex-col items-center justify-center text-center">
-            <div className="bg-red-50 p-4 rounded-full mb-4">
-                <AlertCircle className="h-8 w-8 text-red-600" />
+            <div className="bg-surface-2 p-4 rounded-full mb-4">
+                <AlertCircle className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-2xl font-bold mb-2">Something went wrong!</h2>
             <p className="text-muted-foreground mb-6 max-w-md">

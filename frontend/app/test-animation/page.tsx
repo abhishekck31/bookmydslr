@@ -3,11 +3,11 @@ import { FrameScrollAnimation } from "@/components/homepage/frame-scroll-animati
 export default function TestPage() {
     return (
         <main>
-            <div className="h-screen flex items-center justify-center bg-gray-100 text-black">
+            <div className="h-screen flex items-center justify-center bg-surface text-foreground">
                 <h1>Scroll Down to Test Animation</h1>
             </div>
             <FrameScrollAnimation />
-            <div className="h-screen flex items-center justify-center bg-gray-100 text-black">
+            <div className="h-screen flex items-center justify-center bg-surface text-foreground">
                 <h1>End of Animation</h1>
             </div>
         </main>

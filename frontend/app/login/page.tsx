@@ -12,7 +12,7 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-md w-full">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
-            <Camera className="h-8 w-8 text-yellow-500" />
+            <Camera className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
           <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -25,7 +25,7 @@ export default function LoginPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="text-sm text-yellow-500 hover:underline">
+              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -37,7 +37,7 @@ export default function LoginPage() {
               Remember me
             </Label>
           </div>
-          <Button className="w-full bg-yellow-500 text-black hover:bg-yellow-600">Sign In</Button>
+          <Button className="w-full bg-primary text-foreground hover:bg-primary">Sign In</Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -54,7 +54,7 @@ export default function LoginPage() {
         <CardFooter className="flex flex-col">
           <div className="text-center text-sm text-muted-foreground mt-2">
             Don't have an account?{" "}
-            <Link href="/register" className="text-yellow-500 hover:underline">
+            <Link href="/register" className="text-primary hover:underline">
               Sign up
             </Link>
           </div>

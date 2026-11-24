@@ -1,6 +1,6 @@
-import { fetchProduct, fetchProducts, fetchGlobalSettings } from "@/lib/api"
+import { fetchProduct, fetchProducts } from "@/lib/api"
 import { notFound } from "next/navigation"
-import { ProductClient } from "@/components/product-client"
+import { ProductDetail } from "@/components/film/product-detail"
 import { JsonLd } from "@/components/seo/json-ld"
 import { SeoContent } from "@/components/seo/seo-content"
 import { buildMetadata } from "@/lib/seo/metadata"
@@ -61,7 +61,6 @@ export default async function ProductDetailPage({
       .filter(p => p.category?.id === product.category?.id && p.id !== id)
       .slice(0, 4);
 
-    const globalSettings = await fetchGlobalSettings()
     const faqs = buildProductFaqs(product)
 
     return (
@@ -78,13 +77,9 @@ export default async function ProductDetailPage({
             ]),
           ]}
         />
-        <ProductClient
-          product={product as any}
-          relatedProducts={relatedProducts as any}
-          globalSettings={globalSettings}
-        />
+        <ProductDetail product={product} related={relatedProducts} />
         <SeoContent
-          eyebrow="Product SEO"
+          eyebrow="The long read"
           title={`${product.name} rental in Bangalore`}
           intro={`${product.name} now has a richer product landing page so it can rank for model-specific rental searches while still helping users choose the right add-ons and next steps.`}
           sections={buildProductSections(product)}

@@ -1,11 +1,6 @@
 "use client"
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { SeoContent } from "@/components/seo/seo-content"
 import { FAQItem, InternalLink, SeoNarrativeSection } from "@/lib/seo/types"
 
@@ -16,39 +11,38 @@ interface HomeSeoAccordionProps {
   faqs: FAQItem[]
   links: InternalLink[]
   triggerLabel?: string
+  frame?: number
 }
 
+/** Long-form SEO content, collapsed by default and kept understated. */
 export function HomeSeoAccordion({
   title,
   intro,
   sections,
   faqs,
   links,
-  triggerLabel = "Premium Camera Rental in Bangalore",
+  triggerLabel = "Camera rental in Bangalore — the long read",
+  frame,
 }: HomeSeoAccordionProps) {
   return (
-    <section className="bg-white py-8 md:py-12">
-      <div className="container-premium">
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem
-            value="seo-content"
-            className="overflow-hidden rounded-2xl border border-slate-200 bg-[#eef6fc] px-0"
-          >
-            <AccordionTrigger className="px-6 py-5 text-left text-base font-semibold text-slate-900 hover:no-underline md:text-lg">
-              {triggerLabel}
-            </AccordionTrigger>
-            <AccordionContent className="border-t border-slate-200/80 bg-white px-0 pb-0">
-              <SeoContent
-                title={title}
-                intro={intro}
-                sections={sections}
-                faqs={faqs}
-                links={links}
-              />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-    </section>
+    <AccordionPrimitive.Root type="single" collapsible>
+      <AccordionPrimitive.Item value="seo" className="border-t border-border">
+        <AccordionPrimitive.Header asChild>
+          <div className="film-container">
+            <AccordionPrimitive.Trigger className="group flex min-h-[72px] w-full items-center justify-between gap-6 text-left">
+              <span className="font-serif text-[20px] text-muted-foreground transition-colors group-hover:text-foreground md:text-[24px]">
+                {triggerLabel}
+              </span>
+              <span aria-hidden className="font-mono text-lg text-primary transition-transform duration-200 group-data-[state=open]:rotate-45">
+                +
+              </span>
+            </AccordionPrimitive.Trigger>
+          </div>
+        </AccordionPrimitive.Header>
+        <AccordionPrimitive.Content forceMount className="data-[state=closed]:hidden">
+          <SeoContent title={title} intro={intro} sections={sections} faqs={faqs} links={links} frame={frame} />
+        </AccordionPrimitive.Content>
+      </AccordionPrimitive.Item>
+    </AccordionPrimitive.Root>
   )
 }

@@ -13,8 +13,14 @@ export type CartItem = {
   brand?: string
 }
 
+/** Shared rental window (ISO yyyy-mm-dd). Chosen on the product page, editable in the cart. */
+export type RentalDates = { start: string; end: string }
+
 type CartContextType = {
   items: CartItem[]
+  dates: RentalDates | null
+  setDates: (dates: RentalDates | null) => void
+  setAllDays: (days: number) => void
   addItem: (item: CartItem) => void
   removeItem: (id: string) => void
   updateItemDays: (id: string, days: number) => void
@@ -28,6 +34,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [dates, setDatesState] = useState<RentalDates | null>(null)
   const { toast } = useToast()
 
   type ToastPayload = {
@@ -52,6 +59,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [])
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("cart-dates")
+      if (saved) setDatesState(JSON.parse(saved))
+    } catch {
+      localStorage.removeItem("cart-dates")
+    }
+  }, [])
+
+  const setDates = (next: RentalDates | null) => {
+    setDatesState(next)
+    if (next) localStorage.setItem("cart-dates", JSON.stringify(next))
+    else localStorage.removeItem("cart-dates")
+  }
+
+  const setAllDays = (days: number) => {
+    setItems((prev) => prev.map((item) => ({ ...item, days })))
+  }
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -163,6 +189,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider
       value={{
         items,
+        dates,
+        setDates,
+        setAllDays,
         addItem,
         removeItem,
         updateItemDays,
@@ -183,6 +212,9 @@ export function useCart() {
     // Return default values for server-side rendering
     return {
       items: [],
+      dates: null,
+      setDates: () => {},
+      setAllDays: () => {},
       addItem: () => {},
       removeItem: () => {},
       updateItemDays: () => {},

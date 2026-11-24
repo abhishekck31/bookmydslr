@@ -1,5 +1,5 @@
-import { fetchProducts, fetchGlobalSettings } from "@/lib/api"
-import { LensesClient } from "@/components/lenses-client"
+import { fetchCategories, fetchProducts } from "@/lib/api"
+import { ProductBrowser } from "@/components/film/product-browser"
 import { JsonLd } from "@/components/seo/json-ld"
 import { SeoContent } from "@/components/seo/seo-content"
 import { buildMetadata } from "@/lib/seo/metadata"
@@ -23,9 +23,8 @@ export const metadata = buildMetadata({
 })
 
 export default async function LensesPage() {
-  const products = await fetchProducts()
+  const [products, categories] = await Promise.all([fetchProducts(), fetchCategories()])
   const lenses = products.filter(p => p.category?.name?.toLowerCase().includes("lens"))
-  const settings = await fetchGlobalSettings()
 
   return (
     <>
@@ -44,9 +43,16 @@ export default async function LensesPage() {
           ]),
         ]}
       />
-      <LensesClient initialLenses={lenses as any} globalSettings={settings} />
+      <ProductBrowser
+        products={lenses}
+        categories={categories}
+        title="Lenses to rent"
+        titleEmphasis="Lenses"
+        intro="Primes, zooms and adapters for Canon, Nikon and Sony mounts — for portraits, weddings, wildlife and film."
+        breadcrumb={[{ href: "/", label: "Home" }, { href: "/lenses", label: "Lenses" }]}
+      />
       <SeoContent
-        eyebrow="Lens Category"
+        eyebrow="The long read"
         title="Lens rentals in Bangalore for photo and video teams"
         intro="This lens collection page is structured to rank for high-intent lens rental searches while helping users quickly compare the inventory they need for portraits, events, and productions."
         sections={buildCollectionSections({

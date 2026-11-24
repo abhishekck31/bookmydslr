@@ -12,7 +12,7 @@ export default function RegisterPage() {
       <Card className="mx-auto max-w-md w-full">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
-            <Camera className="h-8 w-8 text-yellow-500" />
+            <Camera className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>Enter your information to create an account</CardDescription>
@@ -44,16 +44,16 @@ export default function RegisterPage() {
             <Checkbox id="terms" />
             <Label htmlFor="terms" className="text-sm font-normal">
               I agree to the{" "}
-              <Link href="/terms" className="text-yellow-500 hover:underline">
+              <Link href="/terms" className="text-primary hover:underline">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="text-yellow-500 hover:underline">
+              <Link href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
               </Link>
             </Label>
           </div>
-          <Button className="w-full bg-yellow-500 text-black hover:bg-yellow-600">Create Account</Button>
+          <Button className="w-full bg-primary text-foreground hover:bg-primary">Create Account</Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -70,7 +70,7 @@ export default function RegisterPage() {
         <CardFooter className="flex flex-col">
           <div className="text-center text-sm text-muted-foreground mt-2">
             Already have an account?{" "}
-            <Link href="/login" className="text-yellow-500 hover:underline">
+            <Link href="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </div>
