@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
       />
       <main className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-surface text-white py-24 md:py-32 overflow-hidden relative">
+      <section className="bg-surface text-foreground py-24 md:py-32 overflow-hidden relative">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" />
 
         <div className="film-container text-center relative z-10">
@@ -99,7 +99,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-surface text-white py-24 relative overflow-hidden">
+      <section className="bg-surface text-foreground py-24 relative overflow-hidden">
         <div className="film-container text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-serif font-normal mb-6">Ready to Start Creating?</h2>
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 text-muted-foreground">
@@ -113,7 +113,7 @@ export default function HowItWorksPage() {
               asChild
               size="lg"
               variant="outline"
-              className="border-border-strong text-white hover:bg-surface-2 rounded-full h-14 px-10 text-lg"
+              className="border-border-strong text-foreground hover:bg-surface-2 rounded-full h-14 px-10 text-lg"
             >
               <Link href="/contact">Contact Support</Link>
             </Button>

@@ -197,7 +197,7 @@ export default function ServicesPage() {
             </p>
             <Button
               asChild
-              className="mt-6 h-12 rounded-full bg-surface px-8 font-semibold text-white hover:bg-surface-2"
+              className="mt-6 h-12 rounded-full bg-background px-8 font-semibold text-foreground hover:bg-surface"
             >
               <Link href="/contact">Contact Us</Link>
             </Button>

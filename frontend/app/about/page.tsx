@@ -48,9 +48,9 @@ export default function AboutPage() {
                             <span className="text-primary text-xs font-bold uppercase tracking-widest">Since 2015</span>
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-normal text-white mb-8 leading-[1.1]">
+                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-normal text-foreground mb-8 leading-[1.1]">
                             Empowering Creators <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 animate-gradient-x">
+                            <span className="italic text-primary">
                                 With Pro Gear
                             </span>
                         </h1>
@@ -62,7 +62,7 @@ export default function AboutPage() {
                             <Button size="lg" className="h-14 px-10 bg-background hover:bg-surface-2 text-foreground font-bold rounded-full text-lg transition-all hover:scale-105">
                                 Explore Our Inventory
                             </Button>
-                            <Button size="lg" variant="outline" className="h-14 px-10 border-border-strong text-muted-foreground hover:bg-surface-2 hover:text-white rounded-full text-lg backdrop-blur-sm bg-white/5 transition-all">
+                            <Button size="lg" variant="outline" className="h-14 px-10 border-border-strong text-muted-foreground hover:bg-surface-2 hover:text-foreground rounded-full text-lg backdrop-blur-sm bg-white/5 transition-all">
                                 Read Our Story
                             </Button>
                         </div>
@@ -105,7 +105,7 @@ export default function AboutPage() {
                                     fill
                                     className="object-cover scale-105 hover:scale-100 transition-transform duration-1000"
                                 />
-                                <div className="absolute bottom-12 left-12 right-12 z-20 text-white">
+                                <div className="absolute bottom-12 left-12 right-12 z-20 text-foreground">
                                     <div className="w-12 h-1 bg-surface-2 mb-6"></div>
                                     <p className="text-3xl font-serif italic leading-relaxed text-foreground">
                                         "Photography is the story I fail to put into words."
@@ -149,7 +149,7 @@ export default function AboutPage() {
                             </div>
 
                             <Link href="/contact" className="inline-block">
-                                <Button size="lg" className="rounded-full bg-surface text-white hover:bg-background h-14 px-10 text-lg group transition-all hover:scale-105">
+                                <Button size="lg" className="rounded-full bg-foreground text-background hover:bg-foreground/90 h-14 px-10 text-lg group transition-all hover:scale-105">
                                     Get in Touch <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </Button>
                             </Link>

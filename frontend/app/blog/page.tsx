@@ -70,7 +70,7 @@ export default function BlogPage() {
       />
 
       <main className="min-h-screen bg-background">
-        <section className="bg-surface py-24 text-white">
+        <section className="bg-surface py-24 text-foreground">
           <div className="film-container max-w-5xl">
             <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary">SEO Blog Roadmap</p>
             <h1 className="mt-4 text-4xl font-serif font-normal md:text-6xl">

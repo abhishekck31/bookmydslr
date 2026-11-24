@@ -161,7 +161,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 />
               </div>
             </div>
-            <span className="label-mono absolute left-4 top-4 text-primary-foreground/70">▸ {code}</span>
+            <span className="label-mono absolute left-4 top-4 text-muted-foreground">▸ {code}</span>
             {pricing.percentOff && pricing.originalPrice ? (
               <DiscountBadge percentOff={pricing.percentOff} originalPrice={pricing.originalPrice} className="absolute bottom-0 left-0" />
             ) : null}

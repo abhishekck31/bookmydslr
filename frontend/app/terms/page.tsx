@@ -193,7 +193,7 @@ export default function TermsPage() {
           </p>
           <Button
             asChild
-            className="mt-4 h-12 rounded-full bg-surface px-8 font-semibold text-white hover:bg-surface-2"
+            className="mt-4 h-12 rounded-full bg-background px-8 font-semibold text-foreground hover:bg-surface"
           >
             <Link href="/rental-equipment">Browse Equipment</Link>
           </Button>

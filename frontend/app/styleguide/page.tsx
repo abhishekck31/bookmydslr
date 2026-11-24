@@ -22,20 +22,20 @@ export const metadata: Metadata = {
 }
 
 const SWATCHES: { name: string; hex: string; use: string }[] = [
-  { name: "background", hex: "#13110E", use: "Page" },
-  { name: "surface", hex: "#1A1612", use: "Alternate bands" },
-  { name: "surface-2", hex: "#1C1814", use: "Hover, image wells" },
-  { name: "border", hex: "#2B2620", use: "Hairlines, sprockets" },
-  { name: "border-strong", hex: "#3A332A", use: "Outlines, inputs" },
-  { name: "text", hex: "#F2EADF", use: "Primary text" },
-  { name: "text-2", hex: "#D6CCBE", use: "Body copy" },
-  { name: "muted", hex: "#A89F92", use: "Labels, meta" },
-  { name: "subtle", hex: "#7E766B", use: "Strikethrough only" },
-  { name: "accent", hex: "#F59E0B", use: "CTAs, prices, codes" },
-  { name: "tile", hex: "#EAE3D8", use: "Product image tile" },
-  { name: "success", hex: "#7FD1A0", use: "Available" },
-  { name: "danger", hex: "#F2A0A0", use: "Booked, errors" },
-  { name: "whatsapp", hex: "#25D366", use: "WhatsApp fill" },
+  { name: "background", hex: "#FAF7F2", use: "Page" },
+  { name: "surface", hex: "#F3EEE6", use: "Alternate bands" },
+  { name: "surface-2", hex: "#ECE5DA", use: "Hover, wells" },
+  { name: "border", hex: "#E2DACD", use: "Hairlines, sprockets" },
+  { name: "border-strong", hex: "#CFC4B4", use: "Outlines, inputs" },
+  { name: "text", hex: "#1A1612", use: "Primary text" },
+  { name: "text-2", hex: "#3D362E", use: "Body copy" },
+  { name: "muted", hex: "#6B6258", use: "Labels, meta" },
+  { name: "subtle", hex: "#8A8076", use: "Strikethrough only" },
+  { name: "accent", hex: "#B45309", use: "CTAs, prices, codes" },
+  { name: "tile", hex: "#FFFFFF", use: "Product image tile" },
+  { name: "success", hex: "#1F7A45", use: "Available" },
+  { name: "danger", hex: "#B42318", use: "Booked, errors" },
+  { name: "whatsapp", hex: "#15803D", use: "WhatsApp fill" },
 ]
 
 function luminance(hex: string) {
@@ -106,7 +106,7 @@ export default function StyleguidePage() {
       <Block n={1} title="Colour">
         <ul className="contact-sheet grid-cols-2 md:grid-cols-4 xl:grid-cols-7">
           {SWATCHES.map((s) => {
-            const onBg = contrast(s.hex, "#13110E")
+            const onBg = contrast(s.hex, "#FAF7F2")
             return (
               <li key={s.name} className="bg-background p-3">
                 <div className="h-20 border border-border" style={{ background: s.hex }} />

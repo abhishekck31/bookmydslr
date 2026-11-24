@@ -122,8 +122,8 @@ export default async function HomePage() {
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover"
             />
-            <span className="label-mono absolute left-4 top-4 text-primary">▸ 14A</span>
-            <span className="label-mono absolute right-4 top-4 text-foreground/80">Cinema rig</span>
+            <span className="label-mono absolute left-4 top-4 text-amber-400">▸ 14A</span>
+            <span className="label-mono absolute right-4 top-4 text-white/80">Cinema rig</span>
             {fromPrice !== null ? (
               <div className="absolute bottom-4 left-4 border border-border-strong bg-background/90 px-4 py-3 backdrop-blur">
                 <p className="label-mono text-muted-foreground">From</p>
