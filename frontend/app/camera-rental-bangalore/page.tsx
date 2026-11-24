@@ -1,6 +1,6 @@
 import { fetchProducts } from "@/lib/api"
 import { LandingPageTemplate } from "@/components/seo/landing-page-template"
-import { bangaloreLocationPages } from "@/data/seo/landing-pages"
+import { LocalityDirectory } from "@/components/seo/locality-directory"
 import { JsonLd } from "@/components/seo/json-ld"
 import { buildMetadata } from "@/lib/seo/metadata"
 import {
@@ -62,7 +62,7 @@ export default async function CameraRentalBangalorePage() {
         description={pageDescription}
         bullets={[
           "DSLR, mirrorless, cinema cameras, drones, and accessories",
-          "Strong local coverage around Kalyan Nagar, Hennur, Whitefield, HSR Layout, and more",
+          "Pickup in Kalyan Nagar · delivery across Bangalore from ₹200, by distance",
           "Built for photographers, filmmakers, creators, production teams, and students",
         ]}
         products={featuredProducts}
@@ -70,7 +70,6 @@ export default async function CameraRentalBangalorePage() {
         contentIntro="This city page is designed to rank for broad Bangalore rental demand while sending visitors into more specific brand, category, and neighborhood pages that match their booking intent."
         sections={buildMainCitySections()}
         faqs={faqs}
-        nearby={bangaloreLocationPages.map((p) => ({ href: `/camera-rental-bangalore/${p.slug}`, label: p.name }))}
         internalLinks={[
           { href: "/rentals/dslr-camera-rental-bangalore", label: "DSLR Rental Bangalore", description: "Budget and professional DSLR rental options." },
           { href: "/rentals/mirrorless-camera-rental-bangalore", label: "Mirrorless Camera Rentals", description: "Creator and hybrid camera options for modern shoots." },
@@ -78,6 +77,7 @@ export default async function CameraRentalBangalorePage() {
           { href: "/camera-rental-bangalore/kalyan-nagar", label: "Kalyan Nagar Rentals", description: "Local-intent page closest to the studio." },
         ]}
       />
+      <LocalityDirectory />
     </>
   )
 }

@@ -2,7 +2,6 @@ import { Category, Product } from "@/types"
 import {
   FAQItem,
   InternalLink,
-  LocationLandingPageConfig,
   ProductFilterRule,
   SeoNarrativeSection,
 } from "@/lib/seo/types"
@@ -112,76 +111,6 @@ export function buildMainCityFaqs(): FAQItem[] {
       question: "Why is this page longer than a normal category page?",
       answer:
         "Because broad commercial keywords like camera rental Bangalore require more topical depth than a simple product grid. The page needs inventory, local relevance, semantic breadth, FAQs, and internal links to compete for high-intent search demand and help visitors choose the right next step.",
-    },
-  ]
-}
-
-export function buildLocationSections(page: LocationLandingPageConfig): SeoNarrativeSection[] {
-  const nearby = page.nearbyAreas.join(", ")
-  const landmarks = page.landmarks.join(", ")
-  const audience = page.audience.join(", ")
-
-  return [
-    {
-      title: `Why ${page.name} needs its own local camera rental page`,
-      paragraphs: [
-        `${page.name} generates a different kind of rental intent than a city-wide page. Searchers here often want something close, practical, and fast. They may be looking for camera rental near me, DSLR rental near me, or a neighborhood-specific result they can trust before a time-sensitive shoot. This page exists to meet that local intent directly and connect it to Book My DSLR's Bangalore inventory and fulfillment model.`,
-        `The service angle for ${page.name} is especially relevant because this area overlaps with ${page.serviceAngle}. Nearby demand often flows in from ${nearby}, while landmarks like ${landmarks} shape how people plan pickup, delivery, and shoot logistics. Local SEO works best when pages reflect those real-world patterns rather than generic city copy.`,
-      ],
-      bullets: [
-        `Primary local audience: ${audience}`,
-        `Nearby search areas: ${nearby}`,
-        `Contextual landmarks: ${landmarks}`,
-      ],
-    },
-    {
-      title: "How local landing pages improve conversions",
-      paragraphs: [
-        `A neighborhood landing page reduces friction because it answers the user's most immediate concern: can this rental service support my location without hassle? For local service businesses, that clarity often matters more than long brand narratives. Users in ${page.name} want to know whether the business is realistic for their schedule, whether support will be quick, and whether they can move from search to rental without multiple back-and-forth steps.`,
-        `This page supports that conversion path by combining locally relevant copy with product inventory, FAQs, schema, and internal links to category pages. That helps search engines understand the page is truly location-specific while also helping users move deeper into the site if they need a DSLR page, Sony page, lens page, or the broader Bangalore city page.`,
-      ],
-      bullets: [
-        "Closer location match usually improves click-through and lead quality",
-        "Neighborhood pages strengthen map relevance and topical depth",
-        "Internal links route the user into the exact gear category they need",
-      ],
-    },
-    {
-      title: `Who typically rents camera gear around ${page.name}`,
-      paragraphs: [
-        `The most common search demand around ${page.name} comes from ${audience}. Some need one-day rentals for events, while others need multiple days for creator content, commercial production, or client projects. This means the page must serve both urgency and clarity: enough detail to help the renter decide, but not so much friction that they abandon the process before reaching the inventory or contact stage.`,
-        `Because this page sits inside a broader Bangalore SEO cluster, it also helps the site rank for many variations of the same local query. Instead of relying on a single city page to carry every neighborhood phrase, Book My DSLR can build stronger local authority with pages that reflect how renters actually search across Bangalore.`,
-      ],
-      bullets: [
-        "Local-event and wedding demand",
-        "Creator and studio demand",
-        "Student and first-time renter demand",
-      ],
-    },
-  ]
-}
-
-export function buildLocationFaqs(page: LocationLandingPageConfig): FAQItem[] {
-  return [
-    {
-      question: `Do you support camera rental near ${page.name}?`,
-      answer:
-        `Yes. This page is designed specifically for users searching in and around ${page.name}. It supports local-intent queries while keeping visitors close to the same live rental catalog used across the main Bangalore site.`,
-    },
-    {
-      question: `Which nearby areas does this page cover beyond ${page.name}?`,
-      answer:
-        `The page is also relevant for nearby demand from ${page.nearbyAreas.join(", ")}. That helps capture hyperlocal searches where users still expect practical Bangalore pickup and delivery support.`,
-    },
-    {
-      question: "What kind of shoots usually drive local rentals here?",
-      answer:
-        `Common demand around this area includes ${page.audience.join(", ")}, along with event coverage, creator shoots, and project-based rentals where buying gear makes less sense than short-term access.`,
-    },
-    {
-      question: "Why not just use the city page for all areas?",
-      answer:
-        "Because neighborhood-specific pages often perform better for local-intent searches and provide more relevant context for the user. They also strengthen the site’s internal linking structure and local SEO footprint across Bangalore.",
     },
   ]
 }

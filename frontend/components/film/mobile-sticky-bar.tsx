@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { Phone } from "lucide-react"
+import { siteConfig } from "@/lib/seo/site"
 import { cn } from "@/lib/utils"
 import { pad2, whatsappLink, DEFAULT_WHATSAPP_MESSAGE } from "@/lib/film"
 import { useCart } from "@/components/cart-provider"
@@ -30,6 +32,13 @@ export function MobileStickyBar({
         >
           Cart <span className="font-mono text-primary">{pad2(itemCount)}</span>
         </Link>
+        <a
+          href={`tel:${siteConfig.phone}`}
+          className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border-strong text-foreground"
+          aria-label={`Call ${siteConfig.phoneDisplay}`}
+        >
+          <Phone aria-hidden className="h-5 w-5" />
+        </a>
         {children ?? (
           <a
             href={whatsappLink(DEFAULT_WHATSAPP_MESSAGE)}

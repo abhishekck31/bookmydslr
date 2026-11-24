@@ -2,6 +2,7 @@ import { Product } from "@/types"
 import { absoluteUrl } from "@/lib/seo/metadata"
 import { siteConfig } from "@/lib/seo/site"
 import { BreadcrumbItem, FAQItem } from "@/lib/seo/types"
+import { PUBLISHED_LOCALITIES, localityPath } from "@/data/seo/localities"
 
 export function buildOrganizationSchema() {
   return {
@@ -16,14 +17,18 @@ export function buildOrganizationSchema() {
   }
 }
 
-export function buildLocalBusinessSchema(pagePath = "/") {
+/** The one physical location (Kalyan Nagar). Every page refers to this same entity. */
+export const LOCAL_BUSINESS_ID = `${siteConfig.url}/#localbusiness`
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function buildLocalBusinessSchema(_pagePath = "/") {
   return {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "Store", "ProfessionalService"],
-    "@id": `${absoluteUrl(pagePath)}#localbusiness`,
+    "@id": LOCAL_BUSINESS_ID,
     name: siteConfig.name,
     image: absoluteUrl(siteConfig.defaultOgImage),
-    url: absoluteUrl(pagePath),
+    url: siteConfig.url,
     telephone: siteConfig.phoneDisplay,
     email: siteConfig.email,
     priceRange: "INR 300-10000",
@@ -32,10 +37,10 @@ export function buildLocalBusinessSchema(pagePath = "/") {
       ...siteConfig.address,
     },
     openingHours: siteConfig.businessHours,
-    areaServed: siteConfig.serviceAreas.map((area) => ({
-      "@type": "City",
-      name: area,
-    })),
+    areaServed: [
+      { "@type": "City", name: "Bangalore" },
+      ...PUBLISHED_LOCALITIES.map((l) => ({ "@type": "Place", name: `${l.name}, Bangalore`, url: absoluteUrl(localityPath(l)) })),
+    ],
     sameAs: [...siteConfig.social],
     aggregateRating: {
       "@type": "AggregateRating",
@@ -130,5 +135,49 @@ export function buildProductSchema(product: Product, path: string) {
             reviewCount: product.reviews,
           }
         : undefined,
+  }
+}
+
+/** A locality page: a WebPage about renting in that area, provided by the single business. */
+export function buildLocalityPageSchema({
+  name,
+  description,
+  path,
+  areaName,
+}: {
+  name: string
+  description: string
+  path: string
+  areaName: string
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${absoluteUrl(path)}#webpage`,
+    name,
+    description,
+    url: absoluteUrl(path),
+    isPartOf: { "@type": "WebSite", url: siteConfig.url, name: siteConfig.name },
+    about: {
+      "@type": "Service",
+      name: `Camera and equipment rental in ${areaName}, Bangalore`,
+      serviceType: "Camera rental",
+      provider: { "@id": LOCAL_BUSINESS_ID },
+      areaServed: { "@type": "Place", name: `${areaName}, Bangalore` },
+    },
+  }
+}
+
+/** Real products shown on a page, as an ItemList pointing at each product page. */
+export function buildProductListSchema(products: Product[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: products.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: absoluteUrl(`/product/${p.id}`),
+      name: p.name,
+    })),
   }
 }

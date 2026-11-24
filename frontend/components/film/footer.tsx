@@ -1,5 +1,9 @@
 import Link from "next/link"
-import { bangaloreLocationPages } from "@/data/seo/landing-pages"
+import { PUBLISHED_LOCALITIES, findPublishedLocality, localityPath } from "@/data/seo/localities"
+
+const FOOTER_AREAS = ["kalyan-nagar", "hennur", "indiranagar", "koramangala", "whitefield", "hsr-layout", "hebbal", "electronic-city"]
+  .map((s) => findPublishedLocality(s))
+  .filter((l): l is NonNullable<typeof l> => Boolean(l))
 import { siteConfig } from "@/lib/seo/site"
 import { CATEGORY_GROUPS, whatsappLink, DEFAULT_WHATSAPP_MESSAGE } from "@/lib/film"
 import { FilmEdge } from "./primitives"
@@ -51,19 +55,22 @@ export function FilmFooter() {
         <Column title="Hours">
           <p className="text-[15px] text-body">Monday – Sunday</p>
           <p className="price mt-1 text-[22px] text-foreground">8 AM – 10 PM</p>
-          <p className="mt-4 text-sm text-muted-foreground">Pickup from Kalyan Nagar or delivery across Bangalore.</p>
+          <p className="mt-4 text-sm text-muted-foreground">Pickup from Kalyan Nagar, or delivery across Bangalore from ₹200 depending on distance.</p>
         </Column>
 
         <Column title="Areas served">
           <ul className="grid grid-cols-2 gap-x-4">
-            {bangaloreLocationPages.map((area) => (
+            {FOOTER_AREAS.map((area) => (
               <li key={area.slug}>
-                <Link href={`/camera-rental-bangalore/${area.slug}`} className={linkCls}>
+                <Link href={localityPath(area)} className={linkCls}>
                   {area.name}
                 </Link>
               </li>
             ))}
           </ul>
+          <Link href="/camera-rental-bangalore" className={`${linkCls} mt-2 inline-block font-semibold`}>
+            All {PUBLISHED_LOCALITIES.length} areas →
+          </Link>
         </Column>
 
         <Column title="Categories">

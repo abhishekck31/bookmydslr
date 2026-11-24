@@ -193,7 +193,7 @@ Return: ${formatShortDate(end)} at ${returnTime}
 *Gear*
 ${lines}
 
-Subtotal: ${formatINR(total)}${deliveryFee ? `\nDelivery: ${formatINR(deliveryFee)}` : ""}
+Subtotal: ${formatINR(total)}${deliveryFee ? `\nDelivery: from ${formatINR(deliveryFee)} (depends on distance)` : ""}
 *Estimated total: ${formatINR(grandTotal)}*
 
 Notes: ${customer.notes.trim() || "None"}`
@@ -313,7 +313,7 @@ Notes: ${customer.notes.trim() || "None"}`
                   {(
                     [
                       { v: "pickup", t: "Self pickup", d: "Kalyan Nagar · free" },
-                      { v: "delivery", t: "Delivery", d: `Across Bangalore · ${formatINR(DELIVERY_FEE)}` },
+                      { v: "delivery", t: "Delivery", d: `From ${formatINR(DELIVERY_FEE)} · by distance` },
                     ] as const
                   ).map((o) => (
                     <label
@@ -373,7 +373,7 @@ Notes: ${customer.notes.trim() || "None"}`
                 ) : null}
                 <div className="flex justify-between gap-4 text-body">
                   <dt>{method === "delivery" ? "Delivery" : "Pickup"}</dt>
-                  <dd className="price">{deliveryFee ? formatINR(deliveryFee) : "Free"}</dd>
+                  <dd className="price">{deliveryFee ? `from ${formatINR(deliveryFee)}` : "Free"}</dd>
                 </div>
                 <div className="flex items-baseline justify-between gap-4 border-t border-dashed border-border-strong pt-4">
                   <dt className="label-mono text-muted-foreground">Estimated total</dt>

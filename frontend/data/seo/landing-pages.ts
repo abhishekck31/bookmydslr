@@ -1,5 +1,4 @@
 import {
-  LocationLandingPageConfig,
   MarketingLandingPageConfig,
   SeoNarrativeSection,
 } from "@/lib/seo/types"
@@ -407,19 +406,4 @@ export const marketingLandingPages: MarketingLandingPageConfig[] = [
       { href: "/contact", label: "Contact for Outstation Shoots", description: "Reach out when you need a custom rental plan or delivery discussion." },
     ],
   },
-]
-
-export const bangaloreLocationPages: LocationLandingPageConfig[] = [
-  { slug: "kalyan-nagar", name: "Kalyan Nagar", nearbyAreas: ["Hennur", "HRBR Layout", "Banaswadi"], landmarks: ["Hennur Main Road", "Outer Ring Road access"], serviceAngle: "pickup-first demand close to the studio", audience: ["creators", "photographers", "event shooters"] },
-  { slug: "hennur", name: "Hennur", nearbyAreas: ["Kalyan Nagar", "Thanisandra", "Hebbal"], landmarks: ["Hennur Main Road", "airport corridor access"], serviceAngle: "fast pickup and delivery for northeast Bangalore", audience: ["wedding teams", "creators", "families shooting events"] },
-  { slug: "koramangala", name: "Koramangala", nearbyAreas: ["BTM Layout", "HSR Layout", "Adugodi"], landmarks: ["startup offices", "creator studios"], serviceAngle: "creator and agency demand for content, ads, and podcasts", audience: ["brand teams", "startups", "YouTubers"] },
-  { slug: "indiranagar", name: "Indiranagar", nearbyAreas: ["Domlur", "Ulsoor", "Old Airport Road"], landmarks: ["commercial studios", "retail brand hubs"], serviceAngle: "premium creator and event demand", audience: ["agencies", "fashion creators", "wedding photographers"] },
-  { slug: "whitefield", name: "Whitefield", nearbyAreas: ["Brookefield", "Marathahalli", "Varthur"], landmarks: ["IT parks", "corporate campuses"], serviceAngle: "corporate shoots and event coverage", audience: ["corporate teams", "event agencies", "commercial videographers"] },
-  { slug: "hsr-layout", name: "HSR Layout", nearbyAreas: ["Koramangala", "BTM Layout", "Electronic City"], landmarks: ["creator studios", "startup offices"], serviceAngle: "creator-led and startup-led video demand", audience: ["podcasters", "course creators", "brand marketers"] },
-  { slug: "jayanagar", name: "Jayanagar", nearbyAreas: ["JP Nagar", "Basavanagudi", "Banashankari"], landmarks: ["residential shoots", "wedding venues"], serviceAngle: "portrait, family, and wedding photography demand", audience: ["wedding photographers", "portrait teams", "families"] },
-  { slug: "electronic-city", name: "Electronic City", nearbyAreas: ["HSR Layout", "BTM Layout", "Bommasandra"], landmarks: ["tech parks", "industrial campuses"], serviceAngle: "corporate AV and training video demand", audience: ["production houses", "corporate teams", "documentary crews"] },
-  { slug: "hebbal", name: "Hebbal", nearbyAreas: ["Hennur", "Manyata", "Nagawara"], landmarks: ["airport access", "north Bangalore offices"], serviceAngle: "fast response for north Bangalore shoots", audience: ["event teams", "creators", "outstation clients"] },
-  { slug: "marathahalli", name: "Marathahalli", nearbyAreas: ["Whitefield", "Bellandur", "Brookefield"], landmarks: ["tech corridor", "outer ring road"], serviceAngle: "commercial, ecommerce, and team content shoots", audience: ["brands", "freelancers", "event videographers"] },
-  { slug: "btm-layout", name: "BTM Layout", nearbyAreas: ["Koramangala", "HSR Layout", "Jayanagar"], landmarks: ["student housing", "college projects"], serviceAngle: "student, indie film, and budget camera rental demand", audience: ["students", "short-film crews", "new creators"] },
-  { slug: "jp-nagar", name: "JP Nagar", nearbyAreas: ["Jayanagar", "Banashankari", "Bannerghatta Road"], landmarks: ["wedding venues", "family events"], serviceAngle: "wedding and portrait use cases with quick planning cycles", audience: ["wedding teams", "family photographers", "portrait shooters"] },
 ]

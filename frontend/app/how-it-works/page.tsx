@@ -155,7 +155,7 @@ const steps = [
     description: "Get your gear delivered to your set or pick it up from our studio.",
     icon: <Truck className="h-8 w-8" />,
     features: [
-      "Same-day delivery available",
+      "Delivery from ₹200, based on distance",
       "Thorough gear walkthrough",
       "Zero-hassle handover"
     ]

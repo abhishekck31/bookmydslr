@@ -23,7 +23,7 @@ const features = [
     icon: Zap,
     title: "Fast Delivery",
     description:
-      "Same-day pickup from Kalyan Nagar or quick delivery across Bangalore when you need gear urgently.",
+      "Same-day pickup from Kalyan Nagar or delivery across Bangalore from ₹200, depending on distance.",
   },
 ]
 

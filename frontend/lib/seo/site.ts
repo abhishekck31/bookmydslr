@@ -50,17 +50,3 @@ export const primaryKeywords = [
   "camera gear rental India",
 ]
 
-export const bangaloreLocationSlugs = [
-  "kalyan-nagar",
-  "hennur",
-  "koramangala",
-  "indiranagar",
-  "whitefield",
-  "hsr-layout",
-  "jayanagar",
-  "electronic-city",
-  "hebbal",
-  "marathahalli",
-  "btm-layout",
-  "jp-nagar",
-] as const

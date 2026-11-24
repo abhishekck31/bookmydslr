@@ -1,119 +1,88 @@
 import { notFound } from "next/navigation"
-import { fetchProducts } from "@/lib/api"
-import { LandingPageTemplate } from "@/components/seo/landing-page-template"
+import { fetchDurationTiers, fetchProducts } from "@/lib/api"
 import { JsonLd } from "@/components/seo/json-ld"
-import { bangaloreLocationPages } from "@/data/seo/landing-pages"
+import { LocalityPage } from "@/components/seo/locality-page"
+import {
+  PUBLISHED_LOCALITIES,
+  findPublishedLocality,
+  localityPath,
+  validateLocalities,
+} from "@/data/seo/localities"
 import { buildMetadata } from "@/lib/seo/metadata"
 import {
   buildBreadcrumbSchema,
-  buildCollectionPageSchema,
   buildFaqSchema,
-  buildLocalBusinessSchema,
+  buildLocalityPageSchema,
+  buildProductListSchema,
 } from "@/lib/seo/schema"
-import { buildLocationFaqs, buildLocationSections, pickProducts } from "@/lib/seo/page-content"
+import {
+  buildLocalityFaqs,
+  focusGroups,
+  localityKeywords,
+  localityMetaDescription,
+  localitySeoTitle,
+  summariseInventory,
+} from "@/lib/seo/locality-content"
 
 export const revalidate = 300
+/** Drafts and unknown slugs 404 instead of rendering on demand. */
+export const dynamicParams = false
 
 export async function generateStaticParams() {
-  return bangaloreLocationPages.map((page) => ({ location: page.slug }))
+  const problems = validateLocalities()
+  if (problems.length) {
+    throw new Error(`Locality dataset is invalid:\n- ${problems.join("\n- ")}`)
+  }
+  return PUBLISHED_LOCALITIES.map((l) => ({ location: l.slug }))
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ location: string }>
-}) {
+type Params = { params: Promise<{ location: string }> }
+
+export async function generateMetadata({ params }: Params) {
   const { location } = await params
-  const page = bangaloreLocationPages.find((item) => item.slug === location)
+  const l = findPublishedLocality(location)
+  if (!l) return {}
 
-  if (!page) {
-    return buildMetadata({
-      title: "Camera Rental Bangalore | Book My DSLR",
-      description: "Browse camera rental landing pages for Bangalore neighborhoods.",
-      path: "/camera-rental-bangalore",
-      noIndex: true,
-    })
-  }
-
+  const products = await fetchProducts()
   return buildMetadata({
-    title: `Camera Rental ${page.name} Bangalore | Book My DSLR`,
-    description: `Rent cameras, lenses, and filmmaking gear near ${page.name}, Bangalore with fast support from Book My DSLR.`,
-    path: `/camera-rental-bangalore/${page.slug}`,
-    keywords: [
-      `camera rental ${page.name} Bangalore`,
-      `DSLR rental ${page.name}`,
-      `camera rental near ${page.name}`,
-      "camera rental Bangalore",
-    ],
+    title: localitySeoTitle(l),
+    description: localityMetaDescription(l, products.length ? summariseInventory(products) : null),
+    path: localityPath(l),
+    keywords: localityKeywords(l),
   })
 }
 
-export default async function CameraRentalLocationPage({
-  params,
-}: {
-  params: Promise<{ location: string }>
-}) {
+export default async function CameraRentalLocalityPage({ params }: Params) {
   const { location } = await params
-  const page = bangaloreLocationPages.find((item) => item.slug === location)
+  const l = findPublishedLocality(location)
+  if (!l) notFound()
 
-  if (!page) {
-    notFound()
-  }
-
-  const products = await fetchProducts()
-  const featuredProducts = pickProducts(products, undefined, 8)
-  const faqs = buildLocationFaqs(page)
-  const title = `Camera rental in ${page.name}, Bangalore`
-  const nearbyNames = new Set(page.nearbyAreas.map((n) => n.toLowerCase()))
-  const nearbyLinks = bangaloreLocationPages
-    .filter((p) => p.slug !== page.slug)
-    .sort((a, b) => Number(nearbyNames.has(b.name.toLowerCase())) - Number(nearbyNames.has(a.name.toLowerCase())))
-    .map((p) => ({ href: `/camera-rental-bangalore/${p.slug}`, label: p.name }))
-  const description = `Rent cameras, lenses, and filmmaking equipment near ${page.name}, Bangalore with quick access from Book My DSLR.`
+  const [products, tiers] = await Promise.all([fetchProducts(), fetchDurationTiers()])
+  const facts = summariseInventory(products)
+  const faqs = buildLocalityFaqs(l, facts, tiers)
+  const path = localityPath(l)
+  const shown = focusGroups(l, facts).flatMap((g) => g.products.slice(0, 4))
 
   return (
     <>
       <JsonLd
         data={[
-          buildCollectionPageSchema({
-            name: title,
-            description,
-            path: `/camera-rental-bangalore/${page.slug}`,
+          buildLocalityPageSchema({
+            name: localitySeoTitle(l),
+            description: localityMetaDescription(l, facts),
+            path,
+            areaName: l.name,
           }),
-          buildFaqSchema(faqs),
           buildBreadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "Camera Rental Bangalore", path: "/camera-rental-bangalore" },
-            { name: page.name, path: `/camera-rental-bangalore/${page.slug}` },
+            { name: l.name, path },
           ]),
-          buildLocalBusinessSchema(`/camera-rental-bangalore/${page.slug}`),
+          buildFaqSchema(faqs),
+          buildProductListSchema(shown),
         ]}
       />
-
-      <LandingPageTemplate
-        eyebrow="Camera rental · Bangalore"
-        title={title}
-        titleEmphasis={page.name}
-        heroMarker={`Near ${page.nearbyAreas.join(" · ")}`}
-        description={description}
-        bullets={[
-          `Pickup from Kalyan Nagar or delivery to ${page.name}`,
-          `Also serving ${page.nearbyAreas.join(", ")}`,
-          `Close to ${page.landmarks.join(" and ")}`,
-        ]}
-        nearby={nearbyLinks}
-        products={featuredProducts}
-        contentTitle={`Local camera rental intent around ${page.name}`}
-        contentIntro={`This page helps Book My DSLR rank for neighborhood-level searches while giving renters in ${page.name} a direct path to the live Bangalore inventory.`}
-        sections={buildLocationSections(page)}
-        faqs={faqs}
-        internalLinks={[
-          { href: "/camera-rental-bangalore", label: "Bangalore Camera Rental", description: "Return to the main city landing page." },
-          { href: "/rentals/dslr-camera-rental-bangalore", label: "DSLR Rentals", description: "Browse DSLR options for local events, shoots, and projects." },
-          { href: "/rentals/lens-rental-bangalore", label: "Lens Rental Bangalore", description: "Pair local camera rentals with the right glass." },
-          { href: "/contact", label: "Talk to the Team", description: "Use the local page as a fast path into inquiry and support." },
-        ]}
-      />
+      <LocalityPage locality={l} facts={facts} faqs={faqs} tiers={tiers} />
     </>
   )
 }

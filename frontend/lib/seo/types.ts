@@ -41,15 +41,6 @@ export interface MarketingLandingPageConfig {
   internalLinks: InternalLink[]
 }
 
-export interface LocationLandingPageConfig {
-  slug: string
-  name: string
-  nearbyAreas: string[]
-  landmarks: string[]
-  serviceAngle: string
-  audience: string[]
-}
-
 export interface BlogTopic {
   slug: string
   title: string

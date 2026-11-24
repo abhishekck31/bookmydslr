@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next"
 import { fetchCategories, fetchProducts } from "@/lib/api"
-import { marketingLandingPages, bangaloreLocationPages } from "@/data/seo/landing-pages"
+import { marketingLandingPages } from "@/data/seo/landing-pages"
+import { PUBLISHED_LOCALITIES, localityPath } from "@/data/seo/localities"
 import { siteConfig } from "@/lib/seo/site"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -47,8 +48,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }))
 
-  const locationPages = bangaloreLocationPages.map((page) => ({
-    url: `${siteConfig.url}/camera-rental-bangalore/${page.slug}`,
+  // Drafts are never listed.
+  const locationPages = PUBLISHED_LOCALITIES.map((l) => ({
+    url: `${siteConfig.url}${localityPath(l)}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.78,
