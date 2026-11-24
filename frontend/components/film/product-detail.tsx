@@ -27,6 +27,7 @@ import { FilmAccordion } from "./faq"
 import { ContactSheet, FilmProductCard } from "./product-card"
 import { MobileStickyBar } from "./mobile-sticky-bar"
 import { TierTable, useDurationTiers } from "./duration-tiers"
+import { trackWhatsAppClick } from "@/lib/track"
 
 export function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
   const { addItem, dates, setDates } = useCart()
@@ -241,13 +242,31 @@ export function ProductDetail({ product, related }: { product: Product; related:
                     href={whatsappLink(`Hi Book My DSLR, please notify me when ${product.name} is available.`)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() =>
+                      trackWhatsAppClick({
+                        event_type: "notify_me",
+                        product: product.id,
+                        product_names: product.name,
+                      })
+                    }
                   >
                     Notify me
                   </a>
                 </FilmButton>
               )}
               <FilmButton size="lg" variant="whatsapp" asChild>
-                <a href={whatsappLink(waMessage)} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={whatsappLink(waMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    trackWhatsAppClick({
+                      event_type: "product_enquiry",
+                      product: product.id,
+                      product_names: product.name,
+                    })
+                  }
+                >
                   <WhatsAppIcon /> Book on WhatsApp
                 </a>
               </FilmButton>
@@ -296,6 +315,13 @@ export function ProductDetail({ product, related }: { product: Product; related:
             href={whatsappLink(`Hi Book My DSLR, please notify me when ${product.name} is available.`)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackWhatsAppClick({
+                event_type: "notify_me",
+                product: product.id,
+                product_names: product.name,
+              })
+            }
             className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-border-strong text-[15px] font-semibold text-foreground"
           >
             Notify me

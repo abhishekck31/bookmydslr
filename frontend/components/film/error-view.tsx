@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { DEFAULT_WHATSAPP_MESSAGE, whatsappLink } from "@/lib/film"
 import { EmptyState, FilmButton, WhatsAppIcon } from "./primitives"
+import { trackWhatsAppClick } from "@/lib/track"
 
 export function ErrorView({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const router = useRouter()
@@ -32,7 +33,12 @@ export function ErrorView({ error, reset }: { error: Error & { digest?: string }
               Try again
             </FilmButton>
             <FilmButton asChild variant="whatsapp">
-              <a href={whatsappLink(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer">
+              <a
+                href={whatsappLink(DEFAULT_WHATSAPP_MESSAGE)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick({ event_type: "general_enquiry" })}
+              >
                 <WhatsAppIcon /> WhatsApp us
               </a>
             </FilmButton>

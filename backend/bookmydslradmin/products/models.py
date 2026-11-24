@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -120,3 +121,54 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class WhatsAppClick(models.Model):
+    """
+    Tracks every "Book on WhatsApp" click.
+    event_type distinguishes a quick enquiry from a full cart checkout.
+    """
+    EVENT_TYPES = [
+        ('product_enquiry', 'Product Enquiry'),       # PDP "Book on WhatsApp"
+        ('cart_checkout', 'Cart Checkout'),             # Cart "Send booking on WhatsApp"
+        ('general_enquiry', 'General Enquiry'),         # Footer / mobile bar / error page
+        ('notify_me', 'Notify Me'),                     # Unavailable product
+    ]
+
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='whatsapp_clicks',
+        help_text="The product involved (null for general or cart-level events).",
+    )
+    product_names = models.TextField(
+        blank=True,
+        default="",
+        help_text="Comma-separated product names (useful for cart checkouts with multiple items).",
+    )
+    cart_total = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="Estimated cart total in ₹ at checkout (null for single-product clicks).",
+    )
+    page_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="The page the user was on when they clicked.",
+    )
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "WhatsApp Click"
+        verbose_name_plural = "WhatsApp Clicks"
+
+    def __str__(self):
+        label = self.get_event_type_display()
+        if self.product:
+            return f"{label} — {self.product.name} @ {self.created_at:%d %b %Y %H:%M}"
+        return f"{label} @ {self.created_at:%d %b %Y %H:%M}"

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 # pyrefly: ignore [missing-import]
 from unfold.admin import ModelAdmin
-from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount
+from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount, WhatsAppClick
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
@@ -76,3 +76,29 @@ class ProductAdmin(ModelAdmin):
         js = (
             'js/admin_image_preview.js',
         )
+
+
+@admin.register(WhatsAppClick)
+class WhatsAppClickAdmin(ModelAdmin):
+    list_display = ('event_type', 'product', 'product_names_short', 'cart_total_display', 'created_at')
+    list_filter = ('event_type', 'created_at')
+    search_fields = ('product__name', 'product_names')
+    readonly_fields = ('event_type', 'product', 'product_names', 'cart_total', 'page_url', 'created_at')
+    ordering = ('-created_at',)
+
+    def has_add_permission(self, request):
+        return False   # clicks come from the frontend only
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def product_names_short(self, obj):
+        txt = obj.product_names
+        return (txt[:60] + "…") if len(txt) > 60 else txt
+    product_names_short.short_description = "Products"
+
+    def cart_total_display(self, obj):
+        if obj.cart_total is not None:
+            return f"₹{obj.cart_total:,}"
+        return "—"
+    cart_total_display.short_description = "Cart ₹"

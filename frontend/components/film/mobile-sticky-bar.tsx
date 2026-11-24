@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { pad2, whatsappLink, DEFAULT_WHATSAPP_MESSAGE } from "@/lib/film"
 import { useCart } from "@/components/cart-provider"
 import { WhatsAppIcon } from "./primitives"
+import { trackWhatsAppClick } from "@/lib/track"
 
 /** Fixed bottom bar on small screens. Pages can render their own variant (PDP, cart). */
 export function MobileStickyBar({
@@ -44,6 +45,7 @@ export function MobileStickyBar({
             href={whatsappLink(DEFAULT_WHATSAPP_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick({ event_type: "general_enquiry" })}
             className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-whatsapp text-[15px] font-semibold text-primary-foreground"
           >
             <WhatsAppIcon />

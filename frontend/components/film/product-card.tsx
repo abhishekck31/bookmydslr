@@ -8,6 +8,7 @@ import { useCartGlow } from "@/components/cart-glow-provider"
 import { cn } from "@/lib/utils"
 import { getPricing, productFrameCode, whatsappLink } from "@/lib/film"
 import { Availability, DiscountBadge, PriceTag } from "./primitives"
+import { trackWhatsAppClick } from "@/lib/track"
 
 export function FilmProductCard({
   product,
@@ -100,6 +101,13 @@ export function FilmProductCard({
                 href={whatsappLink(`Hi Book My DSLR, please notify me when ${product.name} is available.`)}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  trackWhatsAppClick({
+                    event_type: "notify_me",
+                    product: product.id,
+                    product_names: product.name,
+                  })
+                }
                 className="relative z-10 inline-flex h-11 items-center rounded-full border border-border-strong px-4 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
                 aria-label={`Notify me on WhatsApp when ${product.name} is available`}
               >

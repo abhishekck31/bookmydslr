@@ -1,7 +1,10 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
-from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount
-from .serializers import ProductSerializer, CategorySerializer, BrandSerializer, GlobalDiscountSerializer, DurationDiscountSerializer
+from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount, WhatsAppClick
+from .serializers import (
+    ProductSerializer, CategorySerializer, BrandSerializer,
+    GlobalDiscountSerializer, DurationDiscountSerializer, WhatsAppClickSerializer,
+)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -42,3 +45,14 @@ class DurationDiscountViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return DurationDiscount.objects.filter(is_active=True).order_by('min_days')
+
+
+class WhatsAppClickViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    POST-only endpoint.  The frontend fires-and-forgets a POST here
+    every time a user clicks "Book on WhatsApp" or "Send booking".
+    """
+    queryset = WhatsAppClick.objects.all()
+    serializer_class = WhatsAppClickSerializer
+    pagination_class = None
+    filter_backends = []

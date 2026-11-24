@@ -22,6 +22,7 @@ import { Arrow, EmptyState, FilmButton, FrameLabel, WhatsAppIcon } from "@/compo
 import { DaysStepper, RentalRangePicker } from "@/components/film/rental-controls"
 import { MobileStickyBar } from "@/components/film/mobile-sticky-bar"
 import { TierTable, useDurationTiers } from "@/components/film/duration-tiers"
+import { trackWhatsAppClick } from "@/lib/track"
 
 const DELIVERY_FEE = 200
 const TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"]
@@ -199,6 +200,13 @@ Subtotal: ${formatINR(total)}${deliveryFee ? `\nDelivery: from ${formatINR(deliv
 Notes: ${customer.notes.trim() || "None"}`
 
     window.open(whatsappLink(message), "_blank", "noopener,noreferrer")
+
+    // Track the checkout click
+    trackWhatsAppClick({
+      event_type: "cart_checkout",
+      product_names: items.map((i) => i.name).join(", "),
+      cart_total: grandTotal,
+    })
   }
 
   if (items.length === 0) {
