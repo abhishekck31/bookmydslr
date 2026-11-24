@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 # pyrefly: ignore [missing-import]
 from unfold.admin import ModelAdmin
-from .models import Product, Category, Brand, GlobalDiscount
+from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
@@ -18,6 +18,22 @@ class BrandAdmin(ModelAdmin):
 class GlobalDiscountAdmin(ModelAdmin):
     list_display = ('offer_name', 'discount_percentage', 'is_active', 'created_at')
     list_editable = ('is_active',)
+
+@admin.register(DurationDiscount)
+class DurationDiscountAdmin(ModelAdmin):
+    list_display = ('__str__', 'min_days', 'max_days', 'discount_percentage', 'label', 'is_active')
+    list_display_links = ('__str__',)
+    list_editable = ('discount_percentage', 'is_active')
+    ordering = ('min_days',)
+    fieldsets = (
+        ('Rental length', {
+            'fields': ('min_days', 'max_days'),
+            'description': 'Both ends are inclusive. Example: 1 and 10 means rentals of 1 to 10 days. Leave the maximum empty for "and above".',
+        }),
+        ('Discount', {
+            'fields': ('discount_percentage', 'label', 'is_active'),
+        }),
+    )
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):

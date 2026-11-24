@@ -7,6 +7,8 @@ import { CartGlowProvider } from "@/components/cart-glow-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { FilmHeader } from "@/components/film/header"
 import { MobileStickyBar } from "@/components/film/mobile-sticky-bar"
+import { DurationTiersProvider } from "@/components/film/duration-tiers"
+import type { DurationTier } from "@/lib/film"
 
 /** Pages that render their own mobile sticky bar. */
 const OWN_STICKY_BAR = [/^\/product\//, /^\/cart/]
@@ -14,14 +16,17 @@ const OWN_STICKY_BAR = [/^\/product\//, /^\/cart/]
 export function Providers({
   children,
   footer,
+  durationTiers,
 }: {
   children: React.ReactNode
   footer: React.ReactNode
+  durationTiers: DurationTier[]
 }) {
   const pathname = usePathname() ?? "/"
   const isAdmin = pathname.startsWith("/admin")
 
   return (
+    <DurationTiersProvider tiers={durationTiers}>
     <CartProvider>
       <CartGlowProvider>
         {isAdmin ? (
@@ -45,5 +50,6 @@ export function Providers({
         <Toaster />
       </CartGlowProvider>
     </CartProvider>
+    </DurationTiersProvider>
   )
 }

@@ -4,6 +4,7 @@ import { IBM_Plex_Mono, Instrument_Sans, Instrument_Serif } from "next/font/goog
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { FilmFooter } from "@/components/film/footer"
+import { fetchDurationTiers } from "@/lib/api"
 import { JsonLd } from "@/components/seo/json-ld"
 import { buildMetadata } from "@/lib/seo/metadata"
 import { buildLocalBusinessSchema, buildOrganizationSchema } from "@/lib/seo/schema"
@@ -54,7 +55,7 @@ export const metadata: Metadata = {
   manifest: '/favicon_io/site.webmanifest',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
@@ -63,7 +64,9 @@ export default function RootLayout({
     <html lang="en-IN" suppressHydrationWarning>
       <body className={`${serif.variable} ${sans.variable} ${mono.variable} font-sans`} suppressHydrationWarning>
         <JsonLd data={[buildOrganizationSchema(), buildLocalBusinessSchema()]} />
-        <Providers footer={<FilmFooter />}>{children}</Providers>
+        <Providers footer={<FilmFooter />} durationTiers={await fetchDurationTiers()}>
+          {children}
+        </Providers>
       </body>
     </html>
   )

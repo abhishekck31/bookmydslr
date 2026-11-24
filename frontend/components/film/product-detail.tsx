@@ -7,15 +7,17 @@ import type { Product } from "@/types"
 import { useCart } from "@/components/cart-provider"
 import { useCartGlow } from "@/components/cart-glow-provider"
 import {
-  LONG_RENTAL_MIN_DAYS,
   addDaysISO,
   daysBetween,
   formatINR,
   formatShortDate,
+  formatPercent,
+  formatTierRange,
   getPricing,
-  longRentalRate,
+  nextTier,
   productFrameCode,
   rentalTotal,
+  tierFor,
   tomorrowISO,
   whatsappLink,
 } from "@/lib/film"
@@ -24,10 +26,12 @@ import { DaysStepper, RentalRangePicker } from "./rental-controls"
 import { FilmAccordion } from "./faq"
 import { ContactSheet, FilmProductCard } from "./product-card"
 import { MobileStickyBar } from "./mobile-sticky-bar"
+import { TierTable, useDurationTiers } from "./duration-tiers"
 
 export function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
   const { addItem, dates, setDates } = useCart()
   const { triggerCartGlow } = useCartGlow()
+  const tiers = useDurationTiers()
   const pricing = getPricing(product)
   const code = productFrameCode(product)
 
@@ -45,9 +49,10 @@ export function ProductDetail({ product, related }: { product: Product; related:
 
   const end = addDaysISO(start, days)
   const subtotal = pricing.price * days
-  const total = rentalTotal(pricing.price, days)
+  const total = rentalTotal(pricing.price, days, tiers)
   const saving = subtotal - total
-  const rate = longRentalRate(days)
+  const tier = tierFor(days, tiers)
+  const upcoming = nextTier(days, tiers)
 
   const handleAdd = () => {
     addItem({
@@ -69,6 +74,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
     `${product.name}${product.brand ? ` (${product.brand})` : ""}`,
     `Dates: ${formatShortDate(start)} → ${formatShortDate(end)} (${days} ${days === 1 ? "day" : "days"})`,
     `Rate: ${formatINR(pricing.price)}/day`,
+    ...(tier && saving > 0 ? [`Duration discount: ${formatPercent(tier.percent)} (−${formatINR(saving)})`] : []),
     `Estimated total: ${formatINR(total)}`,
     "",
     "Please confirm availability.",
@@ -200,22 +206,29 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 </span>
                 <span className="price text-foreground">{formatINR(subtotal)}</span>
               </p>
-              {saving > 0 ? (
+              {tier && saving > 0 ? (
                 <p className="mt-2 flex justify-between gap-2 text-sm text-success">
-                  <span>Long-rental saving ({Math.round(rate * 100)}%)</span>
+                  <span>
+                    {tier.label ?? "Duration discount"} · {formatPercent(tier.percent)} off {formatTierRange(tier)}
+                  </span>
                   <span className="price">−{formatINR(saving)}</span>
                 </p>
               ) : null}
               <p className="mt-3 flex items-baseline justify-between gap-2 border-t border-border pt-3">
                 <span className="label-mono text-muted-foreground">Estimated total</span>
-                <span className="price text-[28px] text-primary">{formatINR(total)}</span>
+                <span className="flex items-baseline gap-2">
+                  {saving > 0 ? <s className="price text-sm text-subtle">{formatINR(subtotal)}</s> : null}
+                  <span className="price text-[28px] text-primary">{formatINR(total)}</span>
+                </span>
               </p>
-              {days < LONG_RENTAL_MIN_DAYS ? (
-                <p className="mt-2 text-xs text-muted-foreground">Rent for {LONG_RENTAL_MIN_DAYS}+ days and save 20%.</p>
-              ) : days >= 10 ? (
-                <p className="mt-2 text-xs text-muted-foreground">10+ days gets a custom quote — ask us on WhatsApp.</p>
+              {upcoming ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Rent {upcoming.minDays}+ days and save {formatPercent(upcoming.percent)}.
+                </p>
               ) : null}
             </div>
+
+            <TierTable days={days} className="mt-6" />
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {product.isAvailable ? (

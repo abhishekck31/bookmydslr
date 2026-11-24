@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
-from .models import Product, Category, Brand, GlobalDiscount
-from .serializers import ProductSerializer, CategorySerializer, BrandSerializer, GlobalDiscountSerializer
+from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount
+from .serializers import ProductSerializer, CategorySerializer, BrandSerializer, GlobalDiscountSerializer, DurationDiscountSerializer
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -32,3 +32,13 @@ class ProductViewSet(viewsets.ModelViewSet):
         instance.is_active = False
         instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DurationDiscountViewSet(viewsets.ReadOnlyModelViewSet):
+    """Public, read-only list of active duration discount tiers. Edited in the Django admin."""
+    serializer_class = DurationDiscountSerializer
+    pagination_class = None
+    filter_backends = []
+
+    def get_queryset(self):
+        return DurationDiscount.objects.filter(is_active=True).order_by('min_days')

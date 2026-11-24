@@ -65,20 +65,57 @@ export function getPricing(product: Pick<Product, "price" | "discountPercentage"
   return { price: base }
 }
 
-/** Long-rental discount: 20% for 3–6 days, 25% for 7–9 days, custom quote from 10 days. */
-export const LONG_RENTAL_MIN_DAYS = 3
+/* ---------------------------------------------------------------- */
+/* Duration discounts — configured in the Django admin               */
+/* ---------------------------------------------------------------- */
 
-export function longRentalRate(days: number): number {
-  if (days >= 10) return 0
-  if (days >= 7) return 0.25
-  if (days >= LONG_RENTAL_MIN_DAYS) return 0.2
-  return 0
+export type DurationTier = {
+  minDays: number
+  /** Inclusive upper bound; null means "and above". */
+  maxDays: number | null
+  percent: number
+  label?: string
 }
 
-export function rentalTotal(pricePerDay: number, days: number): number {
+/**
+ * Used only when the backend has no duration-discount endpoint yet, so the
+ * site keeps its previous behaviour (20% for 3–6 days, 25% for 7–9 days).
+ * Once the endpoint is live, the admin-configured tiers replace these —
+ * including an empty list, which means no duration discounts.
+ */
+export const DEFAULT_DURATION_TIERS: DurationTier[] = [
+  { minDays: 3, maxDays: 6, percent: 20 },
+  { minDays: 7, maxDays: 9, percent: 25 },
+]
+
+export function tierFor(days: number, tiers: DurationTier[]): DurationTier | null {
+  return tiers.find((t) => days >= t.minDays && (t.maxDays === null || days <= t.maxDays)) ?? null
+}
+
+/** The next tier that would give a bigger discount than the current one. */
+export function nextTier(days: number, tiers: DurationTier[]): DurationTier | null {
+  const current = tierFor(days, tiers)?.percent ?? 0
+  return (
+    [...tiers]
+      .sort((a, b) => a.minDays - b.minDays)
+      .find((t) => t.minDays > days && t.percent > current) ?? null
+  )
+}
+
+export function rentalTotal(pricePerDay: number, days: number, tiers: DurationTier[]): number {
   if (days <= 0) return 0
-  const base = pricePerDay * days
-  return Math.round(base * (1 - longRentalRate(days)))
+  const pct = tierFor(days, tiers)?.percent ?? 0
+  return Math.round(pricePerDay * days * (1 - pct / 100))
+}
+
+export function formatTierRange(t: DurationTier): string {
+  if (t.maxDays === null) return `${t.minDays}+ days`
+  if (t.maxDays === t.minDays) return `${t.minDays} ${t.minDays === 1 ? "day" : "days"}`
+  return `${t.minDays}–${t.maxDays} days`
+}
+
+export function formatPercent(p: number): string {
+  return `${Number.isInteger(p) ? p : p.toFixed(1)}%`
 }
 
 /* ---------------------------------------------------------------- */

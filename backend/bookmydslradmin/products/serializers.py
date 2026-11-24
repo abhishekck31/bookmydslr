@@ -1,6 +1,6 @@
 # pyrefly: ignore [missing-import]
 from rest_framework import serializers
-from .models import Product, Category, Brand, GlobalDiscount
+from .models import Product, Category, Brand, GlobalDiscount, DurationDiscount
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,3 +30,9 @@ class ProductSerializer(serializers.ModelSerializer):
             'is_available', 'is_active', 'created_at'
         ]
         read_only_fields = ['id', 'created_at']
+
+
+class DurationDiscountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DurationDiscount
+        fields = ['id', 'min_days', 'max_days', 'discount_percentage', 'label']

@@ -12,14 +12,16 @@ import {
   daysBetween,
   formatINR,
   formatShortDate,
-  longRentalRate,
+  formatPercent,
   rentalTotal,
+  tierFor,
   tomorrowISO,
   whatsappLink,
 } from "@/lib/film"
 import { Arrow, EmptyState, FilmButton, FrameLabel, WhatsAppIcon } from "@/components/film/primitives"
 import { DaysStepper, RentalRangePicker } from "@/components/film/rental-controls"
 import { MobileStickyBar } from "@/components/film/mobile-sticky-bar"
+import { TierTable, useDurationTiers } from "@/components/film/duration-tiers"
 
 const DELIVERY_FEE = 200
 const TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"]
@@ -80,7 +82,10 @@ function CartLine({
   onDays: (d: number) => void
   onRemove: () => void
 }) {
-  const total = rentalTotal(item.price, item.days)
+  const tiers = useDurationTiers()
+  const total = rentalTotal(item.price, item.days, tiers)
+  const tier = tierFor(item.days, tiers)
+  const full = item.price * item.days
   return (
     <li className="grid grid-cols-[88px_minmax(0,1fr)] gap-4 bg-background p-4 md:grid-cols-[120px_minmax(0,1fr)_auto] md:items-center md:gap-6">
       <Link href={`/product/${item.id}`} className="relative block aspect-square bg-tile" tabIndex={-1} aria-hidden>
@@ -98,6 +103,9 @@ function CartLine({
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
           <span className="price text-body">{formatINR(item.price)}</span> / day
+          {tier && total < full ? (
+            <span className="ml-2 text-success">· {formatPercent(tier.percent)} off for {item.days} days</span>
+          ) : null}
         </p>
         <div className="mt-3 md:hidden">
           <DaysStepper value={item.days} onChange={onDays} size="sm" label={`Rental days for ${item.name}`} />
@@ -107,7 +115,10 @@ function CartLine({
         <div className="hidden md:block">
           <DaysStepper value={item.days} onChange={onDays} size="sm" label={`Rental days for ${item.name}`} />
         </div>
-        <p className="price text-[22px] text-primary">{formatINR(total)}</p>
+        <p className="flex items-baseline gap-2">
+          {total < full ? <s className="price text-sm text-subtle">{formatINR(full)}</s> : null}
+          <span className="price text-[22px] text-primary">{formatINR(total)}</span>
+        </p>
         <button
           type="button"
           onClick={onRemove}
@@ -143,7 +154,8 @@ export default function CartPage() {
   }
 
   const subtotal = items.reduce((s, i) => s + i.price * i.days, 0)
-  const total = items.reduce((s, i) => s + rentalTotal(i.price, i.days), 0)
+  const tiers = useDurationTiers()
+  const total = items.reduce((s, i) => s + rentalTotal(i.price, i.days, tiers), 0)
   const saving = subtotal - total
   const deliveryFee = method === "delivery" ? DELIVERY_FEE : 0
   const grandTotal = total + deliveryFee
@@ -160,9 +172,9 @@ export default function CartPage() {
 
     const lines = items
       .map((i, n) => {
-        const t = rentalTotal(i.price, i.days)
-        const off = longRentalRate(i.days)
-        return `${n + 1}. ${i.name}\n   ${formatINR(i.price)}/day × ${i.days} ${i.days === 1 ? "day" : "days"} = ${formatINR(t)}${off ? ` (${Math.round(off * 100)}% long-rental saving)` : ""}`
+        const t = rentalTotal(i.price, i.days, tiers)
+        const off = t < i.price * i.days ? tierFor(i.days, tiers)?.percent ?? 0 : 0
+        return `${n + 1}. ${i.name}\n   ${formatINR(i.price)}/day × ${i.days} ${i.days === 1 ? "day" : "days"} = ${formatINR(t)}${off ? ` (${formatPercent(off)} duration discount)` : ""}`
       })
       .join("\n")
 
@@ -355,7 +367,7 @@ Notes: ${customer.notes.trim() || "None"}`
                 </div>
                 {saving > 0 ? (
                   <div className="flex justify-between gap-4 text-success">
-                    <dt>Long-rental saving</dt>
+                    <dt>Duration discount</dt>
                     <dd className="price">−{formatINR(saving)}</dd>
                   </div>
                 ) : null}
@@ -369,8 +381,9 @@ Notes: ${customer.notes.trim() || "None"}`
                 </div>
               </dl>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                A refundable security deposit may apply. Save 20% on 3–6 days and 25% on 7–9 days; 10+ days gets a custom quote. We confirm the final amount on WhatsApp.
+                A refundable security deposit may apply. We confirm the final amount on WhatsApp.
               </p>
+              <TierTable className="mt-5" />
               <FilmButton variant="whatsapp" size="lg" className="mt-6 hidden w-full md:inline-flex" onClick={send}>
                 <WhatsAppIcon /> Send booking on WhatsApp
               </FilmButton>

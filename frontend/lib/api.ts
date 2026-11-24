@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { API_BASE_URL, PUBLIC_API_BASE_URL, getApiBaseUrl } from "@/config/constants";
 import { Product, Category, GlobalSettings } from "@/types";
+import { DEFAULT_DURATION_TIERS, type DurationTier } from "@/lib/film";
 
 export { API_BASE_URL };
 
@@ -230,6 +231,54 @@ export const fetchGlobalSettings = cache(async (): Promise<GlobalSettings> => {
     }
     return data;
 });
+
+interface ApiDurationDiscount {
+    id: number;
+    min_days: number;
+    max_days: number | null;
+    discount_percentage: string | number;
+    label?: string;
+}
+
+/**
+ * Duration discount tiers from the Django admin.
+ * Falls back to the previous fixed tiers if the endpoint is not deployed
+ * or the backend is unreachable, so pricing never breaks a page.
+ */
+// One shared lookup per server process for 60s: the root layout asks on every
+// page render, and a burst of parallel calls (e.g. during `next build`) gets
+// throttled by PythonAnywhere.
+const TIERS_TTL_MS = 60_000;
+let tiersMemo: { at: number; promise: Promise<DurationTier[]> } | null = null;
+
+export const fetchDurationTiers = cache(async (): Promise<DurationTier[]> => {
+    if (!tiersMemo || Date.now() - tiersMemo.at > TIERS_TTL_MS) {
+        tiersMemo = { at: Date.now(), promise: loadDurationTiers() };
+    }
+    return tiersMemo.promise;
+});
+
+async function loadDurationTiers(): Promise<DurationTier[]> {
+    try {
+        const data = await fetchAPI<ApiDurationDiscount[] | PaginatedResponse<ApiDurationDiscount>>('/duration-discounts/', {}, 1);
+        if (!data) return DEFAULT_DURATION_TIERS;
+        const rows = Array.isArray(data) ? data : data.results;
+        if (!Array.isArray(rows)) return DEFAULT_DURATION_TIERS;
+        return rows
+            .map((r) => ({
+                minDays: Number(r.min_days),
+                maxDays: r.max_days === null || r.max_days === undefined ? null : Number(r.max_days),
+                percent: Number(r.discount_percentage),
+                label: r.label?.trim() || undefined,
+            }))
+            .filter((t) => t.minDays >= 1 && t.percent > 0 && t.percent <= 100)
+            .sort((a, b) => a.minDays - b.minDays);
+    } catch (error) {
+        console.warn("[API] Duration discounts unavailable, using defaults", error);
+        tiersMemo = null; // retry on the next request instead of pinning the fallback
+        return DEFAULT_DURATION_TIERS;
+    }
+}
 
 // Re-export generic if needed, but prefer specific
 export { fetchAPI as fetchGeneric };
