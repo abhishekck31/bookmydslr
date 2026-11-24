@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Menu, Search, X } from "lucide-react"
@@ -28,6 +29,19 @@ const MORE_NAV = [
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
+}
+
+export function Logo({ className }: { className?: string }) {
+  return (
+    <Image
+      src="/images/logo.png"
+      alt=""
+      width={44}
+      height={44}
+      priority
+      className={cn("h-9 w-9 shrink-0 md:h-11 md:w-11", className)}
+    />
+  )
 }
 
 export function Wordmark({ className }: { className?: string }) {
@@ -113,7 +127,12 @@ export function FilmHeader() {
         </nav>
 
         {/* Center: wordmark */}
-        <Link href="/" className="justify-self-start lg:justify-self-center" aria-label="Book My DSLR — home">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 justify-self-start md:gap-3 lg:justify-self-center"
+          aria-label="Book My DSLR — home"
+        >
+          <Logo />
           <Wordmark />
         </Link>
 
@@ -137,7 +156,8 @@ export function FilmHeader() {
               <Dialog.Content className="fixed inset-x-0 top-0 z-50 max-h-[100dvh] overflow-y-auto border-b border-border bg-background pb-8 data-[state=open]:animate-in data-[state=open]:fade-in-0">
                 <div className="film-container flex h-16 items-center justify-between border-b border-border">
                   <Dialog.Title asChild>
-                    <span>
+                    <span className="flex items-center gap-2.5">
+                      <Logo />
                       <Wordmark />
                     </span>
                   </Dialog.Title>
