@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { API_BASE_URL } from "@/config/constants";
+import { API_BASE_URL, PUBLIC_API_BASE_URL, getApiBaseUrl } from "@/config/constants";
 import { Product, Category, GlobalSettings } from "@/types";
 
 export { API_BASE_URL };
@@ -17,11 +17,16 @@ function slugify(text: string): string {
 // Generic fetch wrapper with automatic retry logic
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}, retries = 3): Promise<T | null> {
     try {
+        const baseUrl = getApiBaseUrl().replace(/\/$/, '');
         let url: string;
         if (endpoint.startsWith('http')) {
-            url = endpoint;
+            // DRF pagination returns absolute `next` links built from whatever host
+            // Django saw (internal service URL or public domain). Re-base them on
+            // the URL that works in the current environment.
+            const parsed = new URL(endpoint);
+            const apiPath = parsed.pathname.replace(/^\/api(?=\/|$)/, '');
+            url = `${baseUrl}${apiPath}${parsed.search}`;
         } else {
-            const baseUrl = API_BASE_URL.replace(/\/$/, '');
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             url = `${baseUrl}${path}`;
         }
@@ -99,7 +104,7 @@ function getImageUrl(imagePath?: string): string {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
     // Remove /api from base url to get root
-    const rootUrl = API_BASE_URL.replace('/api', '').replace(/\/$/, '');
+    const rootUrl = PUBLIC_API_BASE_URL.replace(/\/api\/?$/, '').replace(/\/$/, '');
     const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
     return `${rootUrl}${path}`;
 }
