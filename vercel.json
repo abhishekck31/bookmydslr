@@ -7,22 +7,10 @@
     },
     "frontend": {
       "root": "frontend",
-      "framework": "nextjs",
-      "bindings": [
-        {
-          "type": "service",
-          "service": "bookmydslradmin",
-          "format": "url",
-          "env": "BOOKMYDSLRADMIN_URL"
-        }
-      ]
+      "framework": "nextjs"
     }
   },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": { "service": "bookmydslradmin" }
-    },
     {
       "source": "/(.*)",
       "destination": { "service": "frontend" }
