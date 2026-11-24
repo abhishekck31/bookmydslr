@@ -48,7 +48,7 @@ export function LocalityPage({
 
   const facts4: [string, string][] = [
     ["Pickup", "Kalyan Nagar, Hennur Main Road"],
-    [l.proximity === "pickup" ? "Delivery" : `Delivery to ${l.name}`, `From ${formatINR(DELIVERY_FROM)}, by distance`],
+    [l.proximity === "pickup" ? "Delivery" : `Delivery to ${l.name}`, l.proximity === "outskirts" ? "On request" : `From ${formatINR(DELIVERY_FROM)}, by distance`],
     ["Rates", camsFrom ? `Cameras from ${formatINR(camsFrom)}/day` : "Per day, shown on each item"],
     ["Open", "8 am – 10 pm, every day"],
   ]
@@ -80,7 +80,9 @@ export function LocalityPage({
             </h1>
             <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-body">
               Rent DSLR and mirrorless cameras, lenses, drones, lights and audio gear for your shoot in {l.name}.{" "}
-              {l.proximity === "city"
+              {l.proximity === "outskirts"
+                ? `Collect from our Kalyan Nagar pickup point, or ask us about delivery to ${l.name}.`
+                : l.proximity === "city"
                 ? `Collect from our Kalyan Nagar pickup point or get it delivered to ${l.name}.`
                 : `Our pickup point in Kalyan Nagar is ${l.proximity === "pickup" ? "right here" : "next door"}, and delivery is available too.`}{" "}
               {facts.total} items listed, with live prices and availability.

@@ -102,6 +102,15 @@ export function deliveryCopy(l: Locality): { headline: string; body: string[] } 
       ],
     }
   }
+  if (l.proximity === "outskirts") {
+    return {
+      headline: `Getting your gear to ${l.name}`,
+      body: [
+        `${l.name} is on the outskirts of Bangalore. We don't have a branch here — all gear is handed over from our pickup point in Kalyan Nagar (${PICKUP_ADDRESS_LINE}).`,
+        `Delivery to ${l.name} is arranged on request: tell us your address and dates and we'll confirm whether we can deliver and the charge (from ${formatINR(DELIVERY_FROM)}, based on distance) before you book.`,
+      ],
+    }
+  }
   return {
     headline: `Getting your gear to ${l.name}`,
     body: [
@@ -134,8 +143,9 @@ export function buildLocalityFaqs(l: Locality, facts: InventoryFacts, tiers: Dur
     },
     {
       question: `Do you deliver cameras to ${l.name}?`,
-      answer:
-        `Yes, we can deliver to ${l.name}. Delivery starts at ${formatINR(DELIVERY_FROM)} and the charge depends on the distance from Kalyan Nagar; ` +
+      answer: l.proximity === "outskirts"
+        ? `${l.name} is on the city's outskirts, so delivery is arranged on request. Message or call us with your address and dates; we'll confirm whether we can deliver and the charge (from ${formatINR(DELIVERY_FROM)}, based on distance) before you book. You can always collect from Kalyan Nagar.`
+        : `Yes, we can deliver to ${l.name}. Delivery starts at ${formatINR(DELIVERY_FROM)} and the charge depends on the distance from Kalyan Nagar; ` +
         `we confirm the exact amount and timing on WhatsApp or by phone when you book.`,
     },
     {
@@ -178,7 +188,8 @@ export function localityMetaDescription(l: Locality, facts: InventoryFacts | nul
   const from = facts?.groups.cameras.minPrice ? ` Cameras from ${formatINR(facts.groups.cameras.minPrice)}/day.` : ""
   const pickup =
     l.proximity === "pickup" ? "Pickup right here in Kalyan Nagar" : l.proximity === "adjacent" ? "Pickup next door in Kalyan Nagar" : "Pickup in Kalyan Nagar"
-  return `Rent DSLR & mirrorless cameras, lenses and drones in ${l.name}, Bangalore. ${pickup} or delivery from ${formatINR(DELIVERY_FROM)}.${from}`
+  const how = l.proximity === "outskirts" ? `${pickup}; delivery on request.` : `${pickup} or delivery from ${formatINR(DELIVERY_FROM)}.`
+  return `Rent DSLR & mirrorless cameras, lenses and drones in ${l.name}, Bangalore. ${how}${from}`
 }
 
 export function localityKeywords(l: Locality): string[] {

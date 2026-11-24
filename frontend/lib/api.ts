@@ -191,7 +191,30 @@ export const fetchCategories = cache(async (): Promise<Category[]> => {
     return allCategories.map(mapCategory);
 });
 
+// One shared catalogue load per server process for 30s (same as the fetch
+// revalidate). Without it, every statically generated page — 200+ locality
+// pages at build time — fetches all product pages in parallel and
+// PythonAnywhere throttles the burst. Only a non-empty result is shared.
+const PRODUCTS_TTL_MS = 30_000;
+let productsMemo: { at: number; promise: Promise<Product[]> } | null = null;
+
 export const fetchProducts = cache(async (): Promise<Product[]> => {
+    if (productsMemo && Date.now() - productsMemo.at < PRODUCTS_TTL_MS) {
+        return productsMemo.promise;
+    }
+    const memo = { at: Date.now(), promise: loadAllProducts() };
+    productsMemo = memo;
+    try {
+        const products = await memo.promise;
+        if (products.length === 0 && productsMemo === memo) productsMemo = null;
+        return products;
+    } catch (error) {
+        if (productsMemo === memo) productsMemo = null;
+        throw error;
+    }
+});
+
+async function loadAllProducts(): Promise<Product[]> {
     let allProducts: ApiProduct[] = [];
     let nextUrl: string | null = '/products/?page_size=250';
 
@@ -213,7 +236,7 @@ export const fetchProducts = cache(async (): Promise<Product[]> => {
     }
 
     return allProducts.map(mapProduct);
-});
+}
 
 
 export const fetchProduct = cache(async (id: string): Promise<Product | null> => {

@@ -19,7 +19,7 @@ export type Region = "North" | "North-East" | "East" | "South-East" | "South" | 
  * delivery copy. Never a promise of timing — the charge is confirmed per
  * booking.
  */
-export type Proximity = "pickup" | "adjacent" | "city"
+export type Proximity = "pickup" | "adjacent" | "city" | "outskirts"
 
 export type InventoryGroupKey = "cameras" | "lenses" | "drones" | "action" | "gimbals" | "lighting" | "audio" | "accessories"
 
@@ -507,10 +507,241 @@ export function slugifyLocality(name: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
-const publishedNames = new Set(PUBLISHED.map((l) => l.name))
+/* ---------------------------------------------------------------- */
+/* Batch 3 — the rest of the master list                             */
+/* name | region | kind | nearby;nearby;...                          */
+/* kind: n neighbourhood, r road/corridor, c commercial area,        */
+/*       t town on the outskirts (delivery on request)               */
+/* ---------------------------------------------------------------- */
+
+const BATCH_3_ROWS = `
+Adugodi|South-East|n|Koramangala;Wilson Garden;Ejipura;Madiwala
+Agara|South-East|n|HSR Layout;Bellandur;Koramangala
+Agrahara Layout|North|n|Jakkur;Yelahanka;Amruthahalli
+Akshayanagar|South|n|Hulimavu;Begur;Bannerghatta Road
+Allalasandra|North|n|Yelahanka;Jakkur;Agrahara Layout
+Ambalipura|South-East|n|Bellandur;Sarjapur Road;Kasavanahalli
+Amruthahalli|North|n|Sahakara Nagar;Jakkur;Kodigehalli;Byatarayanapura
+Anjanapura|South|n|Kanakapura Road;Talaghattapura;Konanakunte
+Arekere|South|n|Bannerghatta Road;Hulimavu;Bilekahalli;Puttenahalli
+Arkavathy Layout|North-East|n|Thanisandra;Jakkur;Rachenahalli
+Attibele|South|t|Chandapura;Bommasandra;Electronic City
+Attiguppe|West|n|Vijayanagar;Chandra Layout;Mysore Road
+Austin Town|Central|n|Richmond Town;Langford Town;Ejipura
+Bagalur|North-East|t|Byrathi;Kothanur;Devanahalli
+Balagere|East|n|Varthur;Panathur;Whitefield
+Banashankari 6th Stage|South|n|Banashankari;Uttarahalli;Talaghattapura;Kengeri
+Bannerghatta|South|t|Bannerghatta Road;Gottigere;Jigani
+Basapura|South|n|Electronic City;Hosa Road;Begur
+Basaveshwaranagar|West|n|Rajajinagar;Vijayanagar;Kamakshipalya;Nagarbhavi
+Begur|South|n|Bommanahalli;Hulimavu;Electronic City;Akshayanagar
+Benson Town|Central|n|Frazer Town;Jayamahal;Shivajinagar
+Bharathi Nagar|Central|n|Shivajinagar;Frazer Town;Ulsoor
+Bhoopasandra|North|n|Sanjay Nagar;RT Nagar;Hebbal
+Bidadi|West|t|Kengeri;Mysore Road;Kumbalgodu
+Bilekahalli|South|n|Bannerghatta Road;Arekere;BTM Layout;JP Nagar
+Bommanahalli|South-East|n|HSR Layout;Begur;Garvebhavi Palya;Hosa Road
+Bommasandra|South|n|Electronic City;Chandapura;Hosa Road;Jigani
+Brookefield|East|n|Whitefield;Kundalahalli;Marathahalli
+Brigade Road|Central|r|MG Road;Richmond Town;Central Business District
+Budigere|East|t|Old Madras Road;Hoskote;KR Puram
+Byatarayanapura|North|n|Sahakara Nagar;Kodigehalli;Amruthahalli
+Byrathi|North-East|n|Kothanur;Hennur;Bagalur
+Carmelaram|South-East|n|Sarjapur Road;Doddakannelli;Ambalipura
+Central Business District|Central|c|MG Road;Brigade Road;Lavelle Road
+Chamarajpet|Central|n|Basavanagudi;KR Market;Cottonpet
+Chandra Layout|West|n|Vijayanagar;Attiguppe;Nagarbhavi
+Chandapura|South|t|Bommasandra;Attibele;Electronic City
+Channasandra|East|n|Kadugodi;Whitefield;Hope Farm
+Chikkabanavara|North|n|Jalahalli West;Hesaraghatta Road;Dasarahalli
+Chikkalasandra|South|n|Uttarahalli;Padmanabhanagar;Subramanyapura;Banashankari
+Chikkajala|North|t|Yelahanka;Devanahalli;Bagalur
+Chikkathoguru|South|n|Electronic City;Neeladri Nagar;Begur
+Choodasandra|South-East|n|Kasavanahalli;Hosa Road;Sarjapur Road
+Cooke Town|North-East|n|Frazer Town;Cox Town;Banaswadi
+Cottonpet|Central|n|KR Market;Chamarajpet;Magadi Road
+Cox Town|North-East|n|Frazer Town;Cooke Town;Ulsoor
+Dasanapura|North|t|Nelamangala;Dasarahalli;Chikkabanavara
+Dasarahalli|North|n|Jalahalli;Peenya;Chikkabanavara
+Deepanjali Nagar|West|n|Mysore Road;Attiguppe;Nayandahalli
+Devanahalli|North|t|Chikkajala;Yelahanka;Bagalur
+Devarachikkanahalli|South|n|Bommanahalli;Begur;Hulimavu
+Doddaballapur|North|t|Yelahanka;Rajankunte;Devanahalli
+Doddakallasandra|South|n|Konanakunte;Kanakapura Road;Talaghattapura
+Doddakannelli|South-East|n|Sarjapur Road;Carmelaram;Bellandur
+Doddakammanahalli|South|n|Bannerghatta Road;Gottigere;Akshayanagar
+Doddanekkundi|East|n|Marathahalli;Mahadevapura;Kundalahalli
+Dommasandra|South-East|t|Sarjapur;Varthur;Sarjapur Road
+Dollar Colony|North|n|Sanjay Nagar;New BEL Road;RT Nagar
+Ejipura|South-East|n|Koramangala;Domlur;Austin Town
+Ganganagar|North|n|RT Nagar;Sanjay Nagar;Mathikere
+Garvebhavi Palya|South-East|n|Bommanahalli;HSR Layout;Kudlu Gate
+Gottigere|South|n|Bannerghatta Road;Hulimavu;Bannerghatta
+Gunjur|East|n|Varthur;Balagere;Panathur
+Hagadur|East|n|Whitefield;Channasandra;Kadugodi
+HAL|East|n|Indiranagar;Domlur;Old Airport Road;Vimanapura
+Hebbal Kempapura|North|n|Hebbal;Nagavara;Sahakara Nagar
+Hegde Nagar|North-East|n|Thanisandra;Jakkur;Rachenahalli
+Herohalli|West|n|Magadi Road;Sunkadakatte;Nagarbhavi
+Hesaraghatta|North|t|Hesaraghatta Road;Chikkabanavara;Vidyaranyapura
+Hesaraghatta Road|North|r|Jalahalli West;Chikkabanavara;Hesaraghatta
+Hoodi|East|n|Whitefield;KR Puram;Mahadevapura
+Hope Farm|East|n|Whitefield;Kadugodi;Channasandra
+Hulimavu|South|n|Bannerghatta Road;Arekere;Akshayanagar;Begur
+Hosa Road|South|n|Electronic City;Kudlu Gate;Basapura
+Hoskote|East|t|KR Puram;Old Madras Road;Budigere
+Infantry Road|Central|r|Shivajinagar;Vasanth Nagar;Central Business District
+Jakkur|North|n|Yelahanka;Thanisandra;Amruthahalli;Hegde Nagar
+Jalahalli|North|n|Jalahalli East;Jalahalli West;Dasarahalli
+Jalahalli East|North|n|Jalahalli;Vidyaranyapura;Mathikere
+Jalahalli West|North|n|Jalahalli;Chikkabanavara;Hesaraghatta Road
+Jayamahal|Central|n|Benson Town;Vasanth Nagar;Palace Road
+Jeevan Bima Nagar|East|n|Indiranagar;HAL;CV Raman Nagar;New Thippasandra
+Jigani|South|t|Bommasandra;Electronic City;Bannerghatta
+Jnana Bharathi|West|n|Nagarbhavi;Ullal;Mysore Road
+Kadubeesanahalli|East|n|Bellandur;Marathahalli;Panathur
+Kadugodi|East|n|Whitefield;Channasandra;Hope Farm
+Kaggadasapura|East|n|CV Raman Nagar;Vimanapura;New Thippasandra
+Kamakshipalya|West|n|Basaveshwaranagar;Magadi Road;Vijayanagar
+Kanakapura Road|South|r|JP Nagar;Konanakunte;Talaghattapura;Banashankari
+Kannamangala|East|n|Whitefield;Kadugodi;Channasandra
+Kasavanahalli|South-East|n|Sarjapur Road;Choodasandra;Bellandur
+Kasturi Nagar|East|n|Ramamurthy Nagar;Tin Factory;Old Madras Road
+Kathriguppe|South|n|Banashankari;Padmanabhanagar;Srinagar
+Kengeri|West|n|Kengeri Satellite Town;Mysore Road;Ullal;Bidadi
+Kengeri Satellite Town|West|n|Kengeri;Ullal;Mysore Road
+Kodichikkanahalli|South|n|Bommanahalli;Devarachikkanahalli;Begur
+Kodigehalli|North|n|Sahakara Nagar;Amruthahalli;Vidyaranyapura
+Kogilu|North|n|Yelahanka;Jakkur;Yelahanka New Town
+Konanakunte|South|n|Kanakapura Road;JP Nagar;Doddakallasandra;Talaghattapura
+Kothanur|North-East|n|Hennur;Byrathi;Thanisandra
+KR Market|Central|c|Chamarajpet;Cottonpet;Basavanagudi
+Kudlu|South-East|n|Kudlu Gate;HSR Layout;Singasandra
+Kudlu Gate|South-East|n|Kudlu;Garvebhavi Palya;Singasandra;Hosa Road
+Kumaraswamy Layout|South|n|Banashankari;Padmanabhanagar;Uttarahalli;Yelachenahalli
+Kumbalgodu|West|t|Kengeri;Mysore Road;Bidadi
+Kundalahalli|East|n|Brookefield;Marathahalli;Whitefield
+Laggere|West|n|Peenya;Nandini Layout;Rajajinagar
+Langford Town|Central|n|Richmond Town;Shantinagar;Austin Town
+Lavelle Road|Central|r|MG Road;Central Business District;Richmond Town
+Madiwala|South-East|n|BTM Layout;Koramangala;Adugodi
+Magadi Road|West|r|Kamakshipalya;Herohalli;Sunkadakatte;Cottonpet
+Mahadevapura|East|n|KR Puram;Hoodi;Doddanekkundi
+Mahalakshmi Layout|West|n|Rajajinagar;Nandini Layout;Mahalakshmipuram
+Mahalakshmipuram|West|n|Rajajinagar;Basaveshwaranagar;Mahalakshmi Layout
+Mathikere|North|n|Yeshwanthpur;New BEL Road;Jalahalli East
+MG Road|Central|r|Brigade Road;Ulsoor;Central Business District
+Millers Road|Central|r|Vasanth Nagar;Benson Town;Jayamahal
+Moodalapalya|West|n|Nagarbhavi;Chandra Layout;Vijayanagar
+Munnekollal|East|n|Marathahalli;Kundalahalli;Doddanekkundi
+Murphy Town|Central|n|Ulsoor;Indiranagar;Cox Town
+Mysore Road|West|r|Nayandahalli;Kengeri;Deepanjali Nagar;Jnana Bharathi
+Nagarbhavi|West|n|Moodalapalya;Chandra Layout;Jnana Bharathi
+Nagarbhavi 2nd Stage|West|n|Nagarbhavi;Ullal;Jnana Bharathi
+Nagasandra|North|n|Peenya;Dasarahalli;Jalahalli West
+Nallurhalli|East|n|Whitefield;Brookefield;Kundalahalli
+Nandini Layout|West|n|Laggere;Mahalakshmi Layout;Peenya
+Nayandahalli|West|n|Mysore Road;Deepanjali Nagar;Rajarajeshwari Nagar
+Nelamangala|North|t|Dasanapura;Nagasandra;Dasarahalli
+Neeladri Nagar|South|n|Electronic City;Chikkathoguru;Hosa Road
+New BEL Road|North|r|Mathikere;Sanjay Nagar;Dollar Colony
+New Thippasandra|East|n|CV Raman Nagar;HAL;Jeevan Bima Nagar;Indiranagar
+Old Airport Road|East|r|Domlur;HAL;Marathahalli;Indiranagar
+Old Madras Road|East|r|KR Puram;Kasturi Nagar;CV Raman Nagar;Hoskote
+OMBR Layout|North-East|n|Banaswadi;Ramamurthy Nagar;Horamavu
+Padmanabhanagar|South|n|Banashankari;Kumaraswamy Layout;Kathriguppe
+Palace Road|Central|r|Vasanth Nagar;Sadashivanagar;Seshadripuram
+Panathur|East|n|Kadubeesanahalli;Varthur;Balagere;Bellandur
+Parappana Agrahara|South|n|Electronic City;Hosa Road;Singasandra
+Peenya|North|n|Jalahalli;Dasarahalli;Laggere
+Puttenahalli|South|n|JP Nagar;Bilekahalli;Arekere
+Rachenahalli|North-East|n|Thanisandra;Jakkur;Hegde Nagar
+Rajankunte|North|t|Yelahanka;Doddaballapur;Yelahanka Satellite Town
+Rajarajeshwari Nagar|West|n|Kengeri;Mysore Road;Nayandahalli
+Richmond Town|Central|n|Langford Town;Shantinagar;Brigade Road;Austin Town
+RPC Layout|West|n|Vijayanagar;Attiguppe;Chandra Layout
+Sadashivanagar|North|n|Palace Road;Sanjay Nagar;Mathikere
+Sadahalli|North|t|Devanahalli;Chikkajala;Yelahanka
+Sampigehalli|North-East|n|Thanisandra;Jakkur;Hegde Nagar
+Sanjay Nagar|North|n|RT Nagar;New BEL Road;Ganganagar;Dollar Colony
+Sarjapur|South-East|t|Sarjapur Road;Dommasandra;Carmelaram
+Sarjapur Road|South-East|r|Bellandur;Kasavanahalli;Doddakannelli;Carmelaram
+Sarakki|South|n|JP Nagar;Banashankari;Kanakapura Road
+Seshadripuram|Central|n|Palace Road;Sadashivanagar;Vasanth Nagar
+Shantinagar|Central|n|Richmond Town;Wilson Garden;Langford Town
+Shivajinagar|Central|n|Frazer Town;Infantry Road;Bharathi Nagar;Vasanth Nagar
+Singasandra|South-East|n|Kudlu Gate;Hosa Road;Bommanahalli
+Somasundarapalya|South-East|n|HSR Layout;Kasavanahalli;Kudlu
+Srinagar|South|n|Banashankari;Kathriguppe;Basavanagudi
+Subramanyapura|South|n|Uttarahalli;Chikkalasandra;Talaghattapura
+Sunkadakatte|West|n|Herohalli;Magadi Road;Nagarbhavi
+Talaghattapura|South|n|Kanakapura Road;Konanakunte;Subramanyapura
+Thubarahalli|East|n|Whitefield;Kundalahalli;Varthur
+Tin Factory|East|n|KR Puram;Kasturi Nagar;Ramamurthy Nagar
+Ullal|West|n|Kengeri Satellite Town;Nagarbhavi 2nd Stage;Jnana Bharathi
+Uttarahalli|South|n|Subramanyapura;Kumaraswamy Layout;Chikkalasandra;Banashankari 6th Stage
+Varthur|East|n|Whitefield;Balagere;Gunjur;Panathur
+Vasanth Nagar|Central|n|Palace Road;Millers Road;Shivajinagar;Infantry Road
+Vasanthapura|South|n|Uttarahalli;Subramanyapura;Kanakapura Road
+Vajarahalli|South|n|Kanakapura Road;Talaghattapura;Anjanapura
+Vidyaranyapura|North|n|Jalahalli East;Kodigehalli;Amruthahalli
+Vijayanagar|West|n|Attiguppe;Basaveshwaranagar;Chandra Layout;RPC Layout
+Vimanapura|East|n|HAL;Kaggadasapura;Old Airport Road
+Wilson Garden|South|n|Shantinagar;Adugodi;Langford Town
+Yelahanka New Town|North|n|Yelahanka;Yelahanka Satellite Town;Kogilu
+Yelahanka Satellite Town|North|n|Yelahanka;Yelahanka New Town;Rajankunte
+Yelachenahalli|South|n|Kumaraswamy Layout;JP Nagar;Kanakapura Road;Konanakunte
+Yeshwanthpur|North|n|Mathikere;Rajajinagar;Peenya
+`
+
+/** Master-list names shared by several different places in Bangalore — kept as drafts rather than guessed. */
+export const HELD_BACK = ["Avalahalli", "Ramakrishna Nagar", "Seegehalli", "Thavarekere", "Vishwaneedam"]
+
+const OUTSKIRT_SIDE: Record<Region, string> = {
+  North: "northern",
+  "North-East": "north-eastern",
+  East: "eastern",
+  "South-East": "south-eastern",
+  South: "southern",
+  West: "western",
+  Central: "central",
+}
+
+function batch3About(name: string, region: Region, kind: string, nearby: string[]): string {
+  const near = nearby.length > 1 ? `${nearby.slice(0, -1).join(", ")} and ${nearby[nearby.length - 1]}` : nearby[0]
+  switch (kind) {
+    case "r":
+      return `${name} is a road and the area around it in ${region} Bangalore. This page covers shoots along and around ${name}, near ${near}.`
+    case "c":
+      return `${name} is a busy commercial area in ${region} Bangalore, near ${near}.`
+    case "t":
+      return `${name} is on the ${OUTSKIRT_SIDE[region]} outskirts of Bangalore, beyond ${near}. Delivery this far out is arranged on request.`
+    default:
+      return `${name} is a neighbourhood in ${region} Bangalore, close to ${near}.`
+  }
+}
+
+const BATCH_3: Locality[] = BATCH_3_ROWS.trim()
+  .split("\n")
+  .map((line) => line.trim().split("|"))
+  .map(([name, region, kind, nearby]) => {
+    const near = nearby.split(";").map((n) => n.trim())
+    return {
+      name,
+      slug: slugifyLocality(name),
+      published: true,
+      region: region as Region,
+      proximity: kind === "t" ? ("outskirts" as const) : ("city" as const),
+      nearby: near,
+      about: batch3About(name, region as Region, kind, near),
+    }
+  })
+
+const ALL_PUBLISHED = [...PUBLISHED, ...BATCH_3]
+const publishedNames = new Set(ALL_PUBLISHED.map((l) => l.name))
 
 export const LOCALITIES: Locality[] = [
-  ...PUBLISHED,
+  ...ALL_PUBLISHED,
   ...DRAFT_NAMES.filter((n) => !publishedNames.has(n)).map<Locality>((name) => ({
     name,
     slug: slugifyLocality(name),
