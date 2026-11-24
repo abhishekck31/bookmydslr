@@ -251,6 +251,187 @@ const PUBLISHED: Locality[] = [
       "Electronic City is an IT and industrial hub in South Bangalore along Hosur Road, split into Phase 1 and Phase 2, near Bommasandra and Hosa Road.",
     focus: ["cameras", "lenses", "lighting", "audio"],
   },
+
+  /* Batch 2 */
+  {
+    name: "Lingarajapuram",
+    slug: "lingarajapuram",
+    published: true,
+    region: "North-East",
+    proximity: "city",
+    nearby: ["Kammanahalli", "Hennur", "Banaswadi", "Cooke Town"],
+    about:
+      "Lingarajapuram is a residential neighbourhood in North-East Bangalore, close to Kammanahalli and Hennur Road and a short drive from our Kalyan Nagar pickup point.",
+  },
+  {
+    name: "Ramamurthy Nagar",
+    slug: "ramamurthy-nagar",
+    published: true,
+    region: "East",
+    proximity: "city",
+    nearby: ["Banaswadi", "Horamavu", "KR Puram", "Kasturi Nagar"],
+    about:
+      "Ramamurthy Nagar is a residential area in East Bangalore along the Outer Ring Road, between Banaswadi, Horamavu and KR Puram.",
+  },
+  {
+    name: "Thanisandra",
+    slug: "thanisandra",
+    published: true,
+    region: "North-East",
+    proximity: "city",
+    nearby: ["Hennur", "Nagavara", "Hegde Nagar", "Jakkur"],
+    about:
+      "Thanisandra is a growing residential area in North-East Bangalore along Thanisandra Main Road, between Hennur, Nagavara and Jakkur.",
+  },
+  {
+    name: "Nagavara",
+    slug: "nagavara",
+    published: true,
+    region: "North",
+    proximity: "city",
+    aliases: ["Manyata Tech Park"],
+    nearby: ["HBR Layout", "Hebbal", "Thanisandra", "RT Nagar"],
+    about:
+      "Nagavara is in North Bangalore around Nagavara Lake on the Outer Ring Road, and is home to Manyata Tech Park. It sits between HBR Layout and Hebbal.",
+  },
+  {
+    name: "RT Nagar",
+    slug: "rt-nagar",
+    published: true,
+    region: "North",
+    proximity: "city",
+    aliases: ["R T Nagar"],
+    nearby: ["Hebbal", "Ganganagar", "Sanjay Nagar", "Nagavara"],
+    about:
+      "RT Nagar is an established residential area in North Bangalore, south of Hebbal and next to Ganganagar and Sanjay Nagar.",
+  },
+  {
+    name: "Sahakara Nagar",
+    slug: "sahakara-nagar",
+    published: true,
+    region: "North",
+    proximity: "city",
+    nearby: ["Hebbal", "Kodigehalli", "Amruthahalli", "Byatarayanapura"],
+    about:
+      "Sahakara Nagar is a residential area in North Bangalore off Bellary Road, between Hebbal and Yelahanka, near Kodigehalli and Amruthahalli.",
+  },
+  {
+    name: "Yelahanka",
+    slug: "yelahanka",
+    published: true,
+    region: "North",
+    proximity: "city",
+    nearby: ["Yelahanka New Town", "Yelahanka Satellite Town", "Jakkur", "Kogilu"],
+    about:
+      "Yelahanka is a large North Bangalore suburb on the way to the airport, home to the Yelahanka Air Force Station, with the planned Yelahanka New Town next to the old town.",
+    focus: ["cameras", "lenses", "drones", "audio"],
+  },
+  {
+    name: "Frazer Town",
+    slug: "frazer-town",
+    published: true,
+    region: "Central",
+    proximity: "city",
+    nearby: ["Cooke Town", "Benson Town", "Shivajinagar", "Cox Town"],
+    about:
+      "Frazer Town is a historic neighbourhood just north-east of central Bangalore, known for Mosque Road, next to Cooke Town, Cox Town and Benson Town.",
+  },
+  {
+    name: "Ulsoor",
+    slug: "ulsoor",
+    published: true,
+    region: "Central",
+    proximity: "city",
+    aliases: ["Halasuru"],
+    nearby: ["Indiranagar", "MG Road", "Murphy Town"],
+    about:
+      "Ulsoor (Halasuru) is one of central Bangalore's oldest neighbourhoods, built around Ulsoor Lake, between MG Road and Indiranagar.",
+    focus: ["cameras", "lenses", "lighting", "audio"],
+  },
+  {
+    name: "Domlur",
+    slug: "domlur",
+    published: true,
+    region: "East",
+    proximity: "city",
+    nearby: ["Indiranagar", "Old Airport Road", "Ejipura", "HAL"],
+    about:
+      "Domlur is a compact East Bangalore neighbourhood on Old Airport Road, between Indiranagar, Ejipura and the HAL area.",
+    focus: ["cameras", "lenses", "lighting", "audio"],
+  },
+  {
+    name: "CV Raman Nagar",
+    slug: "cv-raman-nagar",
+    published: true,
+    region: "East",
+    proximity: "city",
+    aliases: ["Bagmane Tech Park"],
+    nearby: ["Indiranagar", "Kaggadasapura", "New Thippasandra", "Old Madras Road"],
+    about:
+      "CV Raman Nagar is in East Bangalore, north-east of Indiranagar, and includes Bagmane Tech Park and the DRDO township.",
+    focus: ["cameras", "lenses", "lighting", "audio"],
+  },
+  {
+    name: "KR Puram",
+    slug: "kr-puram",
+    published: true,
+    region: "East",
+    proximity: "city",
+    nearby: ["Ramamurthy Nagar", "Mahadevapura", "Tin Factory", "Hoodi"],
+    about:
+      "KR Puram (Krishnarajapuram) is in East Bangalore on Old Madras Road, with a major railway station, next to Ramamurthy Nagar, Tin Factory and Mahadevapura.",
+  },
+  {
+    name: "Bellandur",
+    slug: "bellandur",
+    published: true,
+    region: "South-East",
+    proximity: "city",
+    nearby: ["Marathahalli", "HSR Layout", "Sarjapur Road", "Kadubeesanahalli", "Agara"],
+    about:
+      "Bellandur is in South-East Bangalore around Bellandur Lake, on the Outer Ring Road tech corridor between HSR Layout, Marathahalli and Sarjapur Road.",
+    focus: ["cameras", "lenses", "lighting", "audio"],
+  },
+  {
+    name: "Basavanagudi",
+    slug: "basavanagudi",
+    published: true,
+    region: "South",
+    proximity: "city",
+    nearby: ["Jayanagar", "Chamarajpet", "Banashankari"],
+    about:
+      "Basavanagudi is one of South Bangalore's oldest neighbourhoods, known for the Bull Temple and Gandhi Bazaar, next to Jayanagar and Chamarajpet.",
+  },
+  {
+    name: "Banashankari",
+    slug: "banashankari",
+    published: true,
+    region: "South",
+    proximity: "city",
+    nearby: ["Jayanagar", "JP Nagar", "Basavanagudi", "Kumaraswamy Layout"],
+    about:
+      "Banashankari is a large South Bangalore area, named after the Banashankari temple and laid out in stages, next to Jayanagar, JP Nagar and Kumaraswamy Layout.",
+  },
+  {
+    name: "Bannerghatta Road",
+    slug: "bannerghatta-road",
+    published: true,
+    region: "South",
+    proximity: "city",
+    nearby: ["JP Nagar", "Arekere", "Hulimavu", "Bilekahalli"],
+    about:
+      "Bannerghatta Road runs south from Dairy Circle towards Bannerghatta National Park, lined with residential areas such as Bilekahalli, Arekere and Hulimavu.",
+  },
+  {
+    name: "Rajajinagar",
+    slug: "rajajinagar",
+    published: true,
+    region: "West",
+    proximity: "city",
+    nearby: ["Basaveshwaranagar", "Mahalakshmipuram", "Vijayanagar", "Yeshwanthpur"],
+    about:
+      "Rajajinagar is a planned residential area in West Bangalore laid out in blocks, between Yeshwanthpur, Basaveshwaranagar and Vijayanagar.",
+  },
 ]
 
 /* ---------------------------------------------------------------- */
