@@ -1,5 +1,5 @@
-import { fetchProducts, fetchGlobalSettings } from "@/lib/api"
-import { CamerasClient } from "@/components/cameras-client"
+import { fetchCategories, fetchProducts } from "@/lib/api"
+import { ProductBrowser } from "@/components/film/product-browser"
 import { JsonLd } from "@/components/seo/json-ld"
 import { SeoContent } from "@/components/seo/seo-content"
 import { buildMetadata } from "@/lib/seo/metadata"
@@ -23,9 +23,8 @@ export const metadata = buildMetadata({
 })
 
 export default async function CamerasPage() {
-  const products = await fetchProducts()
+  const [products, categories] = await Promise.all([fetchProducts(), fetchCategories()])
   const cameras = products.filter(p => p.category?.name?.toLowerCase().includes("camera"))
-  const settings = await fetchGlobalSettings()
 
   return (
     <>
@@ -44,9 +43,16 @@ export default async function CamerasPage() {
           ]),
         ]}
       />
-      <CamerasClient initialCameras={cameras} globalSettings={settings} />
+      <ProductBrowser
+        products={cameras}
+        categories={categories}
+        title="Cameras to rent"
+        titleEmphasis="Cameras"
+        intro="DSLR, mirrorless, cinema, vlogging and camcorder bodies — checked before every rental, priced by the day."
+        breadcrumb={[{ href: "/", label: "Home" }, { href: "/cameras", label: "Cameras" }]}
+      />
       <SeoContent
-        eyebrow="Camera Category"
+        eyebrow="The long read"
         title="Camera rentals in Bangalore for creators and professionals"
         intro="The camera collection page now supports both browse intent and high-intent search demand for DSLR and mirrorless camera rental in Bangalore."
         sections={buildCollectionSections({

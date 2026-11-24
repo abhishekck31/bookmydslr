@@ -1,5 +1,5 @@
 import { fetchCategories, fetchProducts } from "@/lib/api"
-import { RentalEquipmentListing } from "@/components/rental/rental-equipment-listing"
+import { ProductBrowser } from "@/components/film/product-browser"
 import { JsonLd } from "@/components/seo/json-ld"
 import { HomeSeoAccordion } from "@/components/homepage/home-seo-accordion"
 import { buildMetadata } from "@/lib/seo/metadata"
@@ -47,9 +47,16 @@ export default async function RentalEquipmentPage() {
           ]),
         ]}
       />
-      <RentalEquipmentListing initialProducts={products} categories={categories} />
+      <ProductBrowser
+        products={products}
+        categories={categories}
+        title="All gear, by the day"
+        titleEmphasis="by the day"
+        intro="Cameras, lenses, drones, gimbals, light and sound. Filter by category, brand and price, then book on WhatsApp."
+        breadcrumb={[{ href: "/", label: "Home" }, { href: "/rental-equipment", label: "All gear" }]}
+      />
       <HomeSeoAccordion
-        triggerLabel="Learn more about rental equipment in Bangalore"
+        triggerLabel="Rental equipment in Bangalore — the long read"
         title="Rental equipment in Bangalore for photography, video, and production"
         intro="This inventory hub is designed to rank for broader equipment rental searches while helping visitors filter directly into the categories and products they need."
         sections={buildCollectionSections({

@@ -95,7 +95,7 @@ export default function ContactPage() {
         ]}
       />
 
-      <main className="min-h-screen bg-[#f0f1f8]">
+      <main className="min-h-screen bg-background">
         <PageHero
           icon={MessageCircle}
           badge="We're here to help"
@@ -104,7 +104,7 @@ export default function ContactPage() {
           description="Questions about gear availability, custom quotes, or delivery in Bangalore? Reach out — we typically respond within 2 hours during business hours."
         />
 
-        <section className="container-premium pb-16 pt-8 md:pb-20">
+        <section className="film-container pb-16 pt-8 md:pb-20">
           <div className="grid gap-8 lg:grid-cols-5 lg:gap-10">
             {/* Contact cards */}
             <motion.div
@@ -122,37 +122,37 @@ export default function ContactPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + i * 0.06 }}
-                  className="group flex gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md"
+                  className="group flex gap-4 rounded-none border border-border bg-background p-5 transition-all hover:-translate-y-0.5 hover:border-border-strong"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none bg-surface-2 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                     <method.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       {method.title}
                     </p>
-                    <p className="mt-0.5 font-bold text-slate-900">{method.value}</p>
-                    <p className="mt-1 text-sm text-slate-500">{method.note}</p>
+                    <p className="mt-0.5 font-bold text-foreground">{method.value}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{method.note}</p>
                   </div>
                 </motion.a>
               ))}
 
-              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-                <div className="mb-3 flex items-center gap-2 text-slate-900">
-                  <Clock className="h-5 w-5 text-amber-500" />
+              <div className="rounded-none border border-border bg-background p-5">
+                <div className="mb-3 flex items-center gap-2 text-foreground">
+                  <Clock className="h-5 w-5 text-primary" />
                   <span className="font-bold">Business Hours</span>
                 </div>
-                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
-                  <span className="text-slate-600">Monday – Sunday</span>
-                  <span className="font-semibold text-slate-900">8 AM – 10 PM</span>
+                <div className="flex items-center justify-between rounded-none bg-surface px-4 py-3 text-sm">
+                  <span className="text-body">Monday – Sunday</span>
+                  <span className="font-semibold text-foreground">8 AM – 10 PM</span>
                 </div>
               </div>
 
-              <div className="flex gap-3 rounded-2xl border border-amber-200/80 bg-amber-50 p-5">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-amber-600" />
+              <div className="flex gap-3 rounded-none border border-border-strong bg-surface-2 p-5">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
                 <div>
-                  <p className="text-sm font-bold text-amber-900">Urgent rental?</p>
-                  <p className="mt-1 text-xs leading-relaxed text-amber-800">
+                  <p className="text-sm font-bold text-primary">Urgent rental?</p>
+                  <p className="mt-1 text-xs leading-relaxed text-primary">
                     Call us directly for same-day availability and fastest booking.
                   </p>
                 </div>
@@ -161,7 +161,7 @@ export default function ContactPage() {
               <Button
                 asChild
                 variant="outline"
-                className="h-12 w-full rounded-full border-green-200 bg-green-50 font-semibold text-green-800 hover:bg-green-100"
+                className="h-12 w-full rounded-full border-border-strong bg-surface-2 font-semibold text-primary hover:bg-surface-2"
               >
                 <Link
                   href="https://wa.me/919972122462"
@@ -180,10 +180,10 @@ export default function ContactPage() {
               transition={{ duration: 0.45, delay: 0.2 }}
               className="lg:col-span-3"
             >
-              <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
-                <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-5 md:px-8 md:py-6">
-                  <h2 className="text-xl font-bold text-slate-900">Send us a message</h2>
-                  <p className="mt-1 text-sm text-slate-500">
+              <div className="overflow-hidden rounded-none border border-border bg-background">
+                <div className="border-b border-border bg-surface px-6 py-5 md:px-8 md:py-6">
+                  <h2 className="text-xl font-bold text-foreground">Send us a message</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Fill out the form and we&apos;ll get back to you soon.
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} className="space-y-5 p-6 md:p-8">
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium text-slate-700">
+                      <Label htmlFor="name" className="text-sm font-medium text-body">
                         Name
                       </Label>
                       <Input
@@ -201,11 +201,11 @@ export default function ContactPage() {
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="h-12 rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
+                        className="h-12 rounded-none border-border bg-surface focus:border-primary focus:ring-border-strong"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                      <Label htmlFor="email" className="text-sm font-medium text-body">
                         Email
                       </Label>
                       <Input
@@ -216,13 +216,13 @@ export default function ContactPage() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="h-12 rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
+                        className="h-12 rounded-none border-border bg-surface focus:border-primary focus:ring-border-strong"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subject" className="text-sm font-medium text-slate-700">
+                    <Label htmlFor="subject" className="text-sm font-medium text-body">
                       Subject
                     </Label>
                     <Input
@@ -232,12 +232,12 @@ export default function ContactPage() {
                       required
                       value={formData.subject}
                       onChange={handleChange}
-                      className="h-12 rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
+                      className="h-12 rounded-none border-border bg-surface focus:border-primary focus:ring-border-strong"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message" className="text-sm font-medium text-slate-700">
+                    <Label htmlFor="message" className="text-sm font-medium text-body">
                       Message
                     </Label>
                     <Textarea
@@ -247,14 +247,14 @@ export default function ContactPage() {
                       required
                       value={formData.message}
                       onChange={handleChange}
-                      className="min-h-[160px] resize-none rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-400 focus:ring-amber-400/20"
+                      className="min-h-[160px] resize-none rounded-none border-border bg-surface focus:border-primary focus:ring-border-strong"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-12 w-full rounded-full bg-amber-500 text-base font-semibold text-white hover:bg-amber-600 disabled:opacity-70"
+                    className="h-12 w-full rounded-full bg-primary text-base font-semibold text-primary-foreground hover:bg-primary disabled:opacity-70"
                   >
                     {isSubmitting ? "Sending…" : "Send Message"}
                     <Send className="ml-2 h-4 w-4" />
@@ -265,15 +265,15 @@ export default function ContactPage() {
           </div>
         </section>
 
-        <section className="border-t border-slate-200/60 bg-white py-10">
-          <div className="container-premium flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-slate-600">
+        <section className="border-t border-border bg-background py-10">
+          <div className="film-container flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p className="text-sm text-body">
               Prefer browsing first?{" "}
-              <Link href="/rental-equipment" className="font-semibold text-amber-600 hover:text-amber-700">
+              <Link href="/rental-equipment" className="font-semibold text-primary hover:text-primary">
                 View all equipment
               </Link>
             </p>
-            <Button asChild variant="ghost" className="rounded-full font-semibold text-slate-700">
+            <Button asChild variant="ghost" className="rounded-full font-semibold text-body">
               <Link href="/how-it-works">
                 How it works <ArrowRight className="ml-1 h-4 w-4" />
               </Link>

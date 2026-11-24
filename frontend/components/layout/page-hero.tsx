@@ -1,43 +1,34 @@
-"use client"
-
-import { motion } from "framer-motion"
-import { LucideIcon } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+import { FrameLabel } from "@/components/film/primitives"
 
 interface PageHeroProps {
   badge: string
   title: string
   highlight?: string
   description: string
+  /** Kept for API compatibility; the film style uses mono labels instead of icons. */
   icon?: LucideIcon
 }
 
-export function PageHero({ badge, title, highlight, description, icon: Icon }: PageHeroProps) {
+export function PageHero({ badge, title, highlight, description }: PageHeroProps) {
   return (
-    <section className="border-b border-slate-200/60 bg-white">
-      <div className="container-premium py-8 md:py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl"
-        >
-          <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200/60">
-            {Icon && <Icon className="h-3.5 w-3.5" />}
-            {badge}
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl lg:text-5xl">
+    <section className="border-b border-border">
+      <div className="film-container grid gap-6 py-12 md:py-20 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-10">
+        <FrameLabel n={1}>
+          <span className="label-mono text-primary">{badge}</span>
+        </FrameLabel>
+        <div className="max-w-4xl">
+          <h1 className="font-serif text-display-l text-foreground">
             {title}
-            {highlight && (
+            {highlight ? (
               <>
                 {" "}
-                <span className="bg-gradient-to-r from-amber-500 to-amber-400 bg-clip-text text-transparent">
-                  {highlight}
-                </span>
+                <em className="text-primary">{highlight}</em>
               </>
-            )}
+            ) : null}
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">{description}</p>
-        </motion.div>
+          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-body md:text-[17px]">{description}</p>
+        </div>
       </div>
     </section>
   )

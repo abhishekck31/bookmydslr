@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { fetchCategories, fetchProducts } from "@/lib/api"
-import { CategoryPageClient } from "@/components/rental/category-page-client"
+import { ProductBrowser } from "@/components/film/product-browser"
 import { JsonLd } from "@/components/seo/json-ld"
 import { SeoContent } from "@/components/seo/seo-content"
 import { buildMetadata } from "@/lib/seo/metadata"
@@ -62,7 +62,6 @@ export default async function CategoryPage({
   }
 
   const categoryProducts = products.filter((product) => product.category?.slug === categorySlug)
-  const brands = Array.from(new Set(categoryProducts.map((product) => product.brand).filter(Boolean))) as string[]
   const faqs = buildCollectionFaqs(category.name)
 
   return (
@@ -83,15 +82,21 @@ export default async function CategoryPage({
         ]}
       />
 
-      <CategoryPageClient
-        category={category}
+      <ProductBrowser
+        products={categoryProducts}
         categories={categories}
-        initialProducts={categoryProducts}
-        brands={brands}
+        currentCategorySlug={category.slug}
+        title={category.name}
+        intro={`${categoryProducts.length} ${categoryProducts.length === 1 ? "item" : "items"} in ${category.name}, rented by the day with pickup from Kalyan Nagar or delivery across Bangalore.`}
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/rental-equipment", label: "All gear" },
+          { href: `/rental-equipment/${category.slug}`, label: category.name },
+        ]}
       />
 
       <SeoContent
-        eyebrow="Category SEO"
+        eyebrow="The long read"
         title={`${category.name} rentals in Bangalore`}
         intro={`This category page is optimized to help Book My DSLR rank for ${category.name.toLowerCase()} rental searches in Bangalore while still giving ready-to-book users direct access to inventory.`}
         sections={buildCollectionSections({

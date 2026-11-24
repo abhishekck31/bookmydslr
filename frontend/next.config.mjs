@@ -2,6 +2,14 @@
 const nextConfig = {
   compress: true,
   poweredByHeader: false,
+  async redirects() {
+    // Legacy detail URLs — the canonical product page is /product/[id].
+    return ["cameras", "lenses", "accessories"].map((section) => ({
+      source: `/${section}/:id`,
+      destination: "/product/:id",
+      permanent: true,
+    }))
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

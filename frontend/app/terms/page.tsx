@@ -71,7 +71,7 @@ Damage or loss: You are responsible for damage, theft, accidental damage, and da
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-[#f0f1f8]">
+    <main className="min-h-screen bg-background">
       <PageHero
         icon={FileText}
         badge="Legal"
@@ -80,7 +80,7 @@ export default function TermsPage() {
         description="Please read these terms carefully before using our rental services. They outline your rights and responsibilities when renting equipment from Book My DSLR."
       />
 
-      <section className="container-premium pb-16 pt-4 md:pb-20">
+      <section className="film-container pb-16 pt-4 md:pb-20">
         <div className="grid gap-8 lg:grid-cols-3 lg:gap-10">
           {/* Quick nav — desktop */}
           <motion.aside
@@ -89,8 +89,8 @@ export default function TermsPage() {
             transition={{ duration: 0.4 }}
             className="hidden lg:block"
           >
-            <div className="sticky top-24 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">
+            <div className="sticky top-24 rounded-none border border-border bg-background p-6">
+              <p className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 On this page
               </p>
               <nav className="space-y-1">
@@ -98,15 +98,15 @@ export default function TermsPage() {
                   <a
                     key={section.id}
                     href={`#${section.id}`}
-                    className="block rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                    className="block rounded-none px-3 py-2 text-sm text-body transition-colors hover:bg-surface-2 hover:text-primary"
                   >
                     {section.title}
                   </a>
                 ))}
               </nav>
-              <div className="mt-6 border-t border-slate-100 pt-6">
-                <p className="text-xs text-slate-500">Last updated</p>
-                <p className="text-sm font-semibold text-slate-900">January 2024</p>
+              <div className="mt-6 border-t border-border pt-6">
+                <p className="text-xs text-muted-foreground">Last updated</p>
+                <p className="text-sm font-semibold text-foreground">January 2024</p>
               </div>
             </div>
           </motion.aside>
@@ -128,13 +128,13 @@ export default function TermsPage() {
                   key={section.id}
                   value={section.id}
                   id={section.id}
-                  className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-100 bg-white px-0 shadow-sm"
+                  className="scroll-mt-24 overflow-hidden rounded-none border border-border bg-background px-0"
                 >
-                  <AccordionTrigger className="px-5 py-4 text-left font-semibold text-slate-900 hover:no-underline hover:text-amber-700 md:px-6">
+                  <AccordionTrigger className="px-5 py-4 text-left font-semibold text-foreground hover:no-underline hover:text-primary md:px-6">
                     {section.title}
                   </AccordionTrigger>
-                  <AccordionContent className="border-t border-slate-100 px-5 pb-5 pt-2 md:px-6">
-                    <div className="whitespace-pre-line text-sm leading-relaxed text-slate-600 md:text-base">
+                  <AccordionContent className="border-t border-border px-5 pb-5 pt-2 md:px-6">
+                    <div className="whitespace-pre-line text-sm leading-relaxed text-body md:text-base">
                       {section.content}
                     </div>
                   </AccordionContent>
@@ -147,27 +147,27 @@ export default function TermsPage() {
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm md:p-8"
+              className="mt-8 rounded-none border border-border bg-background p-6 md:p-8"
             >
-              <h3 className="text-lg font-bold text-slate-900">Questions about these terms?</h3>
-              <p className="mt-2 text-sm text-slate-600">
+              <h3 className="text-lg font-bold text-foreground">Questions about these terms?</h3>
+              <p className="mt-2 text-sm text-body">
                 Contact us if you need clarification before booking.
               </p>
-              <ul className="mt-5 space-y-3 text-sm text-slate-700">
+              <ul className="mt-5 space-y-3 text-sm text-body">
                 <li className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-amber-500" />
-                  <a href="mailto:bookmydslr@gmail.com" className="hover:text-amber-600">
+                  <Mail className="h-4 w-4 text-primary" />
+                  <a href="mailto:bookmydslr@gmail.com" className="hover:text-primary">
                     bookmydslr@gmail.com
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-amber-500" />
-                  <a href="tel:+919972122462" className="hover:text-amber-600">
+                  <Phone className="h-4 w-4 text-primary" />
+                  <a href="tel:+919972122462" className="hover:text-primary">
                     +91 99721 22462
                   </a>
                 </li>
                 <li className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span>
                     2nd Floor, No- 212/1, Hennur Main Road, Kalyan Nagar, Bengaluru 560043
                   </span>
@@ -175,7 +175,7 @@ export default function TermsPage() {
               </ul>
               <Button
                 asChild
-                className="mt-6 h-12 rounded-full bg-amber-500 px-8 font-semibold text-white hover:bg-amber-600"
+                className="mt-6 h-12 rounded-full bg-primary px-8 font-semibold text-primary-foreground hover:bg-primary"
               >
                 <Link href="/contact">
                   Contact Support <ArrowRight className="ml-2 h-4 w-4" />
@@ -186,14 +186,14 @@ export default function TermsPage() {
         </div>
       </section>
 
-      <section className="bg-amber-500 py-12">
-        <div className="container-premium text-center">
+      <section className="bg-primary py-12">
+        <div className="film-container text-center">
           <p className="text-lg font-semibold text-white">
             Ready to rent? Browse our inventory and book online.
           </p>
           <Button
             asChild
-            className="mt-4 h-12 rounded-full bg-slate-900 px-8 font-semibold text-white hover:bg-slate-800"
+            className="mt-4 h-12 rounded-full bg-surface px-8 font-semibold text-white hover:bg-surface-2"
           >
             <Link href="/rental-equipment">Browse Equipment</Link>
           </Button>

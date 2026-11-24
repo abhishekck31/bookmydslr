@@ -1,15 +1,39 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { IBM_Plex_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
-import { MobileBottomNav } from "@/components/mobile-bottom-nav"
+import { FilmFooter } from "@/components/film/footer"
 import { JsonLd } from "@/components/seo/json-ld"
 import { buildMetadata } from "@/lib/seo/metadata"
 import { buildLocalBusinessSchema, buildOrganizationSchema } from "@/lib/seo/schema"
 import { primaryKeywords } from "@/lib/seo/site"
 
-const inter = Inter({ subsets: ["latin"] })
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-serif",
+})
+
+const sans = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans",
+})
+
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+  variable: "--font-mono",
+})
+
+export const viewport = {
+  themeColor: "#13110E",
+}
 
 export const metadata: Metadata = {
   ...buildMetadata({
@@ -37,18 +61,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-IN" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${serif.variable} ${sans.variable} ${mono.variable} font-sans`} suppressHydrationWarning>
         <JsonLd data={[buildOrganizationSchema(), buildLocalBusinessSchema()]} />
-        {/* Main Content */}
-        <div className="min-h-screen pb-20 md:pb-0">
-          <Providers>
-            {/* Mobile Bottom Navigation Only */}
-            <div className="md:hidden">
-              <MobileBottomNav />
-            </div>
-            {children}
-          </Providers>
-        </div>
+        <Providers footer={<FilmFooter />}>{children}</Providers>
       </body>
     </html>
   )
