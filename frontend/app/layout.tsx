@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+import Script from "next/script"
 import { IBM_Plex_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
@@ -55,6 +56,9 @@ export const metadata: Metadata = {
   manifest: '/favicon_io/site.webmanifest',
 }
 
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-WQFJD2LQ"
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -63,6 +67,13 @@ export default async function RootLayout({
   return (
     <html lang="en-IN" suppressHydrationWarning>
       <body className={`${serif.variable} ${sans.variable} ${mono.variable} font-sans`} suppressHydrationWarning>
+        <Script src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`} strategy="afterInteractive" />
+        <Script id="google-tag-manager" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());${GA_ID ? `gtag('config','${GA_ID}');` : ""}`}
+        </Script>
+        {GA_ID ? (
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+        ) : null}
         <JsonLd data={[buildOrganizationSchema(), buildLocalBusinessSchema()]} />
         <Providers footer={<FilmFooter />} durationTiers={await fetchDurationTiers()}>
           {children}
