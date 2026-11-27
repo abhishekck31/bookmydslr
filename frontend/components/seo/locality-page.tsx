@@ -2,13 +2,15 @@ import Link from "next/link"
 import { Phone } from "lucide-react"
 import { formatINR, formatPercent, formatTierRange, whatsappLink, type DurationTier } from "@/lib/film"
 import { siteConfig } from "@/lib/seo/site"
-import type { Locality } from "@/data/seo/localities"
+import { localityAliases, type Locality } from "@/data/seo/localities"
 import {
   DELIVERY_FROM,
   PICKUP_ADDRESS_LINE,
   deliveryCopy,
   focusGroups,
+  localityUseCases,
   nearbyLinks,
+  popularRentals,
   type InventoryFacts,
 } from "@/lib/seo/locality-content"
 import type { LocalityFaq } from "@/data/seo/localities"
@@ -42,6 +44,9 @@ export function LocalityPage({
   const groups = focusGroups(l, facts)
   const delivery = deliveryCopy(l)
   const nearby = nearbyLinks(l)
+  const aliases = localityAliases(l)
+  const popular = popularRentals(l, facts)
+  const useCases = localityUseCases(l)
   const waMessage = `Hi Book My DSLR, I'm in ${l.name} and want to rent gear for my shoot. Can you check availability?`
   const camsFrom = facts.groups.cameras.minPrice
   const bestTier = [...tiers].sort((a, b) => b.percent - a.percent)[0]
@@ -86,6 +91,10 @@ export function LocalityPage({
                 ? `Collect from our Kalyan Nagar pickup point or get it delivered to ${l.name}.`
                 : `Our pickup point in Kalyan Nagar is ${l.proximity === "pickup" ? "right here" : "next door"}, and delivery is available too.`}{" "}
               {facts.total} items listed, with live prices and availability.
+            </p>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+              Looking for a DSLR camera on rent in {l.name}, or camera rent near {l.name} for a single day? Book in a few
+              minutes on WhatsApp or by phone — billing is per 24 hours from your pickup time.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <CallButton />
@@ -200,8 +209,8 @@ export function LocalityPage({
       <FrameSection n={5} band labelledBy="area-heading">
         <h2 id="area-heading" className="font-serif text-display-m text-foreground">About {l.name}</h2>
         <p className="mt-4 max-w-3xl text-[16px] leading-relaxed text-body">{l.about}</p>
-        {l.aliases?.length ? (
-          <p className="mt-3 max-w-3xl text-sm text-muted-foreground">Also covers: {l.aliases.join(", ")}.</p>
+        {aliases.length ? (
+          <p className="mt-3 max-w-3xl text-sm text-muted-foreground">Also covers: {aliases.join(", ")}.</p>
         ) : null}
         <h3 className="mt-10 font-serif text-display-s text-foreground">Camera rental in nearby areas</h3>
         <ul className="mt-4 flex flex-wrap gap-2">
@@ -232,8 +241,39 @@ export function LocalityPage({
         </ul>
       </FrameSection>
 
+      {/* Popular rentals + use cases */}
+      <FrameSection n={6} labelledBy="popular-heading">
+        <h2 id="popular-heading" className="mb-2 font-serif text-display-m text-foreground">
+          Popular camera rentals near <em className="text-primary">{l.name}</em>
+        </h2>
+        <p className="mb-8 max-w-2xl text-[15px] text-body">
+          What people in and around {l.name} most often rent from us. Each link opens the live list with today&apos;s prices.
+        </p>
+        {popular.length ? (
+          <ul className="mb-12 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+            {popular.map((p) => (
+              <li key={p.label} className="bg-background">
+                <Link href={p.href} className="flex h-full items-center justify-between gap-4 p-5 transition-colors hover:text-primary">
+                  <span className="text-[15px] font-medium text-foreground">{p.label}</span>
+                  <span className="label-mono shrink-0 text-muted-foreground">{p.note}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <h3 className="mb-6 font-serif text-display-s text-foreground">What renters in {l.name} shoot</h3>
+        <ul className="grid gap-px bg-border md:grid-cols-2">
+          {useCases.map((u) => (
+            <li key={u.title} className="bg-background p-6">
+              <h4 className="font-serif text-title text-foreground">{u.title}</h4>
+              <p className="mt-2 text-[15px] leading-relaxed text-body">{u.body}</p>
+            </li>
+          ))}
+        </ul>
+      </FrameSection>
+
       {/* FAQ */}
-      <FrameSection n={6} labelledBy="faq-heading">
+      <FrameSection n={7} band labelledBy="faq-heading">
         <h2 id="faq-heading" className="mb-8 font-serif text-display-m text-foreground">
           Camera rental in {l.name}: <em className="text-primary">FAQs</em>
         </h2>

@@ -2,7 +2,9 @@ import type { Product } from "@/types"
 import { CATEGORY_GROUPS, formatINR, formatPercent, formatTierRange, groupOf, type DurationTier } from "@/lib/film"
 import { siteConfig } from "@/lib/seo/site"
 import {
+  PUBLISHED_LOCALITIES,
   findLocalityByName,
+  localityAliases,
   localityFocus,
   type InventoryGroupKey,
   type Locality,
@@ -149,6 +151,14 @@ export function buildLocalityFaqs(l: Locality, facts: InventoryFacts, tiers: Dur
         `we confirm the exact amount and timing on WhatsApp or by phone when you book.`,
     },
     {
+      question: `Where can I get a camera on rent near ${l.name}?`,
+      answer:
+        `Book My DSLR rents cameras to ${l.name} from our pickup point in Kalyan Nagar, North-East Bangalore. ` +
+        (l.proximity === "outskirts"
+          ? "Collect it there, or ask us about delivery — we confirm before you book."
+          : `Collect it there or have it delivered to ${l.name}; either way you book on WhatsApp or by phone.`),
+    },
+    {
       question: "Where do I collect my rented camera?",
       answer: `From our pickup point at ${PICKUP_ADDRESS_LINE}. We're open 8 am to 10 pm, every day. Please book first so the gear is ready.`,
     },
@@ -161,7 +171,13 @@ export function buildLocalityFaqs(l: Locality, facts: InventoryFacts, tiers: Dur
     },
     {
       question: "Can I rent a camera for just one day?",
-      answer: "Yes. The minimum rental is one day, which suits single-day shoots, events and weddings.",
+      answer: "Yes. The minimum rental is one day (24 hours from pickup), which suits single-day shoots, events and weddings.",
+    },
+    {
+      question: `Can I rent a DSLR camera in ${l.name} for a wedding or event?`,
+      answer:
+        `Yes. For weddings and events in ${l.name}, renters usually take a camera body, one or two lenses and spare batteries${facts.groups.gimbals.count ? ", often with a gimbal for video" : ""}. ` +
+        "Tell us the event and we'll suggest a kit from what's available on your dates.",
     },
     {
       question: "How do I check if a camera is available on my dates?",
@@ -181,7 +197,7 @@ export function buildLocalityFaqs(l: Locality, facts: InventoryFacts, tiers: Dur
 /* ---------------------------------------------------------------- */
 
 export function localitySeoTitle(l: Locality): string {
-  return `Camera Rental in ${l.name}, Bangalore | Book My DSLR`
+  return `Camera & DSLR Rental in ${l.name}, Bangalore | Book My DSLR`
 }
 
 export function localityMetaDescription(l: Locality, facts: InventoryFacts | null): string {
@@ -189,27 +205,97 @@ export function localityMetaDescription(l: Locality, facts: InventoryFacts | nul
   const pickup =
     l.proximity === "pickup" ? "Pickup right here in Kalyan Nagar" : l.proximity === "adjacent" ? "Pickup next door in Kalyan Nagar" : "Pickup in Kalyan Nagar"
   const how = l.proximity === "outskirts" ? `${pickup}; delivery on request.` : `${pickup} or delivery from ${formatINR(DELIVERY_FROM)}.`
-  return `Rent DSLR & mirrorless cameras, lenses and drones in ${l.name}, Bangalore. ${how}${from}`
+  return `Camera on rent near ${l.name}: DSLR & mirrorless cameras, lenses, GoPro, drones and gimbals. ${how}${from}`
 }
 
 export function localityKeywords(l: Locality): string[] {
   const n = l.name
   return [
     `camera rental in ${n}`,
+    `camera rent in ${n}`,
     `camera on rent in ${n}`,
+    `camera rent near ${n}`,
+    `camera rental near ${n}`,
+    `DSLR camera rent in ${n}`,
+    `DSLR camera on rent near ${n}`,
     `DSLR rental in ${n}`,
+    `mirrorless camera rental in ${n}`,
     `Sony camera rental in ${n}`,
     `Canon camera rental in ${n}`,
     `lens rental in ${n}`,
-    `photography equipment rental in ${n}`,
+    `GoPro on rent in ${n}`,
+    `drone rental in ${n}`,
     `video camera rental in ${n}`,
-    ...(l.aliases ?? []).map((a) => `camera rental ${a}`),
+    `photography equipment rental in ${n}`,
+    ...localityAliases(l).flatMap((a) => [`camera rental ${a}`, `DSLR on rent ${a}`]),
   ]
 }
 
-export function nearbyLinks(l: Locality): { name: string; href: string | null }[] {
-  return l.nearby.map((n) => {
+/**
+ * The locality's own neighbours, then published localities that list it as
+ * a neighbour (so a new page is linked from the pages around it, not only
+ * from the hub).
+ */
+export function nearbyLinks(l: Locality, max = 10): { name: string; href: string | null }[] {
+  const names = [
+    ...l.nearby,
+    ...PUBLISHED_LOCALITIES.filter((o) => o.name !== l.name && o.nearby.includes(l.name)).map((o) => o.name),
+  ]
+  return [...new Set(names)].slice(0, Math.max(max, l.nearby.length)).map((n) => {
     const target = findLocalityByName(n)
-    return { name: n, href: target?.published ? `/camera-rental-bangalore/${target.slug}` : null }
+    return { name: target?.name ?? n, href: target?.published ? `/camera-rental-bangalore/${target.slug}` : null }
   })
+}
+
+/* ---------------------------------------------------------------- */
+/* "Popular rentals" — keyword-phrased links to real inventory        */
+/* ---------------------------------------------------------------- */
+
+export interface PopularRental {
+  label: string
+  href: string
+  note: string
+}
+
+/** Only searches we can actually serve: each needs stock in its group or brand. */
+export function popularRentals(l: Locality, facts: InventoryFacts): PopularRental[] {
+  const n = l.name
+  const g = facts.groups
+  const from = (s: InventoryGroupSummary) => (s.minPrice ? `from ${formatINR(s.minPrice)}/day` : `${s.count} listed`)
+  const out: PopularRental[] = []
+  if (g.cameras.count) {
+    out.push({ label: `DSLR camera on rent in ${n}`, href: "/rentals/dslr-camera-rental-bangalore", note: from(g.cameras) })
+    out.push({ label: `Mirrorless camera rental near ${n}`, href: "/rentals/mirrorless-camera-rental-bangalore", note: `${g.cameras.count} cameras` })
+    if (facts.cameraBrands.includes("Sony")) out.push({ label: `Sony camera rent in ${n}`, href: "/rentals/sony-camera-rental-bangalore", note: "Sony bodies" })
+    if (facts.cameraBrands.includes("Canon")) out.push({ label: `Canon camera on rent in ${n}`, href: "/rentals/canon-camera-rental-bangalore", note: "Canon bodies" })
+    out.push({ label: `Cheap camera rent near ${n}`, href: "/rentals/cheap-dslr-rental-bangalore", note: "Budget picks" })
+  }
+  if (g.lenses.count) out.push({ label: `Lens rental in ${n}`, href: "/rentals/lens-rental-bangalore", note: from(g.lenses) })
+  if (g.action.count) out.push({ label: `GoPro / Insta360 on rent in ${n}`, href: g.action.href, note: from(g.action) })
+  if (g.drones.count) out.push({ label: `Drone on rent near ${n}`, href: g.drones.href, note: from(g.drones) })
+  if (g.gimbals.count) out.push({ label: `Gimbal rental in ${n}`, href: g.gimbals.href, note: from(g.gimbals) })
+  if (g.lighting.count) out.push({ label: `Video light rental near ${n}`, href: g.lighting.href, note: from(g.lighting) })
+  if (g.audio.count) out.push({ label: `Mic & audio gear on rent in ${n}`, href: g.audio.href, note: from(g.audio) })
+  return out
+}
+
+/** What people around Bangalore rent for — phrased for the locality, varied by kind of place. */
+export function localityUseCases(l: Locality): { title: string; body: string }[] {
+  const n = l.name
+  const shoot =
+    l.name === "Cubbon Park"
+      ? { title: "Photoshoots in the park", body: `Portraits, pre-wedding and fashion shoots at ${n}: a camera body with a portrait or telephoto lens, plus a light for shaded spots.` }
+      : { title: "Weddings & pre-wedding shoots", body: `Renting a DSLR camera for a wedding in or around ${n}? Pair a body with a standard zoom and a fast prime, and add a gimbal for the video.` }
+  return [
+    shoot,
+    { title: "YouTube, reels & vlogs", body: `Creators near ${n} rent mirrorless cameras, mics and lights by the day — no need to buy before you know what suits your channel.` },
+    {
+      title: l.proximity === "outskirts" ? "Trips & weekend getaways" : "Events, birthdays & corporate shoots",
+      body:
+        l.proximity === "outskirts"
+          ? `Heading out from ${n} for a trip? Rent an action camera or drone for the days you're away and return it when you're back.`
+          : `For a birthday, office event or product shoot in ${n}, rent a camera and lens for just the day of the event.`,
+    },
+    { title: "Students & first-time shooters", body: `Learning photography or working on a film project near ${n}? Rent a DSLR camera for a few days before deciding what to buy.` },
+  ]
 }

@@ -497,6 +497,110 @@ export const LOCALITY_ALIASES: Record<string, string> = {
   "JP Nagar 7th Phase": "JP Nagar",
   "JP Nagar 8th Phase": "JP Nagar",
   "JP Nagar 9th Phase": "JP Nagar",
+  "RBI Layout": "JP Nagar",
+
+  /* Batch 4 — spellings, blocks, stages and sectors from the second master
+     list. Only sub-areas that actually exist are listed (e.g. Indiranagar
+     has a 1st and 2nd Stage, not an 8th); they are shown on the parent
+     page as "Also covers" and used as its keywords. */
+  Arakere: "Arekere",
+  Chikkalsandra: "Chikkalasandra",
+  "Dollars Colony": "Dollar Colony",
+  "Mahalakshmi Puram": "Mahalakshmipuram",
+  Rajanukunte: "Rajankunte",
+  Malleshwaram: "Malleswaram",
+  "Begur Road": "Begur",
+  "Abbigere Main Road": "Abbigere",
+  "Haralur Road": "Haralur",
+  "Hennur Bande": "Hennur",
+  "Horamavu Agara": "Horamavu",
+  "Kengeri Upanagara": "Kengeri Satellite Town",
+  "Ullalu Upanagara": "Ullal",
+  "HAL Layout": "HAL",
+  "HAL 3rd Stage": "HAL",
+  "HAL 2nd Stage": "Indiranagar",
+  "Defence Colony": "Indiranagar",
+  "Indiranagar 1st Stage": "Indiranagar",
+  "Indiranagar 2nd Stage": "Indiranagar",
+  Thippasandra: "New Thippasandra",
+  "Brookefield Extension": "Brookefield",
+  "Borewell Road": "Whitefield",
+  "Green Glen Layout": "Bellandur",
+  "Mathikere Extension": "Mathikere",
+  "Gokula Extension": "Mathikere",
+  "RT Nagar Extension": "RT Nagar",
+  "Seshadripuram Extension": "Seshadripuram",
+  "Srirampura Extension": "Srirampura",
+  "Malleswaram Extension": "Malleswaram",
+  "Sanjaynagar Layout": "Sanjay Nagar",
+  "Chandra Layout 2nd Stage": "Chandra Layout",
+  "Kumaraswamy Layout 2nd Stage": "Kumaraswamy Layout",
+  "Peenya 2nd Stage": "Peenya",
+  "Rajajinagar Industrial Town": "Rajajinagar",
+  "Jakkur Plantation Layout": "Jakkur",
+  "Rajarajeshwari Nagar BEML Layout": "Rajarajeshwari Nagar",
+  "Rajarajeshwari Nagar Ideal Homes Layout": "Rajarajeshwari Nagar",
+  "Ideal Homes Township": "Rajarajeshwari Nagar",
+  "RR Nagar": "Rajarajeshwari Nagar",
+  "SMV Layout": "Sir M Visvesvaraya Layout",
+  "Vishweshwaraiah Layout": "Sir M Visvesvaraya Layout",
+  "Annapoorneshwari Layout": "Annapoorneshwari Nagar",
+  "Kumara Park East": "Kumara Park",
+  "Kumara Park West": "Kumara Park",
+  "RMV 2nd Stage": "RMV Extension",
+  "Hampinagar": "Vijayanagar",
+  "Vijayanagar 1st Stage": "Vijayanagar",
+  "Vijayanagar 2nd Stage": "Vijayanagar",
+  "Nagarbhavi 1st Stage": "Nagarbhavi",
+  "Basaveshwaranagar 1st Stage": "Basaveshwaranagar",
+  "Basaveshwaranagar 2nd Stage": "Basaveshwaranagar",
+  "Basaveshwaranagar 3rd Stage": "Basaveshwaranagar",
+  "BTM 1st Stage": "BTM Layout",
+  "BTM 2nd Stage": "BTM Layout",
+  "BTM 4th Stage": "BTM Layout",
+  "Banashankari 1st Stage": "Banashankari",
+  "Banashankari 2nd Stage": "Banashankari",
+  "Banashankari 3rd Stage": "Banashankari",
+  "Banashankari 4th Stage": "Banashankari",
+  "Banashankari 5th Stage": "Banashankari",
+  "HRBR Layout 1st Block": "HRBR Layout",
+  "HRBR Layout 2nd Block": "HRBR Layout",
+  "HRBR Layout 3rd Block": "HRBR Layout",
+  "Sahakara Nagar A Block": "Sahakara Nagar",
+  "Sahakara Nagar B Block": "Sahakara Nagar",
+  "Sahakara Nagar C Block": "Sahakara Nagar",
+  "Sahakara Nagar D Block": "Sahakara Nagar",
+  "Rajajinagar 1st Block": "Rajajinagar",
+  "Rajajinagar 2nd Block": "Rajajinagar",
+  "Rajajinagar 3rd Block": "Rajajinagar",
+  "Rajajinagar 4th Block": "Rajajinagar",
+  "Rajajinagar 5th Block": "Rajajinagar",
+  "Rajajinagar 6th Block": "Rajajinagar",
+  "Jayanagar 1st Block": "Jayanagar",
+  "Jayanagar 2nd Block": "Jayanagar",
+  "Jayanagar 3rd Block": "Jayanagar",
+  "Jayanagar 4th Block": "Jayanagar",
+  "Jayanagar 4th T Block": "Jayanagar",
+  "Jayanagar 5th Block": "Jayanagar",
+  "Jayanagar 6th Block": "Jayanagar",
+  "Jayanagar 7th Block": "Jayanagar",
+  "Jayanagar 8th Block": "Jayanagar",
+  "Jayanagar 9th Block": "Jayanagar",
+  "HSR Sector 1": "HSR Layout",
+  "HSR Sector 2": "HSR Layout",
+  "HSR Sector 3": "HSR Layout",
+  "HSR Sector 4": "HSR Layout",
+  "HSR Sector 5": "HSR Layout",
+  "HSR Sector 6": "HSR Layout",
+  "HSR Sector 7": "HSR Layout",
+}
+
+/** Every other name a locality's page covers: its own aliases plus the names folded into it. */
+export function localityAliases(l: Pick<Locality, "name" | "aliases">): string[] {
+  const folded = Object.entries(LOCALITY_ALIASES)
+    .filter(([, target]) => target === l.name)
+    .map(([alias]) => alias)
+  return [...new Set([...(l.aliases ?? []), ...folded])]
 }
 
 export function slugifyLocality(name: string): string {
@@ -737,7 +841,151 @@ const BATCH_3: Locality[] = BATCH_3_ROWS.trim()
     }
   })
 
-const ALL_PUBLISHED = [...PUBLISHED, ...BATCH_3]
+/* ---------------------------------------------------------------- */
+/* Batch 4 — new areas from the second master list (Nov 2026)        */
+/* Same row format as batch 3. Names from that list that are shared   */
+/* by several places in Bangalore are in HELD_BACK_BATCH_4 instead.   */
+/* ---------------------------------------------------------------- */
+
+const BATCH_4_ROWS = `
+Abbigere|North|n|Chikkabanavara;Jalahalli West;Hesaraghatta Road
+A Narayanapura|East|n|KR Puram;Mahadevapura;Hoodi
+Annapoorneshwari Nagar|West|n|Nagarbhavi 2nd Stage;Mallathahalli;Ullal
+Ashok Nagar|Central|n|Brigade Road;Richmond Town;Shantinagar
+Bharatiya City|North-East|n|Thanisandra;Kannur;Hegde Nagar
+Cambridge Layout|East|n|Ulsoor;Indiranagar;Murphy Town
+Chickpet|Central|c|Cottonpet;KR Market;Majestic;Sultanpet
+Chikkagubbi|North-East|t|Kothanur;Byrathi;Bagalur
+Chinnappanahalli|East|n|Marathahalli;Kundalahalli;Munnekollal
+Chokkanahalli|North-East|n|Thanisandra;Jakkur;Hegde Nagar
+Church Street|Central|r|MG Road;Brigade Road;Central Business District
+Coffee Board Layout|North|n|Hebbal Kempapura;Sahakara Nagar;Hebbal
+Commercial Street|Central|c|Shivajinagar;Infantry Road;MG Road
+Cubbon Park|Central|p|MG Road;Central Business District;Vasanth Nagar;Lavelle Road
+Cunningham Road|Central|r|Vasanth Nagar;Millers Road;Palace Road
+Doddaballapur Road|North|r|Yelahanka;Rajankunte;Doddaballapur
+Dr. Shivaram Karanth Layout|North|t|Yelahanka;Rajankunte;Hesaraghatta
+Gandhinagar|Central|c|Majestic;Seshadripuram;Chickpet
+Girinagar|South|n|Banashankari;Kathriguppe;Srinagar
+Gubbalala|South|n|Subramanyapura;Uttarahalli;Vasanthapura
+Haralur|South-East|n|HSR Layout;Kasavanahalli;Bellandur;Somasundarapalya
+Hegganahalli|West|n|Sunkadakatte;Peenya;Laggere
+Hejjala|West|t|Bidadi;Kengeri;Kumbalgodu
+Hongasandra|South-East|n|Bommanahalli;Begur;Mico Layout
+Hosahalli|West|n|Vijayanagar;Magadi Road;Attiguppe
+Hosur Road|South-East|r|Bommanahalli;Electronic City;Madiwala;Kudlu Gate
+ISRO Layout|South|n|Kumaraswamy Layout;Yelachenahalli;Uttarahalli
+Jarganahalli|South|n|JP Nagar;Sarakki;Kanakapura Road
+Johnson Market|Central|c|Richmond Town;Langford Town;Shantinagar
+Kaggalipura|South|t|Kanakapura Road;Talaghattapura;Somanahalli
+Kalasipalya|Central|c|KR Market;Chamarajpet;Cottonpet
+Kalena Agrahara|South|n|Bannerghatta Road;Hulimavu;Gottigere
+Kannur|North-East|t|Bagalur;Kothanur;Bharatiya City
+Kodathi|South-East|n|Carmelaram;Sarjapur Road;Doddakannelli
+Kodihalli|East|n|HAL;Old Airport Road;Murugeshpalya;Domlur
+Koppa Gate|South|t|Bannerghatta;Jigani;Gottigere
+Kottigepalya|West|n|Sunkadakatte;Magadi Road;Nagarbhavi
+Kumara Park|Central|n|Seshadripuram;Vasanth Nagar;Palace Road
+Lottegollahalli|North|n|RMV Extension;Sanjay Nagar;Mathikere
+Majestic|Central|c|Gandhinagar;Chickpet;Seshadripuram;Cottonpet
+Mallathahalli|West|n|Nagarbhavi;Jnana Bharathi;Ullal
+Malleswaram|North|n|Seshadripuram;Rajajinagar;Sadashivanagar;Yeshwanthpur;Vyalikaval
+Maruthi Seva Nagar|North-East|n|Banaswadi;Cox Town;Cooke Town
+Medahalli|East|n|KR Puram;Old Madras Road;Budigere
+Mico Layout|South-East|n|Bommanahalli;Hongasandra;BTM Layout
+Milk Colony|West|n|Subramanyanagar;Malleswaram;Rajajinagar
+Murugeshpalya|East|n|Old Airport Road;HAL;Kodihalli;Vimanapura
+Mysore Bank Colony|South|n|Srinagar;Banashankari;Basavanagudi
+Nagondanahalli|East|n|Whitefield;Hope Farm;Kadugodi
+Nimbekaipura|East|t|Budigere;Hoskote;Kannamangala
+NRI Layout|North-East|n|Ramamurthy Nagar;Horamavu;Kasturi Nagar
+Raghuvanahalli|South|n|Kanakapura Road;Talaghattapura;Konanakunte
+Residency Road|Central|r|Richmond Town;Brigade Road;Shantinagar
+Richmond Road|Central|r|Richmond Town;Langford Town;Shantinagar
+RMV Extension|North|n|Sadashivanagar;Sanjay Nagar;Lottegollahalli
+Sadananda Nagar|East|n|Kaggadasapura;CV Raman Nagar;Vignan Nagar
+Seetharampalya|East|n|Hoodi;Mahadevapura;Whitefield
+Shakambari Nagar|South|n|JP Nagar;Sarakki;Jayanagar
+Singapura|North|n|Vidyaranyapura;Abbigere;Jalahalli East
+Sir M Visvesvaraya Layout|West|n|Ullal;Kengeri Satellite Town;Jnana Bharathi
+Soladevanahalli|North|t|Hesaraghatta;Chikkabanavara;Abbigere
+Somanahalli|South|t|Kanakapura Road;Kaggalipura;Anjanapura
+Srigandhada Kavalu|West|n|Sunkadakatte;Nagarbhavi;Herohalli
+Srirampura|Central|n|Malleswaram;Seshadripuram;Rajajinagar
+Subramanyanagar|West|n|Rajajinagar;Malleswaram;Milk Colony
+Sultanpet|Central|c|Chickpet;Majestic;Cottonpet
+Thindlu|North|n|Vidyaranyapura;Kodigehalli;Sahakara Nagar
+Tumkur Road|North|r|Yeshwanthpur;Peenya;Dasarahalli;Nelamangala
+Vignan Nagar|East|n|CV Raman Nagar;Kaggadasapura;Marathahalli
+Vishwapriya Layout|South|n|Begur;Hongasandra;Bommanahalli
+Vyalikaval|Central|n|Malleswaram;Sadashivanagar;Seshadripuram
+Yamalur|East|n|Old Airport Road;Marathahalli;Kadubeesanahalli;Bellandur
+`
+
+/**
+ * Names from the second master list that are used for several different
+ * places in Bangalore (or whose location we couldn't pin down), so they
+ * get no page rather than a guessed one. Numbered blocks/stages that don't
+ * exist (e.g. "Indiranagar 8th Stage", "Malleswaram 9th Block") are not
+ * listed anywhere.
+ */
+export const HELD_BACK_BATCH_4 = [
+  "AECS Layout", "Agrahara", "Anandapura", "Byrasandra", "Canara Bank Layout", "Classic Paradise Layout",
+  "Corporation Layout", "D Group Employees Layout", "Doddabele", "East End Layout", "Gopalapura", "HMT Layout",
+  "ITI Layout", "Jalahalli Housing Board Layout", "Judicial Layout", "KHB Colony", "KHB Layout", "Kyalasanahalli",
+  "LIC Colony", "Marenahalli", "Maruthi Layout", "NGEF Layout", "Nehru Nagar", "Nisarga Layout", "P&T Colony",
+  "Prashanth Nagar", "Raghavendra Layout", "Rajiv Gandhi Nagar", "Ramagondanahalli", "Saraswathipuram Layout",
+  "Shankar Nagar", "Shiva Shakthi Nagar", "Siddapura", "Surya Nagar", "Teachers Colony", "Telecom Layout",
+  "Thirumagondanahalli",
+]
+
+/** Hand-written "about" text for the best-known batch-4 places. */
+const BATCH_4_ABOUT: Record<string, string> = {
+  Malleswaram:
+    "Malleswaram is one of Bangalore's oldest planned neighbourhoods, north-west of the city centre, known for Sampige Road, Margosa Road and its old temples and markets. Its numbered cross roads run between Seshadripuram, Rajajinagar and Yeshwanthpur.",
+  "Cubbon Park":
+    "Cubbon Park is the large public park in central Bangalore beside Vidhana Soudha, the High Court and the State Central Library, and one of the city's most popular spots for portrait, pre-wedding and street photography.",
+  Majestic:
+    "Majestic is the area around the Kempegowda bus station and Bangalore City railway station in central Bangalore — the city's main transport hub, next to Gandhinagar and Chickpet.",
+  "Commercial Street":
+    "Commercial Street is one of central Bangalore's best-known shopping streets, near Shivajinagar and Infantry Road, a short walk from MG Road.",
+  Chickpet:
+    "Chickpet is one of the oldest market areas in Bangalore, in the city centre, known for its wholesale silk, textile and wedding-shopping streets near Majestic and Cottonpet.",
+  "Church Street":
+    "Church Street runs parallel to MG Road in central Bangalore, lined with cafés, bookshops and restaurants between Brigade Road and St. Mark's Road.",
+  "Hosur Road":
+    "Hosur Road is the main highway south-east out of Bangalore, running from Madiwala and Bommanahalli past Electronic City towards Hosur.",
+  "Tumkur Road":
+    "Tumkur Road is the main highway north-west out of Bangalore, running from Yeshwanthpur past Peenya and Dasarahalli towards Nelamangala.",
+}
+
+function batch4About(name: string, region: Region, kind: string, nearby: string[]): string {
+  if (BATCH_4_ABOUT[name]) return BATCH_4_ABOUT[name]
+  if (kind === "p") {
+    const near = `${nearby.slice(0, -1).join(", ")} and ${nearby[nearby.length - 1]}`
+    return `${name} is a landmark in ${region} Bangalore and a popular photoshoot location, close to ${near}.`
+  }
+  return batch3About(name, region, kind, nearby)
+}
+
+const BATCH_4: Locality[] = BATCH_4_ROWS.trim()
+  .split("\n")
+  .map((line) => line.trim().split("|"))
+  .map(([name, region, kind, nearby]) => {
+    const near = nearby.split(";").map((n) => n.trim())
+    return {
+      name,
+      slug: slugifyLocality(name),
+      published: true,
+      region: region as Region,
+      proximity: kind === "t" ? ("outskirts" as const) : ("city" as const),
+      nearby: near,
+      about: batch4About(name, region as Region, kind, near),
+      ...(name === "Cubbon Park" ? { focus: ["cameras", "lenses", "lighting", "gimbals"] as InventoryGroupKey[] } : {}),
+    }
+  })
+
+const ALL_PUBLISHED = [...PUBLISHED, ...BATCH_3, ...BATCH_4]
 const publishedNames = new Set(ALL_PUBLISHED.map((l) => l.name))
 
 export const LOCALITIES: Locality[] = [
@@ -796,6 +1044,11 @@ export function validateLocalities(list: Locality[] = LOCALITIES): string[] {
     if (names.has(l.name)) problems.push(`Duplicate name "${l.name}"`)
     names.add(l.name)
     if (l.slug !== slugifyLocality(l.name)) problems.push(`Slug "${l.slug}" should be "${slugifyLocality(l.name)}"`)
+  }
+
+  for (const [alias, target] of Object.entries(LOCALITY_ALIASES)) {
+    if (names.has(alias)) problems.push(`Alias "${alias}" is also a locality name`)
+    if (!list.some((l) => l.name === target)) problems.push(`Alias "${alias}" points to unknown "${target}"`)
   }
 
   for (const l of list.filter((x) => x.published)) {
