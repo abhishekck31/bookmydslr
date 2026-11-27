@@ -10,6 +10,86 @@ import { formatShortDate, fromISODate, toISODate } from "@/lib/film"
 
 export const MAX_RENTAL_DAYS = 60
 
+/** Hourly pickup / return slots offered to customers. */
+export const RENTAL_TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"]
+export const DEFAULT_RENTAL_TIME = "10:00"
+
+/**
+ * Billing is per 24 hours from the pickup time. Returning any time after the pickup
+ * time-of-day (even a minute late) starts another 24-hour block.
+ */
+export function billableDays(calendarDays: number, pickupTime: string, returnTime: string) {
+  return Math.max(1, calendarDays + (returnTime > pickupTime ? 1 : 0))
+}
+
+/** "14:00" → "2:00 PM" */
+export function formatTime(t: string) {
+  const [h, m] = t.split(":").map(Number)
+  if (Number.isNaN(h)) return t
+  const suffix = h >= 12 ? "PM" : "AM"
+  return `${h % 12 || 12}:${String(m || 0).padStart(2, "0")} ${suffix}`
+}
+
+/** Pickup + return time selects, laid out to match RentalRangePicker's two columns. */
+export function RentalTimePicker({
+  pickupTime,
+  returnTime,
+  onChange,
+  idPrefix = "rental",
+  className,
+}: {
+  pickupTime: string
+  returnTime: string
+  onChange: (times: { pickupTime: string; returnTime: string }) => void
+  idPrefix?: string
+  className?: string
+}) {
+  const select =
+    "h-12 w-full border border-border-strong bg-background px-4 text-[15px] text-foreground focus:border-primary focus:outline-none"
+  return (
+    <div className={cn("grid grid-cols-2 gap-4", className)}>
+      <div>
+        <label htmlFor={`${idPrefix}-pickup-time`} className="label-mono mb-2 block text-muted-foreground">
+          Pickup time
+        </label>
+        <select
+          id={`${idPrefix}-pickup-time`}
+          value={pickupTime}
+          // The 24h clock starts at pickup, so the return time moves with it.
+          onChange={(e) => onChange({ pickupTime: e.target.value, returnTime: e.target.value })}
+          className={select}
+        >
+          {RENTAL_TIMES.map((t) => (
+            <option key={t} value={t}>
+              {formatTime(t)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label htmlFor={`${idPrefix}-return-time`} className="label-mono mb-2 block text-muted-foreground">
+          Return time
+        </label>
+        <select
+          id={`${idPrefix}-return-time`}
+          value={returnTime}
+          onChange={(e) => onChange({ pickupTime, returnTime: e.target.value })}
+          className={select}
+        >
+          {RENTAL_TIMES.map((t) => (
+            <option key={t} value={t}>
+              {formatTime(t)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <p className="col-span-2 -mt-2 text-sm text-muted-foreground">
+        Your 24-hour day starts at pickup. Return by {formatTime(pickupTime)} on the return date; any later counts as an extra day.
+      </p>
+    </div>
+  )
+}
+
 export function DaysStepper({
   value,
   onChange,

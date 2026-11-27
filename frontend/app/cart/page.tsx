@@ -19,13 +19,12 @@ import {
   whatsappLink,
 } from "@/lib/film"
 import { Arrow, EmptyState, FilmButton, FrameLabel, WhatsAppIcon } from "@/components/film/primitives"
-import { DaysStepper, RentalRangePicker } from "@/components/film/rental-controls"
+import { DEFAULT_RENTAL_TIME, DaysStepper, RentalRangePicker, RentalTimePicker, billableDays, formatTime } from "@/components/film/rental-controls"
 import { MobileStickyBar } from "@/components/film/mobile-sticky-bar"
 import { TierTable, useDurationTiers } from "@/components/film/duration-tiers"
 import { trackWhatsAppClick } from "@/lib/track"
 
 const DELIVERY_FEE = 200
-const TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"]
 
 type Customer = { name: string; phone: string; city: string; address: string; pincode: string; notes: string }
 type Field = keyof Customer
@@ -137,8 +136,6 @@ export default function CartPage() {
   const { items, removeItem, updateItemDays, dates, setDates, setAllDays } = useCart()
   const { toast } = useToast()
 
-  const [pickupTime, setPickupTime] = React.useState("10:00")
-  const [returnTime, setReturnTime] = React.useState("10:00")
   const [method, setMethod] = React.useState<"pickup" | "delivery">("pickup")
   const [customer, setCustomer] = React.useState<Customer>({ name: "", phone: "", city: "Bangalore", address: "", pincode: "", notes: "" })
   const [errors, setErrors] = React.useState<Partial<Record<Field, boolean>>>({})
@@ -148,6 +145,12 @@ export default function CartPage() {
   const fallbackStart = tomorrowISO()
   const start = dates && dates.start >= fallbackStart ? dates.start : fallbackStart
   const end = dates && dates.start >= fallbackStart ? dates.end : addDaysISO(fallbackStart, maxDays)
+  const pickupTime = dates?.pickupTime ?? DEFAULT_RENTAL_TIME
+  const returnTime = dates?.returnTime ?? DEFAULT_RENTAL_TIME
+  // Billed per 24h from pickup time: a later return time adds a day.
+  const calendarDays = daysBetween(start, end)
+  const billed = billableDays(calendarDays, pickupTime, returnTime)
+  const lateExtra = billed > calendarDays
 
   const setCustomerField = (k: Field) => (v: string) => {
     setCustomer((c) => ({ ...c, [k]: v }))
@@ -188,8 +191,8 @@ City: ${customer.city}
 ${method === "delivery" ? `Delivery to: ${customer.address}, ${customer.pincode}` : "Method: Self pickup (Kalyan Nagar)"}
 
 *Schedule*
-Pickup: ${formatShortDate(start)} at ${pickupTime}
-Return: ${formatShortDate(end)} at ${returnTime}
+Pickup: ${formatShortDate(start)} at ${formatTime(pickupTime)}
+Return: ${formatShortDate(end)} at ${formatTime(returnTime)}
 
 *Gear*
 ${lines}
@@ -256,34 +259,28 @@ Notes: ${customer.notes.trim() || "None"}`
                 start={start}
                 end={end}
                 onChange={(r) => {
-                  setDates(r)
-                  setAllDays(daysBetween(r.start, r.end))
+                  setDates({ ...r, pickupTime, returnTime })
+                  setAllDays(billableDays(daysBetween(r.start, r.end), pickupTime, returnTime))
                 }}
               />
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="pickup-time" className="label-mono mb-2 block text-muted-foreground">
-                    Pickup time
-                  </label>
-                  <select id="pickup-time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className={cn(fieldCls, "bg-background")}>
-                    {TIMES.map((t) => (
-                      <option key={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="return-time" className="label-mono mb-2 block text-muted-foreground">
-                    Return time
-                  </label>
-                  <select id="return-time" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} className={cn(fieldCls, "bg-background")}>
-                    {TIMES.map((t) => (
-                      <option key={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+              <RentalTimePicker
+                idPrefix="cart"
+                className="mt-4"
+                pickupTime={pickupTime}
+                returnTime={returnTime}
+                onChange={(t) => {
+                  setDates({ start, end, ...t })
+                  setAllDays(billableDays(calendarDays, t.pickupTime, t.returnTime))
+                }}
+              />
+              {lateExtra ? (
+                <p className="mt-3 text-sm text-danger">
+                  +1 day: return at {formatTime(returnTime)} is after the {formatTime(pickupTime)} pickup time. Rentals are billed
+                  per 24 hours, so even a minute late counts as another day.
+                </p>
+              ) : null}
               <p className="mt-3 text-sm text-muted-foreground">
-                Changing the dates sets every item to {daysBetween(start, end)} {daysBetween(start, end) === 1 ? "day" : "days"}. Adjust a single item with its own stepper.
+                Changing the dates or times sets every item to {billed} {billed === 1 ? "day" : "days"}. Adjust a single item with its own stepper.
               </p>
             </section>
 

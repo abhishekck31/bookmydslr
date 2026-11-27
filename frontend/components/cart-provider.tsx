@@ -13,8 +13,8 @@ export type CartItem = {
   brand?: string
 }
 
-/** Shared rental window (ISO yyyy-mm-dd). Chosen on the product page, editable in the cart. */
-export type RentalDates = { start: string; end: string }
+/** Shared rental window (ISO yyyy-mm-dd, times HH:mm). Chosen on the product page, editable in the cart. */
+export type RentalDates = { start: string; end: string; pickupTime?: string; returnTime?: string }
 
 type CartContextType = {
   items: CartItem[]

@@ -22,7 +22,7 @@ import {
   whatsappLink,
 } from "@/lib/film"
 import { Arrow, Availability, DiscountBadge, FilmButton, PriceTag, WhatsAppIcon } from "./primitives"
-import { DaysStepper, RentalRangePicker } from "./rental-controls"
+import { DEFAULT_RENTAL_TIME, DaysStepper, RentalRangePicker, RentalTimePicker, billableDays, formatTime } from "./rental-controls"
 import { FilmAccordion } from "./faq"
 import { ContactSheet, FilmProductCard } from "./product-card"
 import { MobileStickyBar } from "./mobile-sticky-bar"
@@ -38,22 +38,29 @@ export function ProductDetail({ product, related }: { product: Product; related:
 
   const [start, setStart] = React.useState(() => tomorrowISO())
   const [days, setDays] = React.useState(1)
+  const [pickupTime, setPickupTime] = React.useState(DEFAULT_RENTAL_TIME)
+  const [returnTime, setReturnTime] = React.useState(DEFAULT_RENTAL_TIME)
 
-  // Reuse the dates already chosen for the cart, if they are still in the future.
+  // Reuse the dates and times already chosen for the cart, if they are still in the future.
   React.useEffect(() => {
     if (dates && dates.start >= tomorrowISO()) {
       setStart(dates.start)
       setDays(daysBetween(dates.start, dates.end))
     }
+    if (dates?.pickupTime) setPickupTime(dates.pickupTime)
+    if (dates?.returnTime) setReturnTime(dates.returnTime)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const end = addDaysISO(start, days)
-  const subtotal = pricing.price * days
-  const total = rentalTotal(pricing.price, days, tiers)
+  // Billed per 24h from pickup time: a later return time adds a day.
+  const billed = billableDays(days, pickupTime, returnTime)
+  const lateExtra = billed > days
+  const subtotal = pricing.price * billed
+  const total = rentalTotal(pricing.price, billed, tiers)
   const saving = subtotal - total
-  const tier = tierFor(days, tiers)
-  const upcoming = nextTier(days, tiers)
+  const tier = tierFor(billed, tiers)
+  const upcoming = nextTier(billed, tiers)
 
   const handleAdd = () => {
     addItem({
@@ -61,11 +68,11 @@ export function ProductDetail({ product, related }: { product: Product; related:
       name: product.name,
       price: pricing.price,
       image: product.image || "/placeholder.svg",
-      days,
+      days: billed,
       category: product.category?.name ?? "Equipment",
       brand: product.brand,
     })
-    setDates({ start, end })
+    setDates({ start, end, pickupTime, returnTime })
     triggerCartGlow()
   }
 
@@ -73,7 +80,9 @@ export function ProductDetail({ product, related }: { product: Product; related:
     "Hi Book My DSLR, I'd like to rent:",
     "",
     `${product.name}${product.brand ? ` (${product.brand})` : ""}`,
-    `Dates: ${formatShortDate(start)} → ${formatShortDate(end)} (${days} ${days === 1 ? "day" : "days"})`,
+    `Pickup: ${formatShortDate(start)} at ${formatTime(pickupTime)}`,
+    `Return: ${formatShortDate(end)} at ${formatTime(returnTime)}`,
+    `Duration: ${billed} ${billed === 1 ? "day" : "days"} (billed per 24 hours)`,
     `Rate: ${formatINR(pricing.price)}/day`,
     ...(tier && saving > 0 ? [`Duration discount: ${formatPercent(tier.percent)} (−${formatINR(saving)})`] : []),
     `Estimated total: ${formatINR(total)}`,
@@ -87,7 +96,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
     ["Frame code", code],
     ["Status", product.isAvailable ? "Available" : "Booked"],
     ["Day rate", formatINR(pricing.price)],
-    ["Billing", "Per 24 hours"],
+    ["Billing", "Per 24 hours from pickup"],
   ]
 
   const accordion = [
@@ -111,7 +120,10 @@ export function ProductDetail({ product, related }: { product: Product; related:
       question: "Rental terms",
       answer: (
         <ul className="space-y-2">
-          <li>Rental runs from pickup or delivery to the agreed return date; any part of a day counts as a day.</li>
+          <li>
+            Rentals are billed per 24 hours from your pickup time. Returning even a minute after that time starts
+            another day — e.g. pick up at 10:00 AM, return by 10:00 AM to avoid an extra day.
+          </li>
           <li>A refundable security deposit may be required for some gear or first-time renters.</li>
           <li>Late returns are charged at the daily rate for each day overdue.</li>
           <li>Cancel more than 48 hours ahead for a full refund; later cancellations may carry a 50% fee.</li>
@@ -197,16 +209,31 @@ export function ProductDetail({ product, related }: { product: Product; related:
                   setDays(daysBetween(r.start, r.end))
                 }}
               />
+              <RentalTimePicker
+                idPrefix="product"
+                pickupTime={pickupTime}
+                returnTime={returnTime}
+                onChange={(t) => {
+                  setPickupTime(t.pickupTime)
+                  setReturnTime(t.returnTime)
+                }}
+              />
               <DaysStepper value={days} onChange={setDays} />
             </div>
 
             <div className="mt-6 border border-dashed border-border-strong p-4" aria-live="polite">
               <p className="flex flex-wrap items-baseline justify-between gap-2 text-[15px] text-body">
                 <span>
-                  {days} {days === 1 ? "day" : "days"} × {formatINR(pricing.price)}
+                  {billed} {billed === 1 ? "day" : "days"} × {formatINR(pricing.price)}
                 </span>
                 <span className="price text-foreground">{formatINR(subtotal)}</span>
               </p>
+              {lateExtra ? (
+                <p className="mt-2 text-sm text-danger">
+                  Includes +1 day: return at {formatTime(returnTime)} is after the {formatTime(pickupTime)} pickup time.
+                  Return by {formatTime(pickupTime)} to keep it at {days} {days === 1 ? "day" : "days"}.
+                </p>
+              ) : null}
               {tier && saving > 0 ? (
                 <p className="mt-2 flex justify-between gap-2 text-sm text-success">
                   <span>
@@ -229,7 +256,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
               ) : null}
             </div>
 
-            <TierTable days={days} className="mt-6" />
+            <TierTable days={billed} className="mt-6" />
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {product.isAvailable ? (
